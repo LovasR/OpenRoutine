@@ -1,3 +1,34 @@
 <resources>
     <string name="app_name">Time Allocator</string>
+    <string-array name="cycles">
+        <item>5</item>
+        <item>10</item>
+        <item>15</item>
+        <item>30</item>
+        <item>60</item>
+    </string-array>
+
+    <!--Notification-->
+    <string name="channel_name">Time Allocator</string>
+    <string name="channel_description">Test description</string>
+
+    <string name="notification_title">Hey!</string>
+    <string name="notification_content_text">Are you doing, %1$s?</string>
+
+
+    <string name="notification_action">Already on it</string>
+    <string name="notification_action_other_activity">Doing something else</string>
+    <string name="notification_other_activity">Choose other activity:</string>
+
+    <!-- Settings -->
+    <string name="cycle_setting">Set the intervals of notifications:</string>
+
+
+    <string-array name="default_activities">
+        <item>Studying</item>
+        <item>Work</item>
+        <item>Sports</item>
+        <item>Leisure</item>
+        <item>Doomscrolling</item>
+    </string-array>
 </resources>
