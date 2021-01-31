@@ -23,6 +23,8 @@ public class ATNotificationManager {
     public static void notif(Context context){
         createNotificationChannel(context);
 
+        //TODO make notification responses more flexible
+
         Intent actionTestIntent = new Intent(context, ATBroadcastReceiver.class);
         actionTestIntent.setAction(ACTION_ACTION);
         actionTestIntent.putExtra(EXTRA_NOTIFICATION_ID, 0);
@@ -35,7 +37,7 @@ public class ATNotificationManager {
         actionOtherActivityIntent.putExtra("notificationID", notificationID);
         PendingIntent actionOtherActivityPendingIntent = PendingIntent.getBroadcast(context, 0, actionOtherActivityIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(context, CHANNEL_ID).setSmallIcon(R.drawable.ic_launcher_foreground).setContentTitle(context.getString(R.string.notification_title)).setContentText(String.format(context.getString(R.string.notification_content_text), CycleManager.getCurrentActivity())).setPriority(NotificationCompat.PRIORITY_DEFAULT).addAction(R.drawable.ic_launcher_foreground, context.getString(R.string.notification_action), actionTestPendingIntent).addAction(R.drawable.ic_launcher_foreground, context.getString(R.string.notification_action_other_activity), actionOtherActivityPendingIntent);
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(context, CHANNEL_ID).setSmallIcon(R.drawable.ic_launcher_foreground).setContentTitle(context.getString(R.string.notification_title)).setContentText(String.format(context.getString(R.string.notification_content_text), CycleManager.currentActivityType.name)).setPriority(NotificationCompat.PRIORITY_DEFAULT).addAction(R.drawable.ic_launcher_foreground, context.getString(R.string.notification_action), actionTestPendingIntent).addAction(R.drawable.ic_launcher_foreground, context.getString(R.string.notification_action_other_activity), actionOtherActivityPendingIntent);
 
         NotificationManagerCompat notificationManager = NotificationManagerCompat.from(context);
 

@@ -10,13 +10,16 @@ public class ATBroadcastReceiver extends android.content.BroadcastReceiver {
         Log.e("Notification_test", intent.toString());
         switch(intent.getAction()){
             case ATNotificationManager.ACTION_ACTION:
-                Log.e("Notification_test", "action performed");
+                CycleManager.cycleChecked();
                 break;
             case ATNotificationManager.ACTION_OTHER_ACTIVITY:
                 Intent intent1 = new Intent(context, OtherActivityDialog.class);
                 intent1.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 intent1.putExtra("notificationID", intent.getIntExtra("notificationID", 0));
                 context.startActivity(intent1);
+                break;
+            case CycleManager.ACTION_CHECK:
+                CycleManager.cycleCheck(context);
                 break;
         }
     }
