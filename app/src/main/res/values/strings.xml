@@ -31,4 +31,12 @@
         <item>Leisure</item>
         <item>Doomscrolling</item>
     </string-array>
+
+    <string name="buttonDone">Done</string>
+    <string name="day_item_name_hint">Name of the activity</string>
+    <string name="set_day_name_start">Set start</string>
+    <string name="set_day_name_end">Set end</string>
+    <string name="from">From:</string>
+    <string name="to">To:</string>
+
 </resources>

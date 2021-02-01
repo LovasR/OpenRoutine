@@ -37,12 +37,12 @@ public class ATNotificationManager {
         actionOtherActivityIntent.putExtra("notificationID", notificationID);
         PendingIntent actionOtherActivityPendingIntent = PendingIntent.getBroadcast(context, 0, actionOtherActivityIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(context, CHANNEL_ID).setSmallIcon(R.drawable.ic_launcher_foreground).setContentTitle(context.getString(R.string.notification_title)).setContentText(String.format(context.getString(R.string.notification_content_text), CycleManager.currentActivityType.name)).setPriority(NotificationCompat.PRIORITY_DEFAULT).addAction(R.drawable.ic_launcher_foreground, context.getString(R.string.notification_action), actionTestPendingIntent).addAction(R.drawable.ic_launcher_foreground, context.getString(R.string.notification_action_other_activity), actionOtherActivityPendingIntent);
+        /*NotificationCompat.Builder builder = new NotificationCompat.Builder(context, CHANNEL_ID).setSmallIcon(R.drawable.ic_launcher_foreground).setContentTitle(context.getString(R.string.notification_title)).setContentText(String.format(context.getString(R.string.notification_content_text), CycleManager.currentActivityType.name)).setPriority(NotificationCompat.PRIORITY_DEFAULT).addAction(R.drawable.ic_launcher_foreground, context.getString(R.string.notification_action), actionTestPendingIntent).addAction(R.drawable.ic_launcher_foreground, context.getString(R.string.notification_action_other_activity), actionOtherActivityPendingIntent);
 
         NotificationManagerCompat notificationManager = NotificationManagerCompat.from(context);
 
         notificationManager.notify(notificationID, builder.build());
-        notificationID++;
+        notificationID++;*/
     }
     private static void createNotificationChannel(Context context) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {

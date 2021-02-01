@@ -20,6 +20,8 @@
             android:launchMode="singleInstance" android:excludeFromRecents="true"
             android:taskAffinity="" android:theme="@style/Theme.AppCompat.Dialog">
         </activity>
+
+        <activity android:name=".DayItemActivity"/>
         <receiver
             android:name=".ATBroadcastReceiver"
             android:enabled="true"

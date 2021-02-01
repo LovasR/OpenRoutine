@@ -16,13 +16,14 @@ public class DayInit {
 
         //TODO load from save the daily activities
 
+        CycleManager.currentDay = today;
+        CycleManager.currentItem = today.getDayItem(Calendar.getInstance().getTime());
 
-
-        for(int i = 0; i < 24 * (60 / CycleManager.cycleTime); i++){
+        /*for(int i = 0; i < 24 * (60 / CycleManager.cycleTime); i++){
             Cycle cycle = new Cycle();
             cycle.index = i;
             cycle.dayItem = today.getDayItem(Calendar.getInstance().getTime());
-        }
+        }*/
 
     }
 }

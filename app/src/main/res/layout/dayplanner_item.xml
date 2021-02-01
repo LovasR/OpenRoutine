@@ -3,12 +3,37 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="horizontal"
+    android:orientation="vertical"
     android:foreground="?android:attr/selectableItemBackground"
-    android:id="@+id/dayPlannerItemLinearLayout">
-    <Spinner
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:id="@+id/dayPlannerItemSpinner"
-        android:layout_marginVertical="10dp"/>
+    android:id="@+id/dayPlannerItemLinearLayout"
+    android:background="@drawable/outline_background"
+    android:padding="10dp">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/dayPlannerItemStart"
+        android:gravity="center"
+        android:layout_marginHorizontal="10dp"
+        android:layout_marginTop="4dp"/>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:id="@+id/dayPlannerItem"
+            android:gravity="center"
+            android:layout_marginHorizontal="10dp"/>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:paddingHorizontal="10dp"
+            android:padding="10dp"
+            android:id="@+id/dayPlannerItemActivity"/>
+    </LinearLayout>
+
 </LinearLayout>

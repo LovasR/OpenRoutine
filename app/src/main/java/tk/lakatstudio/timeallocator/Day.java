@@ -26,4 +26,14 @@ public class Day {
     void setDayItem(){
 
     }
+
+
+    void addDayItem(DayItem newDayItem){
+        for(int i = 0; i < dayItems.size(); i++){
+            DayItem dayItem = dayItems.get(i);
+            if(dayItem.start.getTime() < newDayItem.start.getTime() && dayItem.end.getTime() < newDayItem.start.getTime()){
+                dayItems.add(i + 1, newDayItem);
+            }
+        }
+    }
 }

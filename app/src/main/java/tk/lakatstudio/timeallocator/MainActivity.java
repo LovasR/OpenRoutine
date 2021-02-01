@@ -5,22 +5,25 @@ import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
+import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
+import android.view.ViewOutlineProvider;
 import android.widget.ArrayAdapter;
+import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -40,13 +43,22 @@ public class MainActivity extends AppCompatActivity {
         testSpinner.setSelection(4);
 
 
-        //notif_test
-        ATNotificationManager.notif(this);
+        //TODO notif_test
+        //ATNotificationManager.notif(this);
 
         for(String aTName : getResources().getStringArray(R.array.default_activities)){
             Log.e("AT_test", aTName);
             ActivityType.addActivityType(aTName, Color.valueOf(Color.parseColor("#883FBF5F")));
         }
+
+        ImageButton addDayItem = findViewById(R.id.addDayItemButton);
+        addDayItem.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(MainActivity.this, DayItemActivity.class);
+                startActivity(intent);
+            }
+        });
 
         dayPlannerInit(Integer.parseInt(testSpinner.getSelectedItem().toString()));
     }
@@ -60,44 +72,41 @@ public class MainActivity extends AppCompatActivity {
             items.add(at.name);
         }
 
-        //TODO replace adapter<spinner> with adapter<string> and init spinners adapters in getView
         ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(this, R.layout.dayplanner_item, getResources().getStringArray(R.array.default_activities)){
-            @RequiresApi(api = Build.VERSION_CODES.O)
             @NonNull
             @Override
             public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
                 if(convertView==null){
                     convertView = getLayoutInflater().inflate(R.layout.dayplanner_item, null);
                 }
-                Spinner spinner = convertView.findViewById(R.id.dayPlannerItemSpinner);
-                ArrayAdapter adapter = new ArrayAdapter<String>(getContext(), android.R.layout.simple_spinner_item, items){
-                    @NonNull
+                convertView.setOutlineProvider(ViewOutlineProvider.BACKGROUND);
+                convertView.setOnClickListener(new View.OnClickListener() {
                     @Override
-                    public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
-                        if(convertView==null){
-                            convertView = getLayoutInflater().inflate(R.layout.spinner_dropdown_item, null);
-                        }
-                        TextView textView = (TextView) convertView;
-                        convertView.setBackground(getDrawable(R.drawable.spinner_background));
-                        textView.setText(items.get(position));
-                        //convertView.setBackgroundColor(ActivityType.allActivityTypes.get(position).color.toArgb());
-                        return convertView;
-                    }
-                };
-                adapter.setDropDownViewResource(R.layout.spinner_dropdown_item);
-                spinner.getBackground().setColorFilter(Color.parseColor("#00000000"), PorterDuff.Mode.SRC);
-                spinner.setPopupBackgroundDrawable(getDrawable(R.drawable.spinner_background));
-
-                spinner.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                    @Override
-                    public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-
+                    public void onClick(View view) {
+                        Toast.makeText(getContext(), "povo", Toast.LENGTH_SHORT).show();
                     }
                 });
-                spinner.setAdapter(adapter);
+
+                //DayItem dayItem = CycleManager.currentDay.dayItems.get(position);
+
+
+                TextView itemStart = convertView.findViewById(R.id.dayPlannerItemStart);
+                itemStart.setText("04:20");
+
+                TextView itemName = convertView.findViewById(R.id.dayPlannerItem);
+                itemName.setText("Mi havas gefiloj en mia kelo");
+                //TODO fix for ling items
+
+                TextView itemType = convertView.findViewById(R.id.dayPlannerItemActivity);
+                itemType.setText("povo aktiveco");
+
+                Drawable drawable = getDrawable(R.drawable.spinner_background);
+                drawable.setColorFilter(Color.parseColor("#3FBF5F"), PorterDuff.Mode.SRC);
+                itemType.setBackground(drawable);
                 return convertView;
             }
         };
+        dayPlanner.setDividerHeight(10);
         dayPlanner.setAdapter(arrayAdapter);
     }
 }
