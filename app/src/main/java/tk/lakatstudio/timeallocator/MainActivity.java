@@ -5,12 +5,14 @@ import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,8 +24,14 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Locale;
+
+import javax.security.auth.login.LoginException;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -33,17 +41,15 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        Spinner testSpinner = findViewById(R.id.testCycleSpinner);
+        /*Spinner testSpinner = findViewById(R.id.testCycleSpinner);
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this, R.array.cycles, android.R.layout.simple_spinner_item);
         for(int i = 0; i < ActivityType.userActivityTypes.size(); i++) {
             adapter.add(ActivityType.userActivityTypes.get(i).name);
         }
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         testSpinner.setAdapter(adapter);
-        testSpinner.setSelection(4);
+        testSpinner.setSelection(4);*/
 
-
-        //TODO notif_test
         //ATNotificationManager.notif(this);
 
         for(String aTName : getResources().getStringArray(R.array.default_activities)){
@@ -60,45 +66,75 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        dayPlannerInit(Integer.parseInt(testSpinner.getSelectedItem().toString()));
+        DayInit.init(getBaseContext());
+
     }
 
-    void dayPlannerInit(int cycleLength){
+    @Override
+    protected void onResume() {
+        dayPlannerInit();
+        Log.e("UI_test", "onresume");
+        super.onResume();
+    }
+
+    private String lengthAdapter(Date start, Date end){
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(end);
+        int hours = calendar.get(Calendar.HOUR_OF_DAY);
+        int minutes = calendar.get(Calendar.MINUTE);
+        calendar.setTime(start);
+        hours -= calendar.get(Calendar.HOUR_OF_DAY);
+        minutes -= calendar.get(Calendar.MINUTE);
+
+        calendar.set(Calendar.HOUR_OF_DAY, hours);
+        calendar.set(Calendar.MINUTE, minutes);
+
+        String out = "";
+        if(hours > 0){
+            out += new SimpleDateFormat("H", Locale.getDefault()).format(calendar.getTime()) + " " + getString(R.string.hour_short) + " ";
+        }
+        if(minutes > 0 || (hours == 0 && minutes == 0)){
+            out += new SimpleDateFormat("mm", Locale.getDefault()).format(calendar.getTime()) + " " + getString(R.string.minutes_short);
+        }
+        return out;
+    }
+
+    public void dayPlannerInit(){
         ListView dayPlanner = findViewById(R.id.testDayPlanner);
 
-        final ArrayList<String> items = new ArrayList<String>();
-        items.addAll(Arrays.asList(getResources().getStringArray(R.array.default_activities)));
-        for(ActivityType at : ActivityType.userActivityTypes) {
-            items.add(at.name);
-        }
-
-        ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(this, R.layout.dayplanner_item, getResources().getStringArray(R.array.default_activities)){
+        ArrayAdapter<DayItem> arrayAdapter = new ArrayAdapter<DayItem>(this, R.layout.dayplanner_item, CycleManager.currentDay.dayItems){
             @NonNull
             @Override
             public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
                 if(convertView==null){
                     convertView = getLayoutInflater().inflate(R.layout.dayplanner_item, null);
                 }
+                final DayItem dayItem = CycleManager.currentDay.dayItems.get(position);
+
                 convertView.setOutlineProvider(ViewOutlineProvider.BACKGROUND);
                 convertView.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        Toast.makeText(getContext(), "povo", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getContext(), dayItem.name, Toast.LENGTH_SHORT).show();
                     }
                 });
 
-                //DayItem dayItem = CycleManager.currentDay.dayItems.get(position);
-
-
                 TextView itemStart = convertView.findViewById(R.id.dayPlannerItemStart);
-                itemStart.setText("04:20");
+                itemStart.setText(new SimpleDateFormat("HH:mm", Locale.getDefault()).format(dayItem.start.getTime()));
+
+                TextView itemLength = convertView.findViewById(R.id.dayPlannerItemLength);
+                itemLength.setText(lengthAdapter(dayItem.start, dayItem.end));
 
                 TextView itemName = convertView.findViewById(R.id.dayPlannerItem);
-                itemName.setText("Mi havas gefiloj en mia kelo");
-                //TODO fix for ling items
+                if (dayItem.name.length() != 0){
+                    itemName.setText(dayItem.name);
+                    itemName.setVisibility(View.VISIBLE);
+                } else {
+                    itemName.setVisibility(View.GONE);
+                }
 
                 TextView itemType = convertView.findViewById(R.id.dayPlannerItemActivity);
-                itemType.setText("povo aktiveco");
+                itemType.setText(dayItem.type.name);
 
                 Drawable drawable = getDrawable(R.drawable.spinner_background);
                 drawable.setColorFilter(Color.parseColor("#3FBF5F"), PorterDuff.Mode.SRC);

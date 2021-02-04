@@ -9,13 +9,25 @@
     android:background="@drawable/outline_background"
     android:padding="10dp">
 
-    <TextView
+    <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/dayPlannerItemStart"
-        android:gravity="center"
-        android:layout_marginHorizontal="10dp"
-        android:layout_marginTop="4dp"/>
+        android:orientation="horizontal">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/dayPlannerItemStart"
+            android:gravity="center"
+            android:layout_marginHorizontal="10dp"
+            android:layout_marginTop="4dp"/>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/dayPlannerItemLength"
+            android:gravity="center"
+            android:layout_marginHorizontal="10dp"
+            android:layout_marginTop="4dp"/>
+    </LinearLayout>
 
     <LinearLayout
         android:layout_width="wrap_content"
@@ -24,12 +36,18 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
+            android:layout_weight="10"
             android:id="@+id/dayPlannerItem"
             android:gravity="center"
-            android:layout_marginHorizontal="10dp"/>
+            android:layout_marginHorizontal="10dp"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:maxLength="28"/>
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
+            android:layout_weight="90"
+            android:layout_gravity="end"
             android:gravity="center"
             android:paddingHorizontal="10dp"
             android:padding="10dp"

@@ -7,7 +7,8 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:gravity="center_vertical">
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/outlinedTextField"
             android:layout_width="match_parent"
@@ -61,6 +62,24 @@
                 android:id="@+id/addDayItemEndTime"
                 android:text="@string/set_day_name_end"
                 android:background="@drawable/outline_background"
+                android:padding="15dp"/>
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_margin="10dp">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:paddingEnd="10dp"
+                android:text="@string/from"/>
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/addDayItemActivity"
+                android:background="@drawable/spinner_background"
                 android:padding="15dp"/>
         </LinearLayout>
         <Button

@@ -39,4 +39,7 @@
     <string name="from">From:</string>
     <string name="to">To:</string>
 
+    <string name="hour_short">h</string>
+    <string name="minutes_short">min</string>
+
 </resources>

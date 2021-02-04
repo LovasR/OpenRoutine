@@ -15,10 +15,10 @@ public class ActivityType {
 
     static ArrayList<ActivityType> userActivityTypes = new ArrayList<ActivityType>();
 
-    ActivityType(String name, int ID, Color color){
-        name = name;
-        ID = ID;
-        color = color;
+    ActivityType(String n, int id, Color c){
+        name = n;
+        ID = id;
+        color = c;
     }
 
     ActivityType(){ }

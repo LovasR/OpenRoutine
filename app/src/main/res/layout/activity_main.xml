@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:id="@+id/mainActivityRoot"
     tools:context=".MainActivity">
 
     <LinearLayout
@@ -11,7 +12,7 @@
         android:layout_height="match_parent"
         android:orientation="vertical"
         android:id="@+id/mainLayout">
-        <TextView
+        <!--TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/cycle_setting"/>
@@ -19,7 +20,7 @@
         <Spinner
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/testCycleSpinner"/>
+            android:id="@+id/testCycleSpinner"/-->
 
         <ListView
             android:layout_width="match_parent"
@@ -38,7 +39,8 @@
         android:background="@drawable/spinner_background"
         android:layout_alignBottom="@+id/mainLayout"
         android:src="@drawable/ic_baseline_add_24"
-        android:layout_marginHorizontal="10dp"/>
+        android:layout_marginHorizontal="10dp"
+        android:foreground="?android:attr/selectableItemBackground"/>
     <!--com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fab"
         android:layout_width="wrap_content"
