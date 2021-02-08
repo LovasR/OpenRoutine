@@ -36,10 +36,14 @@
     <string name="day_item_name_hint">Name of the activity</string>
     <string name="set_day_name_start">Set start</string>
     <string name="set_day_name_end">Set end</string>
-    <string name="from">From:</string>
-    <string name="to">To:</string>
+
+    <string name="preposition1">From:</string>
+    <string name="preposition2">To:</string>
+    <string name="preposition3"></string>
 
     <string name="hour_short">h</string>
     <string name="minutes_short">min</string>
+
+    <string name="activity_picker_title">Select a type of activity:</string>
 
 </resources>

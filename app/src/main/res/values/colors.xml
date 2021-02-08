@@ -3,4 +3,17 @@
     <color name="colorPrimary">#6200EE</color>
     <color name="colorPrimaryDark">#3700B3</color>
     <color name="colorAccent">#03DAC5</color>
+
+    <color name="default_color_1">#845ec2</color>
+    <color name="default_color_2">#ffc75f</color>
+    <color name="default_color_3">#f9f871</color>
+    <color name="default_color_4">#ff5e78</color>
+    <color name="default_color_5">#9b5151</color>
+    <array name="default_colors">
+        <item>@color/default_color_1</item>
+        <item>@color/default_color_2</item>
+        <item>@color/default_color_3</item>
+        <item>@color/default_color_4</item>
+        <item>@color/default_color_5</item>
+    </array>
 </resources>

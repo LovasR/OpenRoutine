@@ -17,6 +17,7 @@ import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewOutlineProvider;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ImageButton;
 import android.widget.ListView;
@@ -52,10 +53,10 @@ public class MainActivity extends AppCompatActivity {
 
         //ATNotificationManager.notif(this);
 
-        for(String aTName : getResources().getStringArray(R.array.default_activities)){
+        /*for(String aTName : getResources().getStringArray(R.array.default_activities)){
             Log.e("AT_test", aTName);
-            ActivityType.addActivityType(aTName, Color.valueOf(Color.parseColor("#883FBF5F")));
-        }
+            ActivityType.addActivityType(aTName, Color.parseColor("#883FBF5F"));
+        }*/
 
         ImageButton addDayItem = findViewById(R.id.addDayItemButton);
         addDayItem.setOnClickListener(new View.OnClickListener() {
@@ -111,13 +112,13 @@ public class MainActivity extends AppCompatActivity {
                 }
                 final DayItem dayItem = CycleManager.currentDay.dayItems.get(position);
 
-                convertView.setOutlineProvider(ViewOutlineProvider.BACKGROUND);
+                /*convertView.setOutlineProvider(ViewOutlineProvider.BACKGROUND);
                 convertView.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
                         Toast.makeText(getContext(), dayItem.name, Toast.LENGTH_SHORT).show();
                     }
-                });
+                });*/
 
                 TextView itemStart = convertView.findViewById(R.id.dayPlannerItemStart);
                 itemStart.setText(new SimpleDateFormat("HH:mm", Locale.getDefault()).format(dayItem.start.getTime()));
@@ -135,14 +136,22 @@ public class MainActivity extends AppCompatActivity {
 
                 TextView itemType = convertView.findViewById(R.id.dayPlannerItemActivity);
                 itemType.setText(dayItem.type.name);
-
-                Drawable drawable = getDrawable(R.drawable.spinner_background);
-                drawable.setColorFilter(Color.parseColor("#3FBF5F"), PorterDuff.Mode.SRC);
-                itemType.setBackground(drawable);
+                final Drawable textBackground = getDrawable(R.drawable.spinner_background);
+                textBackground.setColorFilter(dayItem.type.color, PorterDuff.Mode.SRC);
+                itemType.setBackground(textBackground);
                 return convertView;
             }
         };
         dayPlanner.setDividerHeight(10);
         dayPlanner.setAdapter(arrayAdapter);
+        dayPlanner.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l) {
+                Log.e("Day_list", "Item removed @: " + i);
+                CycleManager.currentDay.removeDayItem(i);
+                dayPlannerInit();
+                return false;
+            }
+        });
     }
 }

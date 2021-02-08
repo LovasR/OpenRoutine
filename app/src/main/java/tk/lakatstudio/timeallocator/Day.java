@@ -51,4 +51,10 @@ public class Day {
         }
         Log.v("Day_list", "Item added, item: " + new SimpleDateFormat("HH:mm", Locale.getDefault()).format(dayItems.get(0).start.getTime()) + " list size now is: " + dayItems.size());
     }
+
+    void removeDayItem(int index){
+        Log.v("Day_list", "Item removed size before: " + dayItems.size() + " @: " + index);
+        dayItems.remove(index);
+        Log.v("Day_list", "Item removed size now: " + dayItems.size());
+    }
 }

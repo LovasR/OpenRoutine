@@ -6,6 +6,7 @@ import android.os.Build;
 
 import androidx.annotation.RequiresApi;
 
+import java.lang.reflect.Array;
 import java.util.Calendar;
 
 public class DayInit {
@@ -27,10 +28,10 @@ public class DayInit {
         //TODO load from save the daily activities
 
         //else {
-        for(String name : context.getResources().getStringArray(R.array.default_activities)) {
-            //ActivityType.userActivityTypes.add(new ActivityType(name, ));
-            ActivityType.addActivityType(name, Color.valueOf(Color.parseColor("#3FBF5F")));
-            //TODO make compatible with less than 26 API
+        int[] defaultColors = context.getResources().getIntArray(R.array.default_colors);
+        String[] names = context.getResources().getStringArray(R.array.default_activities);
+        for(int i = 0; i < names.length; i++) {
+            ActivityType.addActivityType(names[i], defaultColors[i]);
         }
         //}
 

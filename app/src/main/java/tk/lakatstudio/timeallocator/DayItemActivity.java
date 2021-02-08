@@ -3,17 +3,25 @@ package tk.lakatstudio.timeallocator;
 import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.database.DataSetObserver;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ListAdapter;
+import android.widget.ListView;
+import android.widget.TextView;
+import android.app.AlertDialog;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.FragmentActivity;
 
 import com.google.android.material.timepicker.MaterialTimePicker;
@@ -31,6 +39,8 @@ public class DayItemActivity extends FragmentActivity {
 
     boolean startPickerClicked = false;
     boolean endPickerClicked = false;
+
+    ActivityType selectedActivity = ActivityType.allActivityTypes.get(1);
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -114,18 +124,58 @@ public class DayItemActivity extends FragmentActivity {
             }
         });
 
-        /*Button activityButton = findViewById(R.id.addDayItemActivity);
+
+
+        final Button activityButton = findViewById(R.id.addDayItemActivity);
+        activityButton.setText(selectedActivity.name);
         Drawable drawable = getDrawable(R.drawable.spinner_background);
-        drawable.setColorFilter(Color.parseColor("#3FBF5F"), PorterDuff.Mode.SRC);
+        drawable.setColorFilter(selectedActivity.color, PorterDuff.Mode.SRC);
         activityButton.setBackground(drawable);
         activityButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                AlertDialog.Builder builder = new AlertDialog.Builder(getBaseContext());
+                final AlertDialog.Builder builder = new AlertDialog.Builder(DayItemActivity.this);
                 View dialogView = getLayoutInflater().inflate(R.layout.activity_picker_dialog, null);
+                ListView pickerList = dialogView.findViewById(R.id.activityPickerDialogListview);
+                builder.setView(dialogView);
+                final AlertDialog alertDialog = builder.create();
 
+                ArrayAdapter<ActivityType> adapter = new ArrayAdapter<ActivityType>(getBaseContext(), R.layout.spinner_item, ActivityType.allActivityTypes){
+                    @NonNull
+                    @Override
+                    public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
+                        if(convertView==null){
+                            convertView = getLayoutInflater().inflate(R.layout.spinner_item, null);
+                        }
+                        ActivityType activityType = ActivityType.allActivityTypes.get(position);
+
+                        TextView textView = (TextView) convertView;
+                        textView.setText(activityType.name);
+                        final Drawable textBackground = getDrawable(R.drawable.spinner_background);
+                        textBackground.setColorFilter(activityType.color, PorterDuff.Mode.SRC);
+                        textView.setBackground(textBackground);
+
+                        return convertView;
+                    }
+                };
+                pickerList.setAdapter(adapter);
+                pickerList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                        selectedActivity = ActivityType.allActivityTypes.get(i);
+
+                        activityButton.setText(selectedActivity.name);
+                        Drawable drawable = getDrawable(R.drawable.spinner_background);
+                        drawable.setColorFilter(selectedActivity.color, PorterDuff.Mode.SRC);
+                        activityButton.setBackground(drawable);
+
+                        alertDialog.cancel();
+                    }
+                });
+
+                alertDialog.show();
             }
-        });*/
+        });
 
         Button done = findViewById(R.id.addDayItemDone);
         done.setOnClickListener(new View.OnClickListener() {
@@ -147,7 +197,7 @@ public class DayItemActivity extends FragmentActivity {
                     endTime.set(Calendar.HOUR_OF_DAY, future.get(Calendar.HOUR_OF_DAY));
                     endTime.set(Calendar.MINUTE, 00);
                 }
-                CycleManager.currentDay.addDayItem(new DayItem(itemName.getText().toString(), startTime.getTime(), endTime.getTime(), ActivityType.allActivityTypes.get(0)));//activity type is placeholder
+                CycleManager.currentDay.addDayItem(new DayItem(itemName.getText().toString(), startTime.getTime(), endTime.getTime(), selectedActivity));
                 finish();
             }
         });
