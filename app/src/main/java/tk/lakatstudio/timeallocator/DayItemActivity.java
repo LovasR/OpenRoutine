@@ -40,13 +40,14 @@ public class DayItemActivity extends FragmentActivity {
     boolean startPickerClicked = false;
     boolean endPickerClicked = false;
 
-    ActivityType selectedActivity = ActivityType.allActivityTypes.get(1);
+    ActivityType selectedActivity;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_day_item_add);
 
+        selectedActivity = ActivityType.allActivityTypes.get(0);
 
         final EditText itemName = findViewById(R.id.addDayItemEditName);
 
@@ -80,6 +81,11 @@ public class DayItemActivity extends FragmentActivity {
                         startTime.set(Calendar.MINUTE, startTimePicker.getMinute());
                         SimpleDateFormat simple = new SimpleDateFormat("HH:mm", Locale.getDefault());
                         startTimeButton.setText(simple.format(startTime.getTime()));
+
+                        // when user selects first time, the second updates
+                        endTimePicker = new MaterialTimePicker.Builder()
+                                .setTimeFormat(TimeFormat.CLOCK_24H)
+                                .setHour(startTimePicker.getHour() + 1).setMinute(00).build();
                     }
                 });
             }

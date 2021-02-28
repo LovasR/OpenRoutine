@@ -32,6 +32,17 @@
         <item>Doomscrolling</item>
     </string-array>
 
+
+    <!--Main activity-->
+
+    <string name="main_menu_1_title">Lineup</string>
+    <string name="main_menu_2_title">To-Do</string>
+    <string name="main_menu_3_title">Regime</string> <!-- Routine-->
+    <string name="main_menu_4_title">Activities</string>
+
+
+    <!--DayItem activity-->
+
     <string name="buttonDone">Done</string>
     <string name="day_item_name_hint">Name of the activity</string>
     <string name="set_day_name_start">Set start</string>

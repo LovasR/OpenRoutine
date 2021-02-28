@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -7,32 +8,53 @@
     android:id="@+id/mainActivityRoot"
     tools:context=".MainActivity">
 
-    <LinearLayout
+    <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:id="@+id/mainLayout">
-        <!--TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/cycle_setting"/>
+        android:id="@+id/mainFrame"/>
 
-        <Spinner
+
+    <com.google.android.material.bottomappbar.BottomAppBar
+        android:id="@+id/bottomBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:background="@drawable/spinner_background"
+        app:backgroundTint="@color/color_app_bar"
+        app:contentInsetEnd="0dp"
+        app:contentInsetStart="0dp"
+        app:fabAlignmentMode="center"
+        app:fabCradleMargin="10dp"
+        app:fabCradleRoundedCornerRadius="10dp"
+        app:fabCradleVerticalOffset="5dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:elevation="20dp">
+
+        <com.google.android.material.bottomnavigation.BottomNavigationView
+            android:id="@+id/mainBottomNavigation"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/testCycleSpinner"/-->
+            android:layout_height="match_parent"
+            app:backgroundTint="@android:color/transparent"
+            app:elevation="0dp"
+            app:itemRippleColor="@android:color/white"
+            app:itemIconTint="@color/bottom_navigation_colors"
+            app:itemTextColor="@color/bottom_navigation_colors"
+            app:labelVisibilityMode="labeled"
+            app:menu="@menu/main_menu"/>
 
-        <ListView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/testDayPlanner"
-            android:layout_margin="15dp"
-            android:padding="15dp"
-            android:layout_marginTop="40dp"
-            android:divider="#FFFFFF"/>
+    </com.google.android.material.bottomappbar.BottomAppBar>
 
-    </LinearLayout>
-    <ImageButton
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/mainFab"
+        android:src="@drawable/ic_baseline_add_24"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_anchor="@id/bottomBar"
+        app:fabCustomSize="60dp"
+        app:backgroundTint="#B0B0B0"
+        app:maxImageSize="30dp"/>
+
+    <!--ImageButton
         android:layout_width="match_parent"
         android:layout_height="120dp"
         android:id="@+id/addDayItemButton"
@@ -40,13 +62,8 @@
         android:layout_alignBottom="@+id/mainLayout"
         android:src="@drawable/ic_baseline_add_24"
         android:layout_marginHorizontal="10dp"
-        android:foreground="?android:attr/selectableItemBackground"/>
-    <!--com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/fab"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom|end"
-        android:src="@drawable/ic_launcher_foreground"
-        android:layout_margin="16dp" /-->
+        android:foreground="?android:attr/selectableItemBackground"
+        android:visibility="gone"/-->
 
-</RelativeLayout>
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

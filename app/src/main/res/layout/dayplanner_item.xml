@@ -53,6 +53,7 @@
             android:paddingHorizontal="10dp"
             android:padding="10dp"
             android:id="@+id/dayPlannerItemActivity"/>
+            <!--android:textColor="#f0f0f0"-->
     </LinearLayout>
 
 </LinearLayout>

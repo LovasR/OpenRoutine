@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/main_menu_1"
+        android:enabled="true"
+        android:icon="@drawable/ic_baseline_list_alt_24"
+        android:title="@string/main_menu_1_title"/>
+    <item
+        android:id="@+id/main_menu_2"
+        android:enabled="true"
+        android:icon="@drawable/ic_baseline_library_add_check_24"
+        android:title="@string/main_menu_2_title"/>
+    <item
+        android:enabled="false"
+        android:title="" />
+    <item
+        android:id="@+id/main_menu_3"
+        android:enabled="true"
+        android:icon="@drawable/ic_routine_24"
+        android:title="@string/main_menu_3_title"/>
+    <item
+        android:id="@+id/main_menu_4"
+        android:enabled="true"
+        android:title="@string/main_menu_4_title"
+        android:icon="@drawable/ic_baseline_play_circle_outline_24"/>
+
+</menu>

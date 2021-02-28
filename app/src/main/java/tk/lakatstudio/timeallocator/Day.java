@@ -17,6 +17,8 @@ public class Day {
     int cycleIndex;
     int dayItemIndex;
 
+    boolean isSaved;
+
     DayItem getDayItem(Date time){
         for(int i = 0; i < dayItems.size(); i++){
             if(dayItems.get(i).start.getTime() < time.getTime() && dayItems.get(i).end.getTime() > time.getTime()){

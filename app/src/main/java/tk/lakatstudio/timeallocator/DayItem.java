@@ -9,6 +9,7 @@ public class DayItem {
     boolean isRunning;
     ActivityType type;
 
+
     DayItem(String n, Date s, Date e, ActivityType t){
         name = n;
         start = s;

@@ -4,37 +4,40 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 
-import android.content.Context;
 import android.content.Intent;
-import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
-import android.util.AttributeSet;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewOutlineProvider;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.ImageButton;
+import android.widget.FrameLayout;
 import android.widget.ListView;
-import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.Toast;
+
+import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 
-import javax.security.auth.login.LoginException;
-
 public class MainActivity extends AppCompatActivity {
+
+    static boolean isRunning = true;
+
+    MainFragment1 fragment1;
+    MainFragment2 fragment2;
+    MainFragment4 fragment4;
+
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
@@ -58,7 +61,7 @@ public class MainActivity extends AppCompatActivity {
             ActivityType.addActivityType(aTName, Color.parseColor("#883FBF5F"));
         }*/
 
-        ImageButton addDayItem = findViewById(R.id.addDayItemButton);
+        /*ImageButton addDayItem = findViewById(R.id.addDayItemButton);
         addDayItem.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -67,91 +70,81 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        DayInit.init(getBaseContext());
+*/
+        fragment1 = new MainFragment1();
+        fragmentChange(fragment1);
 
+        fragment2 = new MainFragment2();
+        fragment4 = new MainFragment4();
+
+        BottomNavigationView bottomNav = findViewById(R.id.mainBottomNavigation);
+        bottomNav.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                switch(item.getItemId()){
+                    case R.id.main_menu_1:
+                        fragmentChange(fragment1);
+                        return true;
+                    case R.id.main_menu_2:
+                        fragmentChange(fragment2);
+                        return true;
+                    case R.id.main_menu_3:
+                        Log.e("asda", "afs");
+                        return true;
+                    case R.id.main_menu_4:
+                        fragmentChange(fragment4);
+                        return true;
+                }
+                return false;
+            }
+        });
+
+        FloatingActionButton fab = findViewById(R.id.mainFab);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(MainActivity.this, DayItemActivity.class);
+                startActivity(intent);
+            }
+        });
+
+
+        DayInit.init(this, this);
+    }
+
+    void fragmentChange(Fragment fragment) {
+        // load fragment
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+        transaction.replace(R.id.mainFrame, fragment);
+        transaction.setReorderingAllowed(true);
+        //transaction.addToBackStack(null);
+        transaction.show(fragment);
+        transaction.commit();
     }
 
     @Override
     protected void onResume() {
-        dayPlannerInit();
-        Log.e("UI_test", "onresume");
+        Log.e("UI_test", "onresume " + isRunning);
+        /*if(!isRunning){
+            Log.e("UI_test", "plannerinit " + isRunning);
+            isRunning = true;
+            dayPlannerInit();
+        }*/
         super.onResume();
     }
 
-    private String lengthAdapter(Date start, Date end){
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTime(end);
-        int hours = calendar.get(Calendar.HOUR_OF_DAY);
-        int minutes = calendar.get(Calendar.MINUTE);
-        calendar.setTime(start);
-        hours -= calendar.get(Calendar.HOUR_OF_DAY);
-        minutes -= calendar.get(Calendar.MINUTE);
 
-        calendar.set(Calendar.HOUR_OF_DAY, hours);
-        calendar.set(Calendar.MINUTE, minutes);
 
-        String out = "";
-        if(hours > 0){
-            out += new SimpleDateFormat("H", Locale.getDefault()).format(calendar.getTime()) + " " + getString(R.string.hour_short) + " ";
-        }
-        if(minutes > 0 || (hours == 0 && minutes == 0)){
-            out += new SimpleDateFormat("mm", Locale.getDefault()).format(calendar.getTime()) + " " + getString(R.string.minutes_short);
-        }
-        return out;
+    @Override
+    protected void onStop() {
+
+        super.onStop();
     }
 
-    public void dayPlannerInit(){
-        ListView dayPlanner = findViewById(R.id.testDayPlanner);
-
-        ArrayAdapter<DayItem> arrayAdapter = new ArrayAdapter<DayItem>(this, R.layout.dayplanner_item, CycleManager.currentDay.dayItems){
-            @NonNull
-            @Override
-            public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
-                if(convertView==null){
-                    convertView = getLayoutInflater().inflate(R.layout.dayplanner_item, null);
-                }
-                final DayItem dayItem = CycleManager.currentDay.dayItems.get(position);
-
-                /*convertView.setOutlineProvider(ViewOutlineProvider.BACKGROUND);
-                convertView.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        Toast.makeText(getContext(), dayItem.name, Toast.LENGTH_SHORT).show();
-                    }
-                });*/
-
-                TextView itemStart = convertView.findViewById(R.id.dayPlannerItemStart);
-                itemStart.setText(new SimpleDateFormat("HH:mm", Locale.getDefault()).format(dayItem.start.getTime()));
-
-                TextView itemLength = convertView.findViewById(R.id.dayPlannerItemLength);
-                itemLength.setText(lengthAdapter(dayItem.start, dayItem.end));
-
-                TextView itemName = convertView.findViewById(R.id.dayPlannerItem);
-                if (dayItem.name.length() != 0){
-                    itemName.setText(dayItem.name);
-                    itemName.setVisibility(View.VISIBLE);
-                } else {
-                    itemName.setVisibility(View.GONE);
-                }
-
-                TextView itemType = convertView.findViewById(R.id.dayPlannerItemActivity);
-                itemType.setText(dayItem.type.name);
-                final Drawable textBackground = getDrawable(R.drawable.spinner_background);
-                textBackground.setColorFilter(dayItem.type.color, PorterDuff.Mode.SRC);
-                itemType.setBackground(textBackground);
-                return convertView;
-            }
-        };
-        dayPlanner.setDividerHeight(10);
-        dayPlanner.setAdapter(arrayAdapter);
-        dayPlanner.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
-            @Override
-            public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l) {
-                Log.e("Day_list", "Item removed @: " + i);
-                CycleManager.currentDay.removeDayItem(i);
-                dayPlannerInit();
-                return false;
-            }
-        });
+    @Override
+    protected void onPause() {
+        DayInit.saveAll(this);
+        isRunning = false;
+        super.onPause();
     }
 }

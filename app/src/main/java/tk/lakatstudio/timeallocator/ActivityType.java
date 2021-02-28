@@ -10,6 +10,8 @@ public class ActivityType {
     int ID;
     int color;
 
+    boolean isSaved;
+
     public final static ArrayList<ActivityType> allActivityTypes = new ArrayList<ActivityType>();
     static int currentID;
 
@@ -29,7 +31,12 @@ public class ActivityType {
         at.name = name;
         at.ID = ID;
         at.color = color;
+        at.isSaved = false;
         allActivityTypes.add(at);
         Log.e("AT_test", name + "\t" + String.valueOf(color) + "\t" + allActivityTypes.get(allActivityTypes.size() - 1).name);
+    }
+
+    static void addActivityType(ActivityType at){
+        allActivityTypes.add(at);
     }
 }
