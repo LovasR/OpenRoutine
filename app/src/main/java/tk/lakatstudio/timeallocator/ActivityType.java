@@ -1,6 +1,5 @@
 package tk.lakatstudio.timeallocator;
 
-import android.graphics.Color;
 import android.util.Log;
 
 import java.util.ArrayList;
@@ -25,7 +24,7 @@ public class ActivityType {
 
     ActivityType(){ }
 
-    static void addActivityType(String name, int color){
+    static ActivityType addActivityType(String name, int color){
         int ID = ++currentID;
         ActivityType at = new ActivityType();
         at.name = name;
@@ -34,6 +33,7 @@ public class ActivityType {
         at.isSaved = false;
         allActivityTypes.add(at);
         Log.e("AT_test", name + "\t" + String.valueOf(color) + "\t" + allActivityTypes.get(allActivityTypes.size() - 1).name);
+        return at;
     }
 
     static void addActivityType(ActivityType at){

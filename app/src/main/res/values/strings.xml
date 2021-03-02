@@ -32,6 +32,13 @@
         <item>Doomscrolling</item>
     </string-array>
 
+    <!--General strings-->
+
+    <string name="activity_name">Activity name</string>
+    <string name="remove_activity">Do you want to remove this activity?</string>
+
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
 
     <!--Main activity-->
 

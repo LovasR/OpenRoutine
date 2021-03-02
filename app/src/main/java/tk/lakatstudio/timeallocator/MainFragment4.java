@@ -1,6 +1,7 @@
 package tk.lakatstudio.timeallocator;
 
 import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
@@ -10,18 +11,23 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.content.res.AppCompatResources;
-import androidx.core.content.res.ResourcesCompat;
 import androidx.fragment.app.Fragment;
+
+import java.util.Random;
 
 public class MainFragment4 extends Fragment {
 
     ListView pickerList;
+
+    ArrayAdapter<ActivityType> pickerAdapter;
 
     @Nullable
     @Override
@@ -36,7 +42,7 @@ public class MainFragment4 extends Fragment {
     }
 
     void activityPickerInit(final Fragment fragment){
-        ArrayAdapter<ActivityType> adapter = new ArrayAdapter<ActivityType>(fragment.getContext(), R.layout.spinner_item, ActivityType.allActivityTypes){
+        pickerAdapter = new ArrayAdapter<ActivityType>(fragment.getContext(), R.layout.spinner_item, ActivityType.allActivityTypes){
             @NonNull
             @Override
             public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
@@ -54,12 +60,65 @@ public class MainFragment4 extends Fragment {
                 return convertView;
             }
         };
-        pickerList.setAdapter(adapter);
+        pickerList.setAdapter(pickerAdapter);
         pickerList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-
+                activityTypeAdd(i, fragment);
             }
         });
+        pickerList.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> adapterView, View view, final int i, long l) {
+                DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        switch (which){
+                            case DialogInterface.BUTTON_POSITIVE:
+                                ActivityType.allActivityTypes.remove(ActivityType.allActivityTypes.get(i));
+                                pickerAdapter.notifyDataSetChanged();
+                                break;
+                            case DialogInterface.BUTTON_NEGATIVE:
+                                break;
+                        }
+                    }
+                };
+
+                AlertDialog.Builder builder = new AlertDialog.Builder(fragment.getContext());
+                builder.setMessage(getString(R.string.remove_activity)).setPositiveButton(getString(R.string.yes), dialogClickListener).setNegativeButton(getString(R.string.no), dialogClickListener).show();
+                return true;
+            }
+        });
+    }
+
+    void activityTypeAdd(int index, Fragment fragment){
+        final AlertDialog.Builder builder = new AlertDialog.Builder(fragment.getContext());
+        View dialogView = getLayoutInflater().inflate(R.layout.activity_edit_dialog, null);
+        builder.setView(dialogView);
+        final AlertDialog alertDialog = builder.create();
+        final EditText editText = dialogView.findViewById(R.id.activityEditName);
+        Button done = dialogView.findViewById(R.id.activityEditDone);
+
+        final ActivityType activityType;
+        if(index != -1) {
+            activityType = ActivityType.allActivityTypes.get(index);
+            editText.setText(activityType.name);
+        } else {
+            activityType = ActivityType.addActivityType("", 0);
+            editText.setHint(getString(R.string.activity_name));
+        }
+
+        done.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                activityType.name = editText.getText().toString();
+                activityType.color = getResources().getIntArray(R.array.default_colors)[Math.abs(new Random().nextInt()) % getResources().getIntArray(R.array.default_colors).length];
+                //editText.setText(activityType.name);
+                alertDialog.cancel();
+                pickerAdapter.notifyDataSetChanged();
+            }
+        });
+
+        alertDialog.show();
     }
 }

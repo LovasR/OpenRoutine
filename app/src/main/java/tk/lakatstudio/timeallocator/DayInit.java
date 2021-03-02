@@ -1,10 +1,8 @@
 package tk.lakatstudio.timeallocator;
 
 import android.content.Context;
-import android.graphics.Color;
 import android.os.Build;
 import android.util.Log;
-import android.widget.FrameLayout;
 
 import androidx.annotation.RequiresApi;
 
@@ -12,12 +10,8 @@ import com.google.gson.Gson;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
-import java.lang.reflect.Array;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -31,7 +25,6 @@ public class DayInit {
     static void init(Context context, MainActivity mainActivity){
 
 
-        //TODO load from save the daily activities
         if (!loadAll(context)) {
             Day today;
             today = new Day();
@@ -55,8 +48,12 @@ public class DayInit {
                 ActivityType.addActivityType(names[i], defaultColors[i]);
             }
         } else {
-            Log.v("save_debug_load", " " + CycleManager.currentDay.dayItems.size());
+            Log.v("save_debug_load", "Loading finished " + CycleManager.currentDay.dayItems.size());
             //mainActivity.fragment1.dayPlannerInit(mainActivity.fragment1);
+        }
+
+        if(ActivityType.allActivityTypes.size() > 0) {
+            ActivityType.currentID = ActivityType.allActivityTypes.get(ActivityType.allActivityTypes.size() - 1).ID;
         }
 
         /*for(int i = 0; i < 24 * (60 / CycleManager.cycleTime); i++){
@@ -88,18 +85,24 @@ public class DayInit {
         for(int i = 0; i < ActivityType.allActivityTypes.size(); i++){
             ActivityType activityType = ActivityType.allActivityTypes.get(i);
             Log.v("save_debug", "test");
-            if(!activityType.isSaved){
+            //if(!activityType.isSaved){
                 activityType.isSaved = true;
                 outJson += gson.toJson(activityType);
                 outJson += "\n";
                 Log.v("save_debug", "save activity");
-            } else{
-            Log.v("save_debug", "no save activity " + ActivityType.allActivityTypes.get(2).isSaved);}
+            /*} else{
+                Log.v("save_debug", "no save activity "/* + ActivityType.allActivityTypes.get(2).isSaved);
+            }*/
         }
         Log.v("Out_Json activities", outJson);
         if(outJson.length() > 0){
             writeToFile(context, outJson, "activities");
         }
+        ArrayList<String> testRead = readFromFile(context, "activities");
+        for(int i = 0; i < testRead.size(); i++){
+            Log.e("testreads", testRead.get(i));
+        }
+
     }
     static void writeToFile(Context context, String json, String fileName){
         File dir = new File(context.getFilesDir(), "saves");
@@ -150,7 +153,6 @@ public class DayInit {
             Log.v("save_debug_load", "directory !exist");
         }
 
-        StringBuffer jsonBuffer = new StringBuffer();
         ArrayList<String> out = new ArrayList<>();
 
         try {

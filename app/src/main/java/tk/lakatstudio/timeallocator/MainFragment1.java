@@ -81,7 +81,6 @@ public class MainFragment1 extends Fragment {
 
     public void dayPlannerInit(final Fragment fragment){
 
-        Log.v("save_debug_load", "list_init-run" );
         if(CycleManager.currentDay.dayItems.size() == 0){
             return;
         }
@@ -135,6 +134,5 @@ public class MainFragment1 extends Fragment {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        Log.v("save_debug_load", "array_adapter" + arrayAdapter.getCount());
     }
 }

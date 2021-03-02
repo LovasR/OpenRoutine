@@ -1,10 +1,7 @@
 package tk.lakatstudio.timeallocator;
 
-import android.app.Activity;
-import android.content.Context;
+import android.app.AlertDialog;
 import android.content.DialogInterface;
-import android.database.DataSetObserver;
-import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
@@ -15,10 +12,8 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.app.AlertDialog;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -29,7 +24,6 @@ import com.google.android.material.timepicker.TimeFormat;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.Locale;
 
 public class DayItemActivity extends FragmentActivity {
@@ -91,7 +85,6 @@ public class DayItemActivity extends FragmentActivity {
             }
         });
 
-        //TODO make default activity length so if lessons are the same default to 45 mins
         endTimePicker = new MaterialTimePicker.Builder()
                 .setTimeFormat(TimeFormat.CLOCK_24H)
                 .setHour(hours + 1).setMinute(00).build();
@@ -99,7 +92,6 @@ public class DayItemActivity extends FragmentActivity {
         final Button endTimeButton = findViewById(R.id.addDayItemEndTime);
         final Calendar future = Calendar.getInstance();
         future.set(Calendar.HOUR_OF_DAY, future.get(Calendar.HOUR_OF_DAY) + 1);
-        //TODO 12 hour format switch
         final SimpleDateFormat simpleDateFormat = new SimpleDateFormat("HH:00", Locale.getDefault());
         endTimeButton.setText(simpleDateFormat.format(future.getTime()));
 

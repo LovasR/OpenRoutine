@@ -1,34 +1,20 @@
 package tk.lakatstudio.timeallocator;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.annotation.RequiresApi;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentTransaction;
-
 import android.content.Intent;
-import android.graphics.PorterDuff;
-import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.FrameLayout;
-import android.widget.ListView;
-import android.widget.TextView;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -36,7 +22,9 @@ public class MainActivity extends AppCompatActivity {
 
     MainFragment1 fragment1;
     MainFragment2 fragment2;
+    MainFragment3 fragment3;
     MainFragment4 fragment4;
+
 
 
     @RequiresApi(api = Build.VERSION_CODES.O)
@@ -75,9 +63,10 @@ public class MainActivity extends AppCompatActivity {
         fragmentChange(fragment1);
 
         fragment2 = new MainFragment2();
+        fragment3 = new MainFragment3();
         fragment4 = new MainFragment4();
 
-        BottomNavigationView bottomNav = findViewById(R.id.mainBottomNavigation);
+        final BottomNavigationView bottomNav = findViewById(R.id.mainBottomNavigation);
         bottomNav.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
@@ -89,7 +78,7 @@ public class MainActivity extends AppCompatActivity {
                         fragmentChange(fragment2);
                         return true;
                     case R.id.main_menu_3:
-                        Log.e("asda", "afs");
+                        fragmentChange(fragment3);
                         return true;
                     case R.id.main_menu_4:
                         fragmentChange(fragment4);
@@ -103,8 +92,25 @@ public class MainActivity extends AppCompatActivity {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(MainActivity.this, DayItemActivity.class);
-                startActivity(intent);
+                switch (bottomNav.getSelectedItemId()){
+                    case R.id.main_menu_1:
+                        Intent intent1 = new Intent(MainActivity.this, DayItemActivity.class);
+                        startActivity(intent1);
+                        break;
+                    case R.id.main_menu_2:
+                        /*Intent intent2 = new Intent(MainActivity.this, DayItemActivity.class);
+                        startActivity(intent2);*/
+                        break;
+                    case R.id.main_menu_3:
+                        /*Intent intent3 = new Intent(MainActivity.this, DayItemActivity.class);
+                        startActivity(intent3);*/
+                        break;
+                    case R.id.main_menu_4:
+                        fragment4.activityTypeAdd(-1, fragment4);
+                        break;
+                }
+
+
             }
         });
 
