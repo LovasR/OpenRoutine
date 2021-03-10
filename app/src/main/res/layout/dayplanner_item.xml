@@ -4,9 +4,9 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:foreground="?android:attr/selectableItemBackground"
+    android:background="?attr/selectableItemBackground"
     android:id="@+id/dayPlannerItemLinearLayout"
-    android:background="@drawable/outline_background"
+    android:foreground="@drawable/outline_background"
     android:padding="10dp">
 
     <LinearLayout

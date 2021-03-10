@@ -98,8 +98,8 @@ public class MainActivity extends AppCompatActivity {
                         startActivity(intent1);
                         break;
                     case R.id.main_menu_2:
-                        /*Intent intent2 = new Intent(MainActivity.this, DayItemActivity.class);
-                        startActivity(intent2);*/
+                        Intent intent2 = new Intent(MainActivity.this, TodoItemActivity.class);
+                        startActivity(intent2);
                         break;
                     case R.id.main_menu_3:
                         /*Intent intent3 = new Intent(MainActivity.this, DayItemActivity.class);

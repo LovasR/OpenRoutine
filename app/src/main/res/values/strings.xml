@@ -40,6 +40,8 @@
     <string name="yes">Yes</string>
     <string name="no">No</string>
 
+    <string name="at">At:</string>
+
     <!--Main activity-->
 
     <string name="main_menu_1_title">Lineup</string>
@@ -47,6 +49,11 @@
     <string name="main_menu_3_title">Regime</string> <!-- Routine-->
     <string name="main_menu_4_title">Activities</string>
 
+    <!--Todo_ strings-->
+
+    <string name="todo_hint">Todo`s text</string>
+    <string name="todo_add_time">Add time</string>
+    <string name="todo_set_text_error">Text can`t be empty!</string>
 
     <!--DayItem activity-->
 

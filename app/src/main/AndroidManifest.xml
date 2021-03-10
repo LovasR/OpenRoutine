@@ -22,6 +22,7 @@
         </activity>
 
         <activity android:name=".DayItemActivity"/>
+        <activity android:name=".TodoItemActivity"/>
         <receiver
             android:name=".ATBroadcastReceiver"
             android:enabled="true"

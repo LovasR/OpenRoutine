@@ -103,6 +103,16 @@ public class DayInit {
             Log.e("testreads", testRead.get(i));
         }
 
+        outJson = "";
+        for(int i = 0; i < TodoItem.allTodoItems.size(); i++){
+            TodoItem todoItem = TodoItem.allTodoItems.get(i);
+            outJson += gson.toJson(todoItem);
+            outJson += "\n";
+        }
+        Log.v("save_debug", "todos: " + outJson);
+        if(outJson.length() > 0){
+            writeToFile(context, outJson, "todos");
+        }
     }
     static void writeToFile(Context context, String json, String fileName){
         File dir = new File(context.getFilesDir(), "saves");
@@ -134,16 +144,30 @@ public class DayInit {
         Gson gson = new Gson();
         for(String dayJson : days){
             CycleManager.currentDay = gson.fromJson(dayJson, Day.class);
+            for(DayItem dayItem : CycleManager.currentDay.dayItems){
+                DayItem.allDayItemHashes.put(dayItem.hashCode(), dayItem);
+                Log.v("hash_debug", dayItem.hashCode() + "");
+            }
             Log.v("save_debug_load", "load day: " + CycleManager.currentDay.dayItems.size() + " " + (CycleManager.currentDay.dayItems.size() > 0 ? CycleManager.currentDay.dayItems.get(0).type.name : "null"));
         }
 
-        ArrayList<String> activity = readFromFile(context, "activities");
-        Log.v("save_debug_load", "load activities: " + activity.size());
-        for(String activityJson : activity){
+        ArrayList<String> activityList = readFromFile(context, "activities");
+        Log.v("save_debug_load", "load activities: " + activityList.size());
+        for(String activityJson : activityList){
             ActivityType.addActivityType(gson.fromJson(activityJson, ActivityType.class));
             Log.v("save_debug_load", "load activity: \t" + activityJson);
         }
 
+        ArrayList<String> todoList = readFromFile(context, "todos");
+        if(todoList != null) {
+            for (String todoJson : todoList) {
+                TodoItem todoItem = gson.fromJson(todoJson, TodoItem.class);
+                TodoItem.addItem(todoItem);
+                //TODO hash
+                //todoItem.dayItem = DayItem.allDayItemHashes.get(todoItem.dayItemHash);
+                Log.v("save_debug_load", "load todo: \t" + todoJson);
+            }
+        }
         return true;
     }
 

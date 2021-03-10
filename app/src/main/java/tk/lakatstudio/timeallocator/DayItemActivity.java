@@ -36,6 +36,8 @@ public class DayItemActivity extends FragmentActivity {
 
     ActivityType selectedActivity;
 
+    DayItem dayItem;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -45,14 +47,67 @@ public class DayItemActivity extends FragmentActivity {
 
         final EditText itemName = findViewById(R.id.addDayItemEditName);
 
-        final int hours = Calendar.getInstance().get(Calendar.HOUR_OF_DAY);
+        final int startHour;
+        final int startMinute;
+        final Button startTimeButton = findViewById(R.id.addDayItemStartTime);
+
+        final int endHour;
+        final int endMinute;
+        final Button endTimeButton = findViewById(R.id.addDayItemEndTime);
+
+        final Button activityButton = findViewById(R.id.addDayItemActivity);
+
+        try{
+            Log.v("intent_debug", "" + getIntent().getExtras().getInt("index"));
+            dayItem = CycleManager.currentDay.dayItems.get(getIntent().getExtras().getInt("index"));
+        } catch (NullPointerException np){
+            Log.v("intent_debug", "failed");
+        }
+
+        //this if/else sets all the UI elements if the activity was started with the intention of editing
+        if(dayItem != null){
+            selectedActivity = dayItem.type;
+
+            itemName.setText(dayItem.name);
+
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTime(dayItem.start);
+            startHour = calendar.get(Calendar.HOUR_OF_DAY);
+            startMinute = calendar.get(Calendar.MINUTE);
+            startTimeButton.setText(new SimpleDateFormat("HH:mm").format(calendar.getTime()));
+
+            calendar.setTime(dayItem.end);
+            endHour = calendar.get(Calendar.HOUR_OF_DAY);
+            endMinute = calendar.get(Calendar.MINUTE);
+            endTimeButton.setText(new SimpleDateFormat("HH:mm").format(calendar.getTime()));
+
+            activityButton.setText(dayItem.type.name);
+            Drawable drawable = getDrawable(R.drawable.spinner_background);
+            assert drawable != null;
+            drawable.setColorFilter(dayItem.type.color, PorterDuff.Mode.SRC);
+            activityButton.setBackground(drawable);
+        } else {
+            startHour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY);
+            startMinute = 0;
+            startTimeButton.setText(new SimpleDateFormat("HH:00", Locale.getDefault()).format(Calendar.getInstance().getTime()));
+
+            //TODO set end time to the preferred length of the activityType
+            endHour = startHour + 1;
+            endMinute = 0;
+            final Calendar future = Calendar.getInstance();
+            future.set(Calendar.HOUR_OF_DAY, endHour);
+            endTimeButton.setText(new SimpleDateFormat("HH:00", Locale.getDefault()).format(future.getTime()));
+
+            activityButton.setText(selectedActivity.name);
+            Drawable drawable = getDrawable(R.drawable.spinner_background);
+            drawable.setColorFilter(selectedActivity.color, PorterDuff.Mode.SRC);
+            activityButton.setBackground(drawable);
+        }
 
         startTimePicker = new MaterialTimePicker.Builder()
                 .setTimeFormat(TimeFormat.CLOCK_24H)
-                .setHour(hours).setMinute(00).build();
+                .setHour(startHour).setMinute(startMinute).build();
 
-        final Button startTimeButton = findViewById(R.id.addDayItemStartTime);
-        startTimeButton.setText(new SimpleDateFormat("HH:00", Locale.getDefault()).format(Calendar.getInstance().getTime()));
 
         startTimeButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -64,7 +119,7 @@ public class DayItemActivity extends FragmentActivity {
                     public void onCancel(DialogInterface dialogInterface) {
                         startTimePicker = new MaterialTimePicker.Builder()
                                 .setTimeFormat(TimeFormat.CLOCK_24H)
-                                .setHour(hours).setMinute(00).build();
+                                .setHour(startHour).setMinute(00).build();
                     }
                 });
                 startTimePicker.addOnPositiveButtonClickListener(new View.OnClickListener() {
@@ -85,15 +140,10 @@ public class DayItemActivity extends FragmentActivity {
             }
         });
 
+
         endTimePicker = new MaterialTimePicker.Builder()
                 .setTimeFormat(TimeFormat.CLOCK_24H)
-                .setHour(hours + 1).setMinute(00).build();
-
-        final Button endTimeButton = findViewById(R.id.addDayItemEndTime);
-        final Calendar future = Calendar.getInstance();
-        future.set(Calendar.HOUR_OF_DAY, future.get(Calendar.HOUR_OF_DAY) + 1);
-        final SimpleDateFormat simpleDateFormat = new SimpleDateFormat("HH:00", Locale.getDefault());
-        endTimeButton.setText(simpleDateFormat.format(future.getTime()));
+                .setHour(endHour).setMinute(endMinute).build();
 
         endTimeButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -105,7 +155,7 @@ public class DayItemActivity extends FragmentActivity {
                     public void onCancel(DialogInterface dialogInterface) {
                         endTimePicker = new MaterialTimePicker.Builder()
                                 .setTimeFormat(TimeFormat.CLOCK_24H)
-                                .setHour(hours).setMinute(00).build();
+                                .setHour(startHour).setMinute(00).build();
                     }
                 });
                 endTimePicker.addOnPositiveButtonClickListener(new View.OnClickListener() {
@@ -122,13 +172,6 @@ public class DayItemActivity extends FragmentActivity {
             }
         });
 
-
-
-        final Button activityButton = findViewById(R.id.addDayItemActivity);
-        activityButton.setText(selectedActivity.name);
-        Drawable drawable = getDrawable(R.drawable.spinner_background);
-        drawable.setColorFilter(selectedActivity.color, PorterDuff.Mode.SRC);
-        activityButton.setBackground(drawable);
         activityButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -162,6 +205,7 @@ public class DayItemActivity extends FragmentActivity {
                     public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                         selectedActivity = ActivityType.allActivityTypes.get(i);
 
+                        //set activityindicator to newly selected type
                         activityButton.setText(selectedActivity.name);
                         Drawable drawable = getDrawable(R.drawable.spinner_background);
                         drawable.setColorFilter(selectedActivity.color, PorterDuff.Mode.SRC);
@@ -175,27 +219,40 @@ public class DayItemActivity extends FragmentActivity {
             }
         });
 
-        Button done = findViewById(R.id.addDayItemDone);
+        final Button done = findViewById(R.id.addDayItemDone);
         done.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+
+                //messy code for setting Calendars with the two options being if the user the material dialog or not
                 Calendar startTime = Calendar.getInstance();
-                if(startPickerClicked) {
+                if (startPickerClicked) {
                     startTime.set(Calendar.HOUR_OF_DAY, startTimePicker.getHour());
                     startTime.set(Calendar.MINUTE, startTimePicker.getMinute());
                 } else {
-                    startTime.set(Calendar.HOUR_OF_DAY, hours);
-                    startTime.set(Calendar.MINUTE, 00);
+                    startTime.set(Calendar.HOUR_OF_DAY, startHour);
+                    startTime.set(Calendar.MINUTE, startMinute);
                 }
+
                 Calendar endTime = (Calendar) startTime.clone();
-                if(endPickerClicked) {
+                if (endPickerClicked) {
                     endTime.set(Calendar.HOUR_OF_DAY, endTimePicker.getHour());
                     endTime.set(Calendar.MINUTE, endTimePicker.getMinute());
                 } else {
-                    endTime.set(Calendar.HOUR_OF_DAY, future.get(Calendar.HOUR_OF_DAY));
-                    endTime.set(Calendar.MINUTE, 00);
+                    endTime.set(Calendar.HOUR_OF_DAY, endHour);
+                    endTime.set(Calendar.MINUTE, endMinute);
                 }
-                CycleManager.currentDay.addDayItem(new DayItem(itemName.getText().toString(), startTime.getTime(), endTime.getTime(), selectedActivity));
+
+
+                //if it was only started for editing, it only edits existing item
+                if (dayItem != null) {
+                    dayItem.name = itemName.getText().toString();
+                    dayItem.type = selectedActivity;
+                    dayItem.start = startTime.getTime();
+                    dayItem.end = endTime.getTime();
+                } else {
+                    CycleManager.currentDay.addDayItem(new DayItem(itemName.getText().toString(), startTime.getTime(), endTime.getTime(), selectedActivity));
+                }
                 finish();
             }
         });

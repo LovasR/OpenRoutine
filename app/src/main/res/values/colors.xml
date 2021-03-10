@@ -8,7 +8,9 @@
     <color name="color_app_bar_item_selected">#FFFFFF</color>
     <color name="color_app_bar_item_unselected">#A0A0A0</color>
 
+    <color name="color_error">#FF0000</color>
 
+    <color name="color_box_default">#D1D1D1</color>
 
     <color name="default_color_1">#845ec2</color>
     <color name="default_color_2">#ffc75f</color>

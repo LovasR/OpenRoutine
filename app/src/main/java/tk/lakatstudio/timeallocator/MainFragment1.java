@@ -1,5 +1,6 @@
 package tk.lakatstudio.timeallocator;
 
+import android.content.Intent;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
@@ -69,6 +70,8 @@ public class MainFragment1 extends Fragment {
         calendar.set(Calendar.HOUR_OF_DAY, hours);
         calendar.set(Calendar.MINUTE, minutes);
 
+        Log.e("adaptertest", minutes + " ");
+
         String out = "";
         if(hours > 0){
             out += new SimpleDateFormat("H", Locale.getDefault()).format(calendar.getTime()) + " " + getString(R.string.hour_short) + " ";
@@ -119,6 +122,14 @@ public class MainFragment1 extends Fragment {
         };
         dayPlanner.setDividerHeight(10);
         dayPlanner.setAdapter(arrayAdapter);
+        dayPlanner.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                Intent editIntent = new Intent(fragment.getContext(), DayItemActivity.class);
+                editIntent.putExtra("index", i);
+                startActivity(editIntent);
+            }
+        });
         dayPlanner.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
             public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l) {

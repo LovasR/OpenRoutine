@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:foreground="?android:attr/selectableItemBackground"
+    android:id="@+id/todoItemLinearLayout"
+    android:background="@drawable/outline_background"
+    android:padding="10dp">
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:id="@+id/todoItemTimes">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/todoItemStart"
+                android:gravity="center"
+                android:layout_marginHorizontal="10dp"
+                android:layout_marginTop="4dp"/>
+            <!--TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/dayPlannerItemLength"
+                android:gravity="center"
+                android:layout_marginHorizontal="10dp"
+                android:layout_marginTop="4dp"/-->
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:orientation="horizontal"
+            android:layout_marginTop="5dp">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_weight="10"
+                android:id="@+id/todoItem"
+                android:gravity="center"
+                android:layout_gravity="start"
+                android:layout_marginHorizontal="10dp"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:maxLength="28"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_weight="90"
+                android:layout_gravity="start"
+                android:gravity="center"
+                android:paddingHorizontal="10dp"
+                android:padding="10dp"
+                android:id="@+id/todoItemActivity"/>
+            <!--android:textColor="#f0f0f0"-->
+            <!--view
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"/-->
+        </LinearLayout>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+        <ImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:id="@+id/todoItemCheck"
+            android:background="@drawable/spinner_background"
+            android:foreground="?attr/selectableItemBackground"
+            android:src="@drawable/ic_baseline_check_circle_outline_24"
+            android:scaleType="fitCenter"
+            android:layout_margin="5dp"
+            android:paddingHorizontal="20dp"
+            android:layout_gravity="right"/>
+
+    </LinearLayout>
+
+
+</LinearLayout>
