@@ -34,13 +34,12 @@
 
     <!--General strings-->
 
-    <string name="activity_name">Activity name</string>
-    <string name="remove_activity">Do you want to remove this activity?</string>
 
     <string name="yes">Yes</string>
     <string name="no">No</string>
 
     <string name="at">At:</string>
+    <string name="minutes">minutes</string>
 
     <!--Main activity-->
 
@@ -70,5 +69,11 @@
     <string name="minutes_short">min</string>
 
     <string name="activity_picker_title">Select a type of activity:</string>
+
+    <!--Activity strings-->
+
+    <string name="activity_name">Activity name</string>
+    <string name="remove_activity">Do you want to remove this activity?</string>
+    <string name="activity_preferred_time_length">Usual length of activity (optional)</string>
 
 </resources>

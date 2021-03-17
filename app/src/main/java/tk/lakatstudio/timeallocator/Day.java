@@ -41,6 +41,7 @@ public class Day {
                 dayItems.add(i + 1, newDayItem);
                 Log.v("Day_list", "Item added, last item: " + new SimpleDateFormat("HH:mm", Locale.getDefault()).format(dayItems.get(i).start.getTime()) + " list size now is: " + dayItems.size());
                 Log.v("Day_list", String.valueOf(dayItem.start.getTime() < newDayItem.start.getTime()));
+                isSaved = false;
                 return;
             } else if (dayItems.size() == (i + 1) ? false : (dayItems.get(i + 1).start.getTime() > newDayItem.start.getTime())){
 
@@ -51,12 +52,16 @@ public class Day {
         } else if(dayItems.get(0).start.getTime() > newDayItem.start.getTime()) {
             dayItems.add(0, newDayItem);
         }
+        isSaved = false;
         Log.v("Day_list", "Item added, item: " + new SimpleDateFormat("HH:mm", Locale.getDefault()).format(dayItems.get(0).start.getTime()) + " list size now is: " + dayItems.size());
     }
+
+    //Day dayFrom
 
     void removeDayItem(int index){
         Log.v("Day_list", "Item removed size before: " + dayItems.size() + " @: " + index);
         dayItems.remove(index);
+        isSaved = false;
         Log.v("Day_list", "Item removed size now: " + dayItems.size());
     }
 }

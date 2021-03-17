@@ -57,11 +57,18 @@ public class DayItemActivity extends FragmentActivity {
 
         final Button activityButton = findViewById(R.id.addDayItemActivity);
 
-        try{
-            Log.v("intent_debug", "" + getIntent().getExtras().getInt("index"));
-            dayItem = CycleManager.currentDay.dayItems.get(getIntent().getExtras().getInt("index"));
-        } catch (NullPointerException np){
-            Log.v("intent_debug", "failed");
+        final int focusedFragment = getIntent().getExtras().getInt("fragmentIndex", -1);
+        final Day focusedDay;
+        if(focusedFragment != -1){
+            focusedDay = DayInit.daysHashMap.get(focusedFragment);
+        } else {
+            focusedDay = CycleManager.currentDay;
+        }
+
+        Log.v("intent_debug", "" + getIntent().getExtras().getInt("index", -1));
+        int dayItemIndex = getIntent().getExtras().getInt("index", -1);
+        if(dayItemIndex >= 0) {
+            dayItem = focusedDay.dayItems.get(dayItemIndex);
         }
 
         //this if/else sets all the UI elements if the activity was started with the intention of editing
@@ -211,6 +218,19 @@ public class DayItemActivity extends FragmentActivity {
                         drawable.setColorFilter(selectedActivity.color, PorterDuff.Mode.SRC);
                         activityButton.setBackground(drawable);
 
+                        if(selectedActivity.preferredLength > 0){
+                            int lengthPreferred = selectedActivity.preferredLength;
+                            int endHourPreferred = startHour + (lengthPreferred > 59 ? lengthPreferred / 60 : 0);
+                            int endMinutePreferred = lengthPreferred % 60;
+                            final Calendar future = Calendar.getInstance();
+                            future.set(Calendar.HOUR_OF_DAY, endHourPreferred);
+                            future.set(Calendar.MINUTE, endMinutePreferred);
+                            endTimeButton.setText(new SimpleDateFormat("HH:mm", Locale.getDefault()).format(future.getTime()));
+                            endTimePicker = new MaterialTimePicker.Builder()
+                                    .setTimeFormat(TimeFormat.CLOCK_24H)
+                                    .setHour(endHourPreferred).setMinute(endMinutePreferred).build();
+                        }
+
                         alertDialog.cancel();
                     }
                 });
@@ -251,7 +271,9 @@ public class DayItemActivity extends FragmentActivity {
                     dayItem.start = startTime.getTime();
                     dayItem.end = endTime.getTime();
                 } else {
-                    CycleManager.currentDay.addDayItem(new DayItem(itemName.getText().toString(), startTime.getTime(), endTime.getTime(), selectedActivity));
+
+                    Log.v("fragment_preload", "focusedFragment: "  + focusedFragment);
+                    focusedDay.addDayItem(new DayItem(itemName.getText().toString(), startTime.getTime(), endTime.getTime(), selectedActivity));
                 }
                 finish();
             }

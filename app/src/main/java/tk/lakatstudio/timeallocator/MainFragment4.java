@@ -97,12 +97,16 @@ public class MainFragment4 extends Fragment {
         builder.setView(dialogView);
         final AlertDialog alertDialog = builder.create();
         final EditText editText = dialogView.findViewById(R.id.activityEditName);
+        final EditText editTimeText = dialogView.findViewById(R.id.activityEditTime);
         Button done = dialogView.findViewById(R.id.activityEditDone);
 
         final ActivityType activityType;
         if(index != -1) {
             activityType = ActivityType.allActivityTypes.get(index);
             editText.setText(activityType.name);
+            if(activityType.preferredLength > 0) {
+                editTimeText.setText(String.valueOf(activityType.preferredLength));
+            }
         } else {
             activityType = ActivityType.addActivityType("", 0);
             editText.setHint(getString(R.string.activity_name));
@@ -114,8 +118,22 @@ public class MainFragment4 extends Fragment {
                 activityType.name = editText.getText().toString();
                 activityType.color = getResources().getIntArray(R.array.default_colors)[Math.abs(new Random().nextInt()) % getResources().getIntArray(R.array.default_colors).length];
                 //editText.setText(activityType.name);
+                if(editTimeText.getText().length() > 0) {
+                    activityType.preferredLength = Integer.parseInt(editTimeText.getText().toString());
+                } else {
+                    activityType.preferredLength = -1;
+                }
                 alertDialog.cancel();
                 pickerAdapter.notifyDataSetChanged();
+            }
+        });
+
+        alertDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
+            @Override
+            public void onCancel(DialogInterface dialogInterface) {
+                if(activityType.name.length() == 0){
+                    ActivityType.allActivityTypes.remove(activityType);
+                }
             }
         });
 

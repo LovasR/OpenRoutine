@@ -15,11 +15,12 @@ import java.io.FileWriter;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.HashMap;
 import java.util.Locale;
 
 public class DayInit {
 
-
+    static HashMap<Integer, Day> daysHashMap = new HashMap<>();
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     static void init(Context context, MainActivity mainActivity){
@@ -76,10 +77,22 @@ public class DayInit {
         //}
         Log.v("Out_Json days", outJson);
         if(outJson.length() > 0) {
-            writeToFile(context, outJson, "day_" + new SimpleDateFormat("yMd", Locale.getDefault()).format(Calendar.getInstance().getTime()));
+            writeToFile(context, outJson, "day_" + new SimpleDateFormat("y.M.d", Locale.getDefault()).format(Calendar.getInstance().getTime()));
         }
 
-        Log.v("day_debug", "day_" + new SimpleDateFormat("yMd", Locale.getDefault()).format(Calendar.getInstance().getTime()));
+        //save modified days
+        for(Day day : daysHashMap.values()){
+            if(!day.isSaved){
+                outJson = "";
+                outJson += gson.toJson(day);
+                outJson += "\n";
+                Log.v("day_save", "day_" + new SimpleDateFormat("y.M.d", Locale.getDefault()).format(day.start.getTime()));
+                writeToFile(context, outJson, "day_" + new SimpleDateFormat("y.M.d", Locale.getDefault()).format(day.start.getTime()));
+                day.isSaved = true;
+            }
+        }
+
+        Log.v("day_debug", "day_" + new SimpleDateFormat("y.M.d", Locale.getDefault()).format(Calendar.getInstance().getTime()));
 
         outJson = "";
         for(int i = 0; i < ActivityType.allActivityTypes.size(); i++){
@@ -135,7 +148,7 @@ public class DayInit {
     }
 
     static boolean loadAll(Context context){
-        ArrayList<String> days = readFromFile(context, "day_" + new SimpleDateFormat("yMd", Locale.getDefault()).format(Calendar.getInstance().getTime()));
+        ArrayList<String> days = readFromFile(context, "day_" + new SimpleDateFormat("y.M.d", Locale.getDefault()).format(Calendar.getInstance().getTime()));
 
         if(days == null){
             return false;
@@ -144,6 +157,7 @@ public class DayInit {
         Gson gson = new Gson();
         for(String dayJson : days){
             CycleManager.currentDay = gson.fromJson(dayJson, Day.class);
+            daysHashMap.put(Calendar.getInstance().get(Calendar.DAY_OF_YEAR), CycleManager.currentDay);
             for(DayItem dayItem : CycleManager.currentDay.dayItems){
                 DayItem.allDayItemHashes.put(dayItem.hashCode(), dayItem);
                 Log.v("hash_debug", dayItem.hashCode() + "");

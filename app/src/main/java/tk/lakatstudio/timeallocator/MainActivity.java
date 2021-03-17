@@ -95,6 +95,7 @@ public class MainActivity extends AppCompatActivity {
                 switch (bottomNav.getSelectedItemId()){
                     case R.id.main_menu_1:
                         Intent intent1 = new Intent(MainActivity.this, DayItemActivity.class);
+                        intent1.putExtra("fragmentIndex", fragment1.fragmentIndex);
                         startActivity(intent1);
                         break;
                     case R.id.main_menu_2:

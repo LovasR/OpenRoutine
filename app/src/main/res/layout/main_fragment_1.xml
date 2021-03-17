@@ -8,24 +8,24 @@
         android:layout_height="match_parent"
         android:orientation="vertical"
         android:id="@+id/mainLayout">
-        <!--TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/cycle_setting"/>
 
-        <Spinner
+        <!--Spinner
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:id="@+id/testCycleSpinner"/-->
-
-        <ListView
+        <androidx.viewpager.widget.ViewPager
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
+            android:id="@+id/verticalViewPager"/>
+
+        <!--ListView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
             android:id="@+id/testDayPlanner"
             android:layout_margin="15dp"
             android:padding="15dp"
             android:layout_marginTop="40dp"
-            android:divider="#FFFFFF"/>
+            android:divider="#FFFFFF"/-->
 
 
     </LinearLayout>

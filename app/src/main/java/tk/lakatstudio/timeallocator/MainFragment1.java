@@ -1,149 +1,236 @@
 package tk.lakatstudio.timeallocator;
 
-import android.content.Intent;
-import android.graphics.PorterDuff;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.ListView;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.content.res.AppCompatResources;
 import androidx.fragment.app.Fragment;
+import androidx.viewpager.widget.ViewPager;
+
+import com.google.gson.Gson;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.Locale;
 
 public class MainFragment1 extends Fragment {
 
-    ListView dayPlanner;
+    ViewPager viewPager;
+    CollectionPagerAdapter collectionPagerAdapter;
     boolean isRunning = false;
+
+    DayFragment[] dayFragments;
+    int fragmentIndex;
+    int todayIndex;
+    int dayStartIndex;
+    int dayRange;
+
+    int focusedPage;
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.main_fragment_1, container, false);
 
-        Log.e("UI_test", "oncreateview");
-        dayPlanner = view.findViewById(R.id.testDayPlanner);
+        Log.e("UI_test", "oncreateview main_fragment1");
+        //dayPlanner = view.findViewById(R.id.testDayPlanner);
         //dayPlannerInit(this);
+
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(Calendar.DAY_OF_YEAR, 1);
+        Log.v("date test", new SimpleDateFormat("y.M.d", Locale.getDefault()).format(calendar.getTime()));
+        Calendar.getInstance().get(Calendar.DAY_OF_YEAR);
 
         return view;
     }
 
     @Override
-    public void onResume() {
-        Log.e("UI_test", "onresume_fragment");
-        if(!isRunning){
-            isRunning = true;
-            dayPlannerInit(this);
-        } else {
-            dayPlannerInit(this);
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        Log.e("UI_test", "onviewcreated main_fragment1");
+        dayFragments = new DayFragment[]{new DayFragment(), new DayFragment(), new DayFragment()};
+        collectionPagerAdapter = new CollectionPagerAdapter(getChildFragmentManager(), dayFragments);
+        viewPager = view.findViewById(R.id.verticalViewPager);
+        viewPager.setAdapter(collectionPagerAdapter);
+        viewPager.setSaveEnabled(false);
+        //viewPager.setCurrentItem(viewPager.getChildCount() * 1000 / 2);
+        //dayFragments[0].onStart();7821111111111
+        fragmentIndex = Calendar.getInstance().get(Calendar.DAY_OF_YEAR);
+        viewPager.setCurrentItem(1);
+        //dayStartIndex = fragmentIndex - 1;
+
+        viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+                Log.v("fragment_preload_", "position: " + position);
+                focusedPage = position;
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+                Log.v("fragment_preload_", "focusedPAge: " + focusedPage);
+                if(state == ViewPager.SCROLL_STATE_IDLE){
+                    if(focusedPage == 0){
+                        fragmentIndex--;
+                        refreshAllFragments();
+                        //dayStartIndex--;
+                        /*dayFragments[0].dayPlannerInit(dayFragments[0]);
+                        dayFragments[1].dayPlannerInit(dayFragments[1]);
+                        dayFragments[2].dayPlannerInit(dayFragments[2]);*/
+                        //dayFragments[1].dayPlanner.setAdapter(dayFragments[0].dayPlanner.getAdapter());
+                    } else if(focusedPage == 2){
+                        fragmentIndex++;
+                        refreshAllFragments();
+                        /*dayFragments[0].dayPlannerInit(dayFragments[0]);
+                        dayFragments[1].dayPlannerInit(dayFragments[1]);
+                        dayFragments[2].dayPlannerInit(dayFragments[2]);*/
+                        //dayFragments[1].dayPlanner.setAdapter(dayFragments[2].dayPlanner.getAdapter());
+                    }
+
+                    //prevent flashing of old ListView
+                    try {
+                        Thread.sleep(50);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+
+
+                    //dayFragments[0].fragmentDay = DayInit.daysHashMap.get(fragmentIndex - 1) != null ? DayInit.daysHashMap.get(fragmentIndex - 1) :
+                    //gson.fromJson(DayInit.readFromFile(getContext(), "day_" + dateFormat.format(calendar.getTime())).get(0), Day.class);
+
+                    //this is a joke
+                    //dayFragments[0].fragmentDay = DayInit.daysHashMap.get(fragmentIndex - 1) != null ? DayInit.daysHashMap.get(fragmentIndex - 1) : new Gson().fromJson(DayInit.readFromFile(getContext(), "day_" + new SimpleDateFormat("y.M.d", Locale.getDefault()).format(calendar.getTime())).get(0), Day.class);
+                    viewPager.setCurrentItem(1, false);
+                }
+            }
+        });
+        viewPager.setOffscreenPageLimit(3);
+
+        /*for(int i = 0; i < 3; i++) {
+            final int finalI = i;
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    dayFragments[finalI].onStart();
+                }
+            }).start();
+        }*/
+
+        super.onViewCreated(view, savedInstanceState);
+        todayIndex = Calendar.getInstance().get(Calendar.DAY_OF_YEAR);
+        refreshAllFragments();
+    }
+
+    void refreshAllFragments(){
+        for(int i = 0; i < 3; i++){
+            final int finalIndex = i;
+            /*new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    setFragmentDay(finalIndex);
+                }
+            }).start();*/
+            new Thread(){
+                @Override
+                public void run() {
+                    Log.v("fragment_preload", "start load: " + finalIndex);
+                    setFragmentDay(finalIndex);
+
+                    try{
+                        synchronized (this){
+
+                                Log.v("fragment_preload", "dayPlannerInit " + finalIndex);
+
+                                getActivity().runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        if(dayFragments[finalIndex].getContext() != null) {
+                                            dayFragments[finalIndex].dayPlannerInit(dayFragments[finalIndex]);
+                                        }
+                                        Log.v("fragment_date", "dateindex: " + todayIndex + " " + fragmentIndex);
+                                        dayFragments[finalIndex].setDateText(fragmentIndex + (finalIndex - 1), todayIndex);
+                                    }
+                                });
+
+                        }
+                    } catch (NullPointerException np){
+                        np.printStackTrace();
+                        try {
+                            Thread.sleep(50);
+                            getActivity().runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    dayFragments[finalIndex].setDateText(fragmentIndex + (finalIndex - 1), todayIndex);
+                                }
+                            });
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+            }.start();
         }
-        super.onResume();
+    }
+
+    void setFragmentDay(int index){
+        //new index offsets to the two positons realative to the changed fragmentIndex
+        //newIndex is the position of the day to be loaded
+        int newIndex = fragmentIndex + (index - 1);
+        Log.v("fragment_preload", "newindex: " + newIndex + " index: " + index + " fragmentIndex: " + fragmentIndex);
+
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(Calendar.DAY_OF_YEAR, newIndex);
+
+        Gson gson = new Gson();
+        SimpleDateFormat dateFormat = new SimpleDateFormat("y.M.d", Locale.getDefault());
+
+        //retrieve Day from the hashmap, if null, try to load from file
+        if((dayFragments[index].fragmentDay = DayInit.daysHashMap.get(newIndex)) == null){
+
+            ArrayList<String> dayJsons = DayInit.readFromFile(getContext(), "day_" + dateFormat.format(calendar.getTime()));
+
+            if(dayJsons != null){
+                dayFragments[index].fragmentDay = gson.fromJson(dayJsons.get(0), Day.class);
+                Log.v("fragment_preload", "loaded from file: " + new SimpleDateFormat("D").format(dayFragments[index].fragmentDay.start.getTime()));
+                dayFragments[index].fragmentDay.isSaved = true;
+                //dayFragments[index].dayPlannerInit(dayFragments[index]);
+            } else {
+                Log.v("fragment_preload", "new Day");
+                dayFragments[index].fragmentDay = new Day();
+
+                Calendar date = Calendar.getInstance();
+                date.set(Calendar.DAY_OF_YEAR, newIndex);
+                date.set(Calendar.HOUR_OF_DAY, 0);
+                date.set(Calendar.MINUTE, 0);
+                date.set(Calendar.SECOND, 0);
+                dayFragments[index].fragmentDay.start = date.getTime();
+
+                dayFragments[index].fragmentDay.isSaved = true;
+            }
+            //put the value not yet in the hashmap
+            DayInit.daysHashMap.put(newIndex, dayFragments[index].fragmentDay);
+        } else {
+            Log.v("fragment_preload", "loaded from hashmap: " + new SimpleDateFormat("D").format(dayFragments[index].fragmentDay.dayItems.size()));
+            //dayFragments[index].dayPlannerInit(dayFragments[index]);
+        }
+
+        //dayFragments[index].dayPlannerInit(dayFragments[index]);
     }
 
     @Override
     public void onDestroyView() {
-        Log.e("UI_test", "ondestroyview");
+        Log.e("UI_test", "ondestroyview main_fragment1");
         super.onDestroyView();
     }
-
-    private String lengthAdapter(Date start, Date end){
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTime(end);
-        int hours = calendar.get(Calendar.HOUR_OF_DAY);
-        int minutes = calendar.get(Calendar.MINUTE);
-        calendar.setTime(start);
-        hours -= calendar.get(Calendar.HOUR_OF_DAY);
-        minutes -= calendar.get(Calendar.MINUTE);
-
-        calendar.set(Calendar.HOUR_OF_DAY, hours);
-        calendar.set(Calendar.MINUTE, minutes);
-
-        Log.e("adaptertest", minutes + " ");
-
-        String out = "";
-        if(hours > 0){
-            out += new SimpleDateFormat("H", Locale.getDefault()).format(calendar.getTime()) + " " + getString(R.string.hour_short) + " ";
-        }
-        if(minutes > 0 || (hours == 0 && minutes == 0)){
-            out += new SimpleDateFormat("mm", Locale.getDefault()).format(calendar.getTime()) + " " + getString(R.string.minutes_short);
-        }
-        return out;
-    }
-
-    public void dayPlannerInit(final Fragment fragment){
-
-        if(CycleManager.currentDay.dayItems.size() == 0){
-            return;
-        }
-        final ArrayAdapter<DayItem> arrayAdapter = new ArrayAdapter<DayItem>(fragment.getContext(), R.layout.dayplanner_item, CycleManager.currentDay.dayItems){
-            @NonNull
-            @Override
-            public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
-                if(convertView==null){
-                    convertView = getLayoutInflater().inflate(R.layout.dayplanner_item, null);
-                }
-
-                final DayItem dayItem = CycleManager.currentDay.dayItems.get(position);
-                Log.v("save_debug_load", "a" + dayItem.type.name);
-
-                TextView itemStart = convertView.findViewById(R.id.dayPlannerItemStart);
-                itemStart.setText(new SimpleDateFormat("HH:mm", Locale.getDefault()).format(dayItem.start.getTime()));
-
-                TextView itemLength = convertView.findViewById(R.id.dayPlannerItemLength);
-                itemLength.setText(lengthAdapter(dayItem.start, dayItem.end));
-
-                TextView itemName = convertView.findViewById(R.id.dayPlannerItem);
-                if (dayItem.name.length() != 0){
-                    itemName.setText(dayItem.name);
-                    itemName.setVisibility(View.VISIBLE);
-                } else {
-                    itemName.setVisibility(View.GONE);
-                }
-
-                TextView itemType = convertView.findViewById(R.id.dayPlannerItemActivity);
-                itemType.setText(dayItem.type.name);
-                final Drawable textBackground = AppCompatResources.getDrawable(fragment.getContext(), R.drawable.spinner_background);
-                textBackground.setColorFilter(dayItem.type.color, PorterDuff.Mode.SRC);
-                itemType.setBackground(textBackground);
-                return convertView;
-            }
-        };
-        dayPlanner.setDividerHeight(10);
-        dayPlanner.setAdapter(arrayAdapter);
-        dayPlanner.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                Intent editIntent = new Intent(fragment.getContext(), DayItemActivity.class);
-                editIntent.putExtra("index", i);
-                startActivity(editIntent);
-            }
-        });
-        dayPlanner.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
-            @Override
-            public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l) {
-                Log.e("Day_list", "Item removed @: " + i);
-                CycleManager.currentDay.removeDayItem(i);
-                arrayAdapter.notifyDataSetChanged();
-                return false;
-            }
-        });
-
-        try {
-            Thread.sleep(300);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-    }
 }
+
+

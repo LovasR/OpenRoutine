@@ -2,14 +2,15 @@ package tk.lakatstudio.timeallocator;
 
 import android.util.Log;
 
+import com.google.gson.annotations.Expose;
+
 import java.util.ArrayList;
 
 public class TodoItem {
     String name;
     int dayItemHash;
 
-    //@Expose
-    //TODO hash
+    @Expose
     DayItem dayItem;
 
 
