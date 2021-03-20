@@ -25,7 +25,7 @@ public class MainFragment1 extends Fragment {
     boolean isRunning = false;
 
     DayFragment[] dayFragments;
-    int fragmentIndex;
+    static int fragmentIndex = -1;
     int todayIndex;
     int dayStartIndex;
     int dayRange;
@@ -56,12 +56,15 @@ public class MainFragment1 extends Fragment {
         collectionPagerAdapter = new CollectionPagerAdapter(getChildFragmentManager(), dayFragments);
         viewPager = view.findViewById(R.id.verticalViewPager);
         viewPager.setAdapter(collectionPagerAdapter);
+        viewPager.setCurrentItem(1);
         viewPager.setSaveEnabled(false);
         //viewPager.setCurrentItem(viewPager.getChildCount() * 1000 / 2);
         //dayFragments[0].onStart();7821111111111
-        fragmentIndex = Calendar.getInstance().get(Calendar.DAY_OF_YEAR);
-        viewPager.setCurrentItem(1);
-        //dayStartIndex = fragmentIndex - 1;
+
+        //only sets current day on first run
+        if(fragmentIndex == -1){
+            fragmentIndex = Calendar.getInstance().get(Calendar.DAY_OF_YEAR);
+        }
 
         viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
@@ -220,9 +223,13 @@ public class MainFragment1 extends Fragment {
             DayInit.daysHashMap.put(newIndex, dayFragments[index].fragmentDay);
         } else {
             Log.v("fragment_preload", "loaded from hashmap: " + new SimpleDateFormat("D").format(dayFragments[index].fragmentDay.dayItems.size()));
+
+            Regime.removeRegimeDays(dayFragments[index].fragmentDay);
             //dayFragments[index].dayPlannerInit(dayFragments[index]);
         }
-
+        if(!dayFragments[index].fragmentDay.isRegimeSet){
+            Regime.setAllActiveRegimesDays(dayFragments[index].fragmentDay);
+        }
         //dayFragments[index].dayPlannerInit(dayFragments[index]);
     }
 

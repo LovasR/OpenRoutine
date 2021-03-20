@@ -1,10 +1,7 @@
 package tk.lakatstudio.timeallocator;
 
 import android.content.Context;
-import android.os.Build;
 import android.util.Log;
-
-import androidx.annotation.RequiresApi;
 
 import com.google.gson.Gson;
 
@@ -22,7 +19,6 @@ public class DayInit {
 
     static HashMap<Integer, Day> daysHashMap = new HashMap<>();
 
-    @RequiresApi(api = Build.VERSION_CODES.O)
     static void init(Context context, MainActivity mainActivity){
 
 
@@ -83,6 +79,10 @@ public class DayInit {
         //save modified days
         for(Day day : daysHashMap.values()){
             if(!day.isSaved){
+                //remove dayItems added by the regimes to make regimes usable
+                if(day.start.getTime() > Calendar.getInstance().getTime().getTime()){
+                    Regime.removeRegimeDays(day);
+                }
                 outJson = "";
                 outJson += gson.toJson(day);
                 outJson += "\n";
@@ -116,7 +116,7 @@ public class DayInit {
             Log.e("testreads", testRead.get(i));
         }
 
-        outJson = "";
+        /*outJson = "";
         for(int i = 0; i < TodoItem.allTodoItems.size(); i++){
             TodoItem todoItem = TodoItem.allTodoItems.get(i);
             outJson += gson.toJson(todoItem);
@@ -125,7 +125,19 @@ public class DayInit {
         Log.v("save_debug", "todos: " + outJson);
         if(outJson.length() > 0){
             writeToFile(context, outJson, "todos");
+        }*/
+        outJson = "";
+        for(int i = 0; i < Regime.allRegimes.size(); i++){
+            Regime regime = Regime.allRegimes.get(i);
+            regime.isSaved = true;
+            outJson += gson.toJson(regime);
+            outJson += "\n";
         }
+        Log.v("save_debug", "regimes: " + outJson);
+        if(outJson.length() > 0){
+            writeToFile(context, outJson, "regimes");
+        }
+
     }
     static void writeToFile(Context context, String json, String fileName){
         File dir = new File(context.getFilesDir(), "saves");
@@ -172,16 +184,24 @@ public class DayInit {
             Log.v("save_debug_load", "load activity: \t" + activityJson);
         }
 
-        ArrayList<String> todoList = readFromFile(context, "todos");
+        /*ArrayList<String> todoList = readFromFile(context, "todos");
         if(todoList != null) {
             for (String todoJson : todoList) {
                 TodoItem todoItem = gson.fromJson(todoJson, TodoItem.class);
                 TodoItem.addItem(todoItem);
-                //TODO hash
+                //TODdO hash
                 //todoItem.dayItem = DayItem.allDayItemHashes.get(todoItem.dayItemHash);
-                Log.v("save_debug_load", "load todo: \t" + todoJson);
+                Log.v("save_debug_load", "load toddo: \t" + todoJson);
+            }
+        }*/
+
+        ArrayList<String> regimeList = readFromFile(context, "regimes");
+        if(regimeList != null) {
+            for (String regimeJson : regimeList) {
+                Regime.addRegime(gson.fromJson(regimeJson, Regime.class));
             }
         }
+
         return true;
     }
 
@@ -189,6 +209,7 @@ public class DayInit {
         File dir = new File(context.getFilesDir(), "saves");
         if(!dir.exists()){
             Log.v("save_debug_load", "directory !exist");
+            return null;
         }
 
         ArrayList<String> out = new ArrayList<>();

@@ -41,6 +41,23 @@
     <string name="at">At:</string>
     <string name="minutes">minutes</string>
 
+    <string name="day_of_week_1">Monday</string>
+    <string name="day_of_week_2">Tuesday</string>
+    <string name="day_of_week_3">Wednesday</string>
+    <string name="day_of_week_4">Thursday</string>
+    <string name="day_of_week_5">Friday</string>
+    <string name="day_of_week_6">Saturday</string>
+    <string name="day_of_week_7">Sunday</string>
+    <string-array name="days_of_week">
+        <item>@string/day_of_week_1</item>
+        <item>@string/day_of_week_2</item>
+        <item>@string/day_of_week_3</item>
+        <item>@string/day_of_week_4</item>
+        <item>@string/day_of_week_5</item>
+        <item>@string/day_of_week_6</item>
+        <item>@string/day_of_week_7</item>
+    </string-array>
+
     <!--Main activity-->
 
     <string name="main_menu_1_title">Lineup</string>
@@ -53,6 +70,7 @@
     <string name="todo_hint">Todo`s text</string>
     <string name="todo_add_time">Add time</string>
     <string name="todo_set_text_error">Text can`t be empty!</string>
+    <string name="todo_no_todo">Nothing to do on this day!</string>
 
     <!--DayItem activity-->
 
@@ -70,10 +88,18 @@
 
     <string name="activity_picker_title">Select a type of activity:</string>
 
+    <!--Regime strings-->
+    <string name="regime_menu_1_title">Days</string>
+    <string name="regime_menu_2_title">To-Dos</string>
+
+    <string name="regime_name_hint">Name the regime</string>
+
     <!--Activity strings-->
 
     <string name="activity_name">Activity name</string>
     <string name="remove_activity">Do you want to remove this activity?</string>
-    <string name="activity_preferred_time_length">Usual length of activity (optional)</string>
+    <string name="activity_preferred_time_length">Length of activity (optional)</string>
+    <string name="activity_pick_color">Pick color</string>
+    <string name="activity_pick_A_color">Pick a color</string>
 
 </resources>

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto">
@@ -35,7 +36,8 @@
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/outlineActivityTimeTextField"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_weight="4"
                 android:hint="@string/activity_preferred_time_length"
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
 
@@ -51,10 +53,27 @@
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="match_parent"
                     android:inputType="number"
                     android:id="@+id/activityEditTime"/>
             </com.google.android.material.textfield.TextInputLayout>
+            <androidx.appcompat.widget.AppCompatButton
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:id="@+id/activityEditColor"
+                android:layout_weight="6"
+                android:layout_margin="10dp"
+                android:layout_marginTop="5dp"
+                android:text="@string/activity_pick_color"
+                android:background="@drawable/spinner_background"/>
+            <!--ImageView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:id="@+id/activityEditColor"
+                android:paddingVertical="8dp"
+
+                android:src="@drawable/circle_24"
+                android:layout_weight="6"/-->
         </LinearLayout>
         <Button
             android:layout_width="wrap_content"

@@ -62,7 +62,14 @@ public class DayItemActivity extends FragmentActivity {
         if(focusedFragment != -1){
             focusedDay = DayInit.daysHashMap.get(focusedFragment);
         } else {
-            focusedDay = CycleManager.currentDay;
+            int regimeIndex = getIntent().getExtras().getInt("regimeIndex", -1);
+            int regimeDayIndex = getIntent().getExtras().getInt("regimeDayIndex", -1);
+            Log.v("regime_intent_debug", "" + getIntent().getExtras().getInt("regimeIndex", -1));
+            if(regimeIndex != -1){
+                focusedDay = Regime.allRegimes.get(regimeIndex).days[regimeDayIndex];
+            } else {
+                focusedDay = new Day();
+            }
         }
 
         Log.v("intent_debug", "" + getIntent().getExtras().getInt("index", -1));

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/regime_menu_1"
+        android:enabled="true"
+        android:icon="@drawable/ic_baseline_list_alt_24"
+        android:title="@string/regime_menu_1_title"/>
+    <item
+        android:id="@+id/regime_menu_2"
+        android:enabled="true"
+        android:icon="@drawable/ic_baseline_library_add_check_24"
+        android:title="@string/regime_menu_2_title"/>
+</menu>

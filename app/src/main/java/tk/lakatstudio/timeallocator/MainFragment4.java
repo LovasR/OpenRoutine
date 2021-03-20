@@ -19,8 +19,12 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.content.res.AppCompatResources;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
+import java.util.ArrayList;
 import java.util.Random;
 
 public class MainFragment4 extends Fragment {
@@ -91,14 +95,18 @@ public class MainFragment4 extends Fragment {
         });
     }
 
-    void activityTypeAdd(int index, Fragment fragment){
+    int selectedColor;
+
+    void activityTypeAdd(int index, final Fragment fragment){
         final AlertDialog.Builder builder = new AlertDialog.Builder(fragment.getContext());
         View dialogView = getLayoutInflater().inflate(R.layout.activity_edit_dialog, null);
         builder.setView(dialogView);
         final AlertDialog alertDialog = builder.create();
         final EditText editText = dialogView.findViewById(R.id.activityEditName);
         final EditText editTimeText = dialogView.findViewById(R.id.activityEditTime);
+        final Button colorPicker = dialogView.findViewById(R.id.activityEditColor);
         Button done = dialogView.findViewById(R.id.activityEditDone);
+
 
         final ActivityType activityType;
         if(index != -1) {
@@ -107,16 +115,29 @@ public class MainFragment4 extends Fragment {
             if(activityType.preferredLength > 0) {
                 editTimeText.setText(String.valueOf(activityType.preferredLength));
             }
+            selectedColor = activityType.color;
         } else {
             activityType = ActivityType.addActivityType("", 0);
             editText.setHint(getString(R.string.activity_name));
+            selectedColor = getResources().getIntArray(R.array.default_colors)[Math.abs(new Random().nextInt()) % getResources().getIntArray(R.array.default_colors).length];
         }
+
+        Drawable drawable = ContextCompat.getDrawable(fragment.getContext(), R.drawable.spinner_background);
+        drawable.setColorFilter(selectedColor, PorterDuff.Mode.SRC);
+        colorPicker.setBackground(drawable);
+        colorPicker.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                colorPickerDialog(fragment, colorPicker);
+            }
+        });
 
         done.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 activityType.name = editText.getText().toString();
-                activityType.color = getResources().getIntArray(R.array.default_colors)[Math.abs(new Random().nextInt()) % getResources().getIntArray(R.array.default_colors).length];
+                Log.v("selectedColor", "will be: " + selectedColor);
+                activityType.color = selectedColor;
                 //editText.setText(activityType.name);
                 if(editTimeText.getText().length() > 0) {
                     activityType.preferredLength = Integer.parseInt(editTimeText.getText().toString());
@@ -134,6 +155,42 @@ public class MainFragment4 extends Fragment {
                 if(activityType.name.length() == 0){
                     ActivityType.allActivityTypes.remove(activityType);
                 }
+            }
+        });
+
+        alertDialog.show();
+    }
+
+
+    void colorPickerDialog(final Fragment fragment, final Button colorPickerButton){
+        final AlertDialog.Builder builder = new AlertDialog.Builder(fragment.getContext());
+        View dialogView = getLayoutInflater().inflate(R.layout.color_picker_dialog, null);
+        RecyclerView colorSheet = dialogView.findViewById(R.id.colorPickerRecyclerView);
+        Button done = dialogView.findViewById(R.id.colorPickerDone);
+        builder.setView(dialogView);
+        final AlertDialog alertDialog = builder.create();
+
+        colorSheet.setLayoutManager(new GridLayoutManager(fragment.getContext(), 3));
+        ArrayList<Integer> colorList = new ArrayList<Integer>();
+        for(int color : getResources().getIntArray(R.array.default_colors)) colorList.add(color);
+        final ColorPickerAdapter adapter = new ColorPickerAdapter(fragment.getContext(), colorList);
+        adapter.setClickListener(new ColorPickerAdapter.ItemClickListener() {
+            @Override
+            public void onItemClick(View view, int position) {
+                Log.v("selectedColor", "was: " + selectedColor);
+                selectedColor = adapter.getItem(position);
+                Drawable drawable = ContextCompat.getDrawable(fragment.getContext(), R.drawable.spinner_background);
+                drawable.setColorFilter(selectedColor, PorterDuff.Mode.SRC);
+                colorPickerButton.setBackground(drawable);
+                Log.v("selectedColor", "now: " + selectedColor);
+            }
+        });
+        colorSheet.setAdapter(adapter);
+
+        done.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                alertDialog.cancel();
             }
         });
 

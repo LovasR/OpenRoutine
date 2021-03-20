@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+<manifest
+    xmlns:android="http://schemas.android.com/apk/res/android"
     package="tk.lakatstudio.timeallocator">
 
     <application
@@ -23,6 +24,7 @@
 
         <activity android:name=".DayItemActivity"/>
         <activity android:name=".TodoItemActivity"/>
+        <activity android:name=".RegimeActivity"/>
         <receiver
             android:name=".ATBroadcastReceiver"
             android:enabled="true"

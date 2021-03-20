@@ -4,8 +4,6 @@ import android.content.Intent;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import android.text.SpannableString;
-import android.text.style.UnderlineSpan;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -22,14 +20,15 @@ import androidx.appcompat.content.res.AppCompatResources;
 import androidx.fragment.app.Fragment;
 
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.Locale;
 
-public class MainFragment2 extends Fragment {
+public class RegimeTodoFragment extends Fragment {
 
     TextView noTodoText;
     ListView todoList;
     Day day;
+    Regime regime;
+    int dayIndex;
 
     @Nullable
     @Override
@@ -40,22 +39,9 @@ public class MainFragment2 extends Fragment {
         TextView todoDateText = view.findViewById(R.id.todoDate);
         todoList = view.findViewById(R.id.todoListview);
         noTodoText = view.findViewById(R.id.todoNoTodo);
-        //todoListInit(this);
-
-        day = DayInit.daysHashMap.get(MainFragment1.fragmentIndex);
-
 
         //TODO settings
-        SpannableString dateText = new SpannableString(new SimpleDateFormat("y.M.d.", Locale.getDefault()).format(day.start));
-        Calendar today = Calendar.getInstance();
-        today.set(Calendar.HOUR_OF_DAY, 0);
-        today.set(Calendar.MINUTE, 0);
-        today.set(Calendar.SECOND, 0);
-        today.set(Calendar.MILLISECOND, 0);
-        if(day.start.getTime() == today.getTime().getTime()) {
-            dateText.setSpan(new UnderlineSpan(), 0, dateText.length(), 0);
-        }
-        todoDateText.setText(dateText);
+        todoDateText.setText(regime.dayNames[dayIndex]);
 
         return view;
     }
@@ -106,8 +92,9 @@ public class MainFragment2 extends Fragment {
                     @Override
                     public void onClick(View view) {
                         Intent editIntent = new Intent(fragment.getContext(), TodoItemActivity.class);
-                        editIntent.putExtra("fragmentIndex", MainFragment1.fragmentIndex);
-                        editIntent.putExtra("index", position);
+                        editIntent.putExtra("regimeIndex", regime.index);
+                        editIntent.putExtra("regimeDayIndex", dayIndex);
+                        editIntent.putExtra("regimeTodoIndex", position);
                         startActivity(editIntent);
                     }
                 });
@@ -115,7 +102,7 @@ public class MainFragment2 extends Fragment {
                 convertView.setOnLongClickListener(new View.OnLongClickListener() {
                     @Override
                     public boolean onLongClick(View view) {
-                        TodoItem.removeItem(todo);
+                        //TodoItem.removeItem();
                         day.removeTodoItem(todo);
                         notifyDataSetChanged();
                         return false;
@@ -128,7 +115,7 @@ public class MainFragment2 extends Fragment {
                     @Override
                     public void onClick(View view) {
                         Log.v("__debug", "check clicked");
-                        TodoItem.removeItem(todo);
+                        //TodoItem.removeItem();
                         day.removeTodoItem(todo);
                         notifyDataSetChanged();
                     }

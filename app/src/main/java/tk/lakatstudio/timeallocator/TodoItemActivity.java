@@ -29,6 +29,7 @@ import java.util.Locale;
 
 public class TodoItemActivity extends FragmentActivity {
 
+    Day day;
     DayItem assoc;
     TodoItem todoItem;
 
@@ -38,12 +39,31 @@ public class TodoItemActivity extends FragmentActivity {
         setContentView(R.layout.todo_item_add);
 
         //get item for editing
-        try{
+        final int dayIndex = getIntent().getExtras().getInt("fragmentIndex", -1);
+        if(dayIndex != -1){
+            day = DayInit.daysHashMap.get(dayIndex);
+            int todoIndex = getIntent().getExtras().getInt("index", -1);
+            if(todoIndex != -1) {
+                todoItem = day.todoItems.get(todoIndex);
+            }
+        } else {
+            int regimeIndex = getIntent().getExtras().getInt("regimeIndex", -1);
+            int regimeDayIndex = getIntent().getExtras().getInt("regimeDayIndex", -1);
+            int regimeTodoIndex = getIntent().getExtras().getInt("regimeTodoIndex", -1);
+            if(regimeIndex != -1){
+                day = Regime.allRegimes.get(regimeIndex).days[regimeDayIndex];
+                if(regimeTodoIndex != -1){
+                    todoItem = day.todoItems.get(regimeTodoIndex);
+                }
+            }
+            Log.e("TODO_INTENT", "INTENT_ERROR");
+        }
+        /*try{
             Log.v("intent_debug", "" + getIntent().getExtras().getInt("index"));
             todoItem = TodoItem.allTodoItems.get(getIntent().getExtras().getInt("index"));
         } catch (NullPointerException np){
             Log.v("intent_debug", "failed");
-        }
+        }*/
 
         final EditText itemName = findViewById(R.id.addTodoEditName);
         final TextInputLayout itemNameParent = findViewById(R.id.addTodoEditNameLayout);
@@ -76,7 +96,7 @@ public class TodoItemActivity extends FragmentActivity {
         selectDayItem.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(CycleManager.currentDay.dayItems.size() == 0){
+                if(day.dayItems.size() == 0){
                     //TODO relay lack of item to associate to user
                     return;
                 }
@@ -87,14 +107,14 @@ public class TodoItemActivity extends FragmentActivity {
                 builder.setView(dialogView);
                 final AlertDialog alertDialog = builder.create();
 
-                ArrayAdapter<DayItem> adapter = new ArrayAdapter<DayItem>(getBaseContext(), R.layout.dayplanner_item, CycleManager.currentDay.dayItems) {
+                ArrayAdapter<DayItem> adapter = new ArrayAdapter<DayItem>(getBaseContext(), R.layout.dayplanner_item, day.dayItems) {
                     @NonNull
                     @Override
                     public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
                         if (convertView == null) {
                             convertView = getLayoutInflater().inflate(R.layout.dayplanner_item, null);
                         }
-                        final DayItem dayItem = CycleManager.currentDay.dayItems.get(position);
+                        final DayItem dayItem = day.dayItems.get(position);
                         Log.v("save_debug_load", "a" + dayItem.type.name);
 
                         TextView itemStart = convertView.findViewById(R.id.dayPlannerItemStart);
@@ -124,7 +144,7 @@ public class TodoItemActivity extends FragmentActivity {
                 pickerList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                     @Override
                     public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                        assoc = CycleManager.currentDay.dayItems.get(i);
+                        assoc = day.dayItems.get(i);
 
                         if(assoc != null) {
                             selectDayItem.setText(assoc.type.name);
@@ -184,7 +204,9 @@ public class TodoItemActivity extends FragmentActivity {
                         todoItem.name = name;
                         todoItem.dayItem = assoc;
                     } else {
-                        TodoItem.addItem(new TodoItem(name, assoc));
+                        TodoItem todoItem = new TodoItem(name, assoc);
+                        TodoItem.addItem(todoItem);
+                        day.addTodoItem(todoItem);
                     }
                     finish();
                 } else {
