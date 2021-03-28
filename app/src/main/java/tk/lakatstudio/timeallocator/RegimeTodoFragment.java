@@ -1,5 +1,7 @@
 package tk.lakatstudio.timeallocator;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
@@ -40,8 +42,10 @@ public class RegimeTodoFragment extends Fragment {
         todoList = view.findViewById(R.id.todoListview);
         noTodoText = view.findViewById(R.id.todoNoTodo);
 
-        //TODO settings
         todoDateText.setText(regime.dayNames[dayIndex]);
+        todoDateText.setVisibility(View.VISIBLE);
+        View line = ((ViewGroup) view).getChildAt(((ViewGroup) view).indexOfChild(todoDateText) + 1);
+        line.setVisibility(View.VISIBLE);
 
         return view;
     }
@@ -102,9 +106,24 @@ public class RegimeTodoFragment extends Fragment {
                 convertView.setOnLongClickListener(new View.OnLongClickListener() {
                     @Override
                     public boolean onLongClick(View view) {
-                        //TodoItem.removeItem();
-                        day.removeTodoItem(todo);
-                        notifyDataSetChanged();
+                        DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                switch (which){
+                                    case DialogInterface.BUTTON_POSITIVE:
+                                        day.removeTodoItem(todo);
+                                        notifyDataSetChanged();
+                                        break;
+                                    case DialogInterface.BUTTON_NEGATIVE:
+                                        break;
+                                }
+                            }
+                        };
+
+                        AlertDialog.Builder builder = new AlertDialog.Builder(fragment.getContext());
+                        builder.setMessage(getString(R.string.remove_activity,
+                                getString(R.string.todo_singular))).setPositiveButton(getString(R.string.yes),
+                                dialogClickListener).setNegativeButton(getString(R.string.no), dialogClickListener).show();
                         return false;
                     }
                 });

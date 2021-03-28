@@ -1,5 +1,8 @@
 package tk.lakatstudio.timeallocator;
 
+import android.app.AlertDialog;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
@@ -12,6 +15,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -27,6 +31,7 @@ import java.util.Locale;
 
 public class DayFragment extends Fragment {
 
+    TextView noDayItemText;
     ListView dayPlanner;
     Day fragmentDay;
     boolean isRunning = false;
@@ -40,18 +45,27 @@ public class DayFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.day_fragment, container, false);
 
-        dayPlanner = view.findViewById(R.id.testDayPlanner);
+        dayPlanner = view.findViewById(R.id.dayPlanner);
         dayDateText = view.findViewById(R.id.dayDate);
-        fragmentIndex = getArguments().getInt("test", -1);
+        noDayItemText = view.findViewById(R.id.dayNoItems);
         Log.e("UI_test", "oncreateview fragment " + fragmentIndex);
 
 
         //when the setDateText was called before the view was inflated
         if(dayDateText.getText().length() == 0) {
-            SpannableString dateText = new SpannableString(new SimpleDateFormat("y.M.d.", Locale.getDefault()).format(Calendar.getInstance().getTime()));
+            SpannableString dateText = new SpannableString(new SimpleDateFormat(DayInit.getDateFormat(getContext()), Locale.getDefault()).format(Calendar.getInstance().getTime()));
             dateText.setSpan(new UnderlineSpan(), 0, dateText.length(), 0);
             dayDateText.setText(dateText);
         }
+
+        ImageButton daySettings = view.findViewById(R.id.daySettings);
+        daySettings.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent settingsIntent = new Intent(DayFragment.this.getContext(), SettingsActivity.class);
+                startActivity(settingsIntent);
+            }
+        });
 
         return view;
     }
@@ -74,9 +88,9 @@ public class DayFragment extends Fragment {
         super.onDestroy();
     }
 
-    void setDateText(int fragmentIndex, int todayIndex){
+    void setDateText(int fragmentIndex, int todayIndex, Context context){
         //TODO settings_todo make this user selectable format
-        SpannableString dateText = new SpannableString(new SimpleDateFormat("y.M.d.", Locale.getDefault()).format(fragmentDay.start.getTime()));;
+        SpannableString dateText = new SpannableString(new SimpleDateFormat(DayInit.getDateFormat(context), Locale.getDefault()).format(fragmentDay.start.getTime()));;
         if(fragmentIndex == todayIndex){
             Log.v("fragment_date", "underline void");
             dateText.setSpan(new UnderlineSpan(), 0, dateText.length(), 0);
@@ -133,7 +147,12 @@ public class DayFragment extends Fragment {
             //if(dayPlanner != null){
                 dayPlanner.setAdapter(null);
             //}
+            noDayItemText.setVisibility(View.VISIBLE);
             return;
+        } else {
+
+            noDayItemText.setVisibility(View.GONE);
+
         }
         //test.setText("test " + fragmentIndex + " " +  new SimpleDateFormat("D").format(fragmentDay.start));
         //Log.v("fragment_preload", fragmentIndex + " b " + fragmentDay.dayItems.size());
@@ -149,7 +168,7 @@ public class DayFragment extends Fragment {
                 final DayItem dayItem = fragmentDay.dayItems.get(position);
 
                 TextView itemStart = convertView.findViewById(R.id.dayPlannerItemStart);
-                itemStart.setText(new SimpleDateFormat("HH:mm", Locale.getDefault()).format(dayItem.start.getTime()));
+                itemStart.setText(new SimpleDateFormat(DayInit.getHourFormat(getContext()), Locale.getDefault()).format(dayItem.start.getTime()));
 
                 TextView itemLength = convertView.findViewById(R.id.dayPlannerItemLength);
                 itemLength.setText(lengthAdapter(dayItem.start, dayItem.end));
@@ -176,16 +195,34 @@ public class DayFragment extends Fragment {
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 Intent editIntent = new Intent(fragment.getContext(), DayItemActivity.class);
                 editIntent.putExtra("index", i);
+                editIntent.putExtra("fragmentIndex", fragmentIndex);
                 startActivity(editIntent);
             }
         });
         dayPlanner.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
-            public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l) {
+            public boolean onItemLongClick(AdapterView<?> adapterView, View view, final int i, long l) {
                 Log.e("Day_list", "Item removed @: " + i);
-                fragmentDay.removeDayItem(i);
-                arrayAdapter.notifyDataSetChanged();
-                return false;
+
+                DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        switch (which){
+                            case DialogInterface.BUTTON_POSITIVE:
+                                fragmentDay.removeDayItem(i);
+                                arrayAdapter.notifyDataSetChanged();
+                                break;
+                            case DialogInterface.BUTTON_NEGATIVE:
+                                break;
+                        }
+                    }
+                };
+
+                AlertDialog.Builder builder = new AlertDialog.Builder(fragment.getContext());
+                builder.setMessage(getString(R.string.remove_activity,
+                        getString(R.string.day_item_singular))).setPositiveButton(getString(R.string.yes),
+                        dialogClickListener).setNegativeButton(getString(R.string.no), dialogClickListener).show();
+                return true;
             }
         });
     }

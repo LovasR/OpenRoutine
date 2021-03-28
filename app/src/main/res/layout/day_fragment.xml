@@ -3,34 +3,64 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:id="@+id/mainLayout">
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal"
+            android:layout_marginTop="10dp">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="10dp"
+                android:id="@+id/dayDate"
+                android:textSize="26sp"
+                android:textStyle="bold"/>
+            <View
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_weight="10"/>
+            <ImageButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/daySettings"
+                android:src="@drawable/ic_baseline_settings_24"
+                android:layout_gravity="center"
+                android:background="@drawable/selected_background"
+                android:padding="5dp"
+                android:layout_marginEnd="10dp"/>
+        </LinearLayout>
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="2dp"
+                android:layout_marginHorizontal="6dp"
+                android:background="@android:color/darker_gray"/>
+    </LinearLayout>
+
+
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="10dp"
-        android:layout_marginTop="10dp"
-        android:id="@+id/dayDate"
-        android:textSize="26sp"
-        android:textStyle="bold"/>
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="2dp"
-        android:layout_marginHorizontal="6dp"
-        android:background="@android:color/darker_gray"/>
+        android:text="@string/day_no_item"
+        android:id="@+id/dayNoItems"
+        android:textStyle="bold"
+        android:textSize="20sp"
+        android:layout_marginTop="30dp"
+        android:visibility="gone"
+        android:gravity="center"/>
 
     <ListView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-
-        android:clickable="true"
-        android:focusable="true"
-        android:focusableInTouchMode="true"
-
-        android:id="@+id/testDayPlanner"
+        android:id="@+id/dayPlanner"
         android:dividerHeight="10dp"
-        android:padding="15dp"
-        android:layout_marginTop="10dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginHorizontal="10dp"
         android:divider="#FFFFFF"/>
 
 

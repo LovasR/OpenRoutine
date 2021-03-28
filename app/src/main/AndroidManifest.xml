@@ -25,6 +25,7 @@
         <activity android:name=".DayItemActivity"/>
         <activity android:name=".TodoItemActivity"/>
         <activity android:name=".RegimeActivity"/>
+        <activity android:name=".SettingsActivity"/>
         <receiver
             android:name=".ATBroadcastReceiver"
             android:enabled="true"

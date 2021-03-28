@@ -89,7 +89,7 @@ public class MainFragment4 extends Fragment {
                 };
 
                 AlertDialog.Builder builder = new AlertDialog.Builder(fragment.getContext());
-                builder.setMessage(getString(R.string.remove_activity)).setPositiveButton(getString(R.string.yes), dialogClickListener).setNegativeButton(getString(R.string.no), dialogClickListener).show();
+                builder.setMessage(getString(R.string.remove_activity, getString(R.string.activity_singular))).setPositiveButton(getString(R.string.yes), dialogClickListener).setNegativeButton(getString(R.string.no), dialogClickListener).show();
                 return true;
             }
         });

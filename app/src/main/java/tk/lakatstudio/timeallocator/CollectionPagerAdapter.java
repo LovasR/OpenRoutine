@@ -22,7 +22,6 @@ public class CollectionPagerAdapter extends FragmentStatePagerAdapter {
         Log.e("UI_test", position + fragments[0].toString());
         Fragment fragment = fragments[position];
         Bundle args = new Bundle();
-        args.putInt("test", position + 1);
         fragment.setArguments(args);
         return fragment;
     }

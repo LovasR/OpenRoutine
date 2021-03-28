@@ -1,8 +1,13 @@
 package tk.lakatstudio.timeallocator;
 
 import android.content.Context;
+import android.content.SharedPreferences;
+import android.text.format.DateFormat;
 import android.util.Log;
 
+import androidx.preference.PreferenceManager;
+
+import com.google.android.material.timepicker.TimeFormat;
 import com.google.gson.Gson;
 
 import java.io.BufferedReader;
@@ -11,6 +16,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Locale;
@@ -18,6 +24,7 @@ import java.util.Locale;
 public class DayInit {
 
     static HashMap<Integer, Day> daysHashMap = new HashMap<>();
+    static SharedPreferences sharedPreferences;
 
     static void init(Context context, MainActivity mainActivity){
 
@@ -53,28 +60,57 @@ public class DayInit {
             ActivityType.currentID = ActivityType.allActivityTypes.get(ActivityType.allActivityTypes.size() - 1).ID;
         }
 
-        /*for(int i = 0; i < 24 * (60 / CycleManager.cycleTime); i++){
-            Cycle cycle = new Cycle();
-            cycle.index = i;
-            cycle.dayItem = today.getDayItem(Calendar.getInstance().getTime());
-        }*/
+        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+        Log.v("shared_preferences_test", sharedPreferences.getString("hour_format", "null"));
 
     }
+
+    static String getHourFormat(Context context){
+        //returns either the 24 or 12 hour format based on SharedPreference string list
+        String setting = sharedPreferences.getString("hour_format", context.getResources().getStringArray(R.array.hour_format_setting_entries)[0]);
+        int options = Arrays.asList(context.getResources().getStringArray(R.array.hour_format_setting_entries)).indexOf(setting);
+        Log.v("hour_format", options + "");
+        switch (options){
+            default:
+            case 0:
+                // is24HourFormat returns true if 24 hour format is used
+                if(DateFormat.is24HourFormat(context)){
+                    return context.getString(R.string.format_24_hour);
+                }
+            case 1:
+                return context.getString(R.string.format_12_hour);
+            case 2:
+                return context.getString(R.string.format_24_hour);
+        }
+    }
+
+    static int getMaterialTimeFormat(Context context){
+        //same as hour format just for material time pickers
+        String setting = sharedPreferences.getString("hour_format", context.getResources().getStringArray(R.array.hour_format_setting_entries)[0]);
+        int options = Arrays.asList(context.getResources().getStringArray(R.array.hour_format_setting_entries)).indexOf(setting);
+        switch (options){
+            default:
+            case 0:
+                // is24HourFormat returns true if 24 hour format is used
+                if(DateFormat.is24HourFormat(context)){
+                    return TimeFormat.CLOCK_24H;
+                }
+            case 1:
+                return TimeFormat.CLOCK_12H;
+            case 2:
+                return TimeFormat.CLOCK_24H;
+        }
+    }
+
+    static String getDateFormat(Context context){
+        //get dateformat from string
+        Log.v("pref_test", sharedPreferences.getString("date_format", "null"));
+        return sharedPreferences.getString("date_format", context.getString(R.string.default_date_format));
+    }
+
     static void saveAll(Context context){
         Gson gson = new Gson();
         String outJson = "";
-        //for(int i = 0; i < CycleManager.currentDay.dayItems.size(); i++){
-            //DayItem dayItem = CycleManager.currentDay.dayItems.get(i);
-            //if(dayItem.)
-        if(!CycleManager.currentDay.isSaved){
-            outJson += gson.toJson(CycleManager.currentDay);
-            outJson += "\n";
-        }
-        //}
-        Log.v("Out_Json days", outJson);
-        if(outJson.length() > 0) {
-            writeToFile(context, outJson, "day_" + new SimpleDateFormat("y.M.d", Locale.getDefault()).format(Calendar.getInstance().getTime()));
-        }
 
         //save modified days
         for(Day day : daysHashMap.values()){
@@ -116,22 +152,14 @@ public class DayInit {
             Log.e("testreads", testRead.get(i));
         }
 
-        /*outJson = "";
-        for(int i = 0; i < TodoItem.allTodoItems.size(); i++){
-            TodoItem todoItem = TodoItem.allTodoItems.get(i);
-            outJson += gson.toJson(todoItem);
-            outJson += "\n";
-        }
-        Log.v("save_debug", "todos: " + outJson);
-        if(outJson.length() > 0){
-            writeToFile(context, outJson, "todos");
-        }*/
         outJson = "";
         for(int i = 0; i < Regime.allRegimes.size(); i++){
             Regime regime = Regime.allRegimes.get(i);
-            regime.isSaved = true;
-            outJson += gson.toJson(regime);
-            outJson += "\n";
+            if(!regime.toDelete) {
+                regime.isSaved = true;
+                outJson += gson.toJson(regime);
+                outJson += "\n";
+            }
         }
         Log.v("save_debug", "regimes: " + outJson);
         if(outJson.length() > 0){
@@ -183,17 +211,6 @@ public class DayInit {
             ActivityType.addActivityType(gson.fromJson(activityJson, ActivityType.class));
             Log.v("save_debug_load", "load activity: \t" + activityJson);
         }
-
-        /*ArrayList<String> todoList = readFromFile(context, "todos");
-        if(todoList != null) {
-            for (String todoJson : todoList) {
-                TodoItem todoItem = gson.fromJson(todoJson, TodoItem.class);
-                TodoItem.addItem(todoItem);
-                //TODdO hash
-                //todoItem.dayItem = DayItem.allDayItemHashes.get(todoItem.dayItemHash);
-                Log.v("save_debug_load", "load toddo: \t" + todoJson);
-            }
-        }*/
 
         ArrayList<String> regimeList = readFromFile(context, "regimes");
         if(regimeList != null) {

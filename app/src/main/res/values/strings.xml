@@ -1,5 +1,14 @@
 <resources>
-    <string name="app_name">Time Allocator</string>
+    <!--Not to be translated-->
+
+    <string name="format_24_hour" translatable="false">HH:mm</string>
+    <string name="format_12_hour" translatable="false">hh:mm aa</string>
+
+    <string name="default_date_format" translatable="false">y.M.d.</string>
+
+    <!--Not to be translated-->
+
+    <string name="app_name">Open Routine</string>
     <string-array name="cycles">
         <item>5</item>
         <item>10</item>
@@ -9,7 +18,7 @@
     </string-array>
 
     <!--Notification-->
-    <string name="channel_name">Time Allocator</string>
+    <string name="channel_name">Open Routine</string>
     <string name="channel_description">Test description</string>
 
     <string name="notification_title">Hey!</string>
@@ -62,11 +71,12 @@
 
     <string name="main_menu_1_title">Lineup</string>
     <string name="main_menu_2_title">To-Do</string>
-    <string name="main_menu_3_title">Regime</string> <!-- Routine-->
+    <string name="main_menu_3_title">Routines</string> <!-- Routine-->
     <string name="main_menu_4_title">Activities</string>
 
     <!--Todo_ strings-->
 
+    <string name="todo_singular">to-do</string>
     <string name="todo_hint">Todo`s text</string>
     <string name="todo_add_time">Add time</string>
     <string name="todo_set_text_error">Text can`t be empty!</string>
@@ -74,32 +84,61 @@
 
     <!--DayItem activity-->
 
+    <string name="day_item_singular">item</string>
     <string name="buttonDone">Done</string>
     <string name="day_item_name_hint">Name of the activity</string>
     <string name="set_day_name_start">Set start</string>
     <string name="set_day_name_end">Set end</string>
+
+    <string name="day_no_item">Nothing to do on this day!</string>
 
     <string name="preposition1">From:</string>
     <string name="preposition2">To:</string>
     <string name="preposition3"></string>
 
     <string name="hour_short">h</string>
-    <string name="minutes_short">min</string>
+    <string name="minutes_short">m</string>
 
     <string name="activity_picker_title">Select a type of activity:</string>
 
     <!--Regime strings-->
+    <string name="regime_title">Routines</string>
+    <string name="regime_singular">routine</string>
+
     <string name="regime_menu_1_title">Days</string>
     <string name="regime_menu_2_title">To-Dos</string>
 
-    <string name="regime_name_hint">Name the regime</string>
+    <string name="regime_name_hint">Name the routine</string>
 
     <!--Activity strings-->
-
+    <string name="activity_title">Activities</string>
+    <string name="activity_singular">activity</string>
     <string name="activity_name">Activity name</string>
-    <string name="remove_activity">Do you want to remove this activity?</string>
+    <string name="remove_activity">Do you want to remove this %1$s?</string>
     <string name="activity_preferred_time_length">Length of activity (optional)</string>
     <string name="activity_pick_color">Pick color</string>
     <string name="activity_pick_A_color">Pick a color</string>
+
+    <!--Settings strings-->
+    <string name="setting_title">Settings</string>
+
+    <string name="setting_system_default">System default</string>
+
+    <string name="format_settings_title">Formats</string>
+
+    <string name="date_format_setting_title">Set date format</string>
+    <string name="date_format_setting_summary"><b>Advanced feature:</b> Set date format based on Java`s SimpleDateFormat.</string>
+
+    <string name="date_format_setting_info_title">Info about the date format</string>
+    <string name="date_format_setting_info_data">https://docs.oracle.com/javase/8/docs/api/java/text/SimpleDateFormat.html</string>
+
+
+    <string name="hour_format_setting_title">Set the hour format</string>
+    <string name="hour_format_setting_summary">Choose between 12 and 24 hour formats</string>
+    <string-array name="hour_format_setting_entries">
+        <item>@string/setting_system_default</item>
+        <item>12-hour format</item>
+        <item>24-hour format</item>
+    </string-array>
 
 </resources>

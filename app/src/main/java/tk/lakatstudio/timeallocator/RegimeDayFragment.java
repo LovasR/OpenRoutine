@@ -1,5 +1,7 @@
 package tk.lakatstudio.timeallocator;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
@@ -41,7 +43,7 @@ public class RegimeDayFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.day_fragment, container, false);
 
-        dayPlanner = view.findViewById(R.id.testDayPlanner);
+        dayPlanner = view.findViewById(R.id.dayPlanner);
         dayDateText = view.findViewById(R.id.dayDate);
         //fragmentIndex = getArguments().getInt("test", -1);
         Log.e("UI_test", "oncreateview fragment " + fragmentIndex);
@@ -151,11 +153,27 @@ public class RegimeDayFragment extends Fragment {
         });
         dayPlanner.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
-            public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l) {
+            public boolean onItemLongClick(AdapterView<?> adapterView, View view, final int i, long l) {
                 Log.e("Day_list", "Item removed @: " + i);
-                fragmentDay.removeDayItem(i);
-                arrayAdapter.notifyDataSetChanged();
-                return false;
+                DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        switch (which){
+                            case DialogInterface.BUTTON_POSITIVE:
+                                fragmentDay.removeDayItem(i);
+                                arrayAdapter.notifyDataSetChanged();
+                                break;
+                            case DialogInterface.BUTTON_NEGATIVE:
+                                break;
+                        }
+                    }
+                };
+
+                AlertDialog.Builder builder = new AlertDialog.Builder(fragment.getContext());
+                builder.setMessage(getString(R.string.remove_activity,
+                        getString(R.string.day_item_singular))).setPositiveButton(getString(R.string.yes),
+                        dialogClickListener).setNegativeButton(getString(R.string.no), dialogClickListener).show();
+                return true;
             }
         });
     }

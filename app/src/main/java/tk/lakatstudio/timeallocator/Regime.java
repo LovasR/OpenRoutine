@@ -11,12 +11,14 @@ public class Regime {
 
     boolean isActive;
     boolean isSaved;
+    boolean toDelete;       //when regime is removed it isn`t going to be saved
 
     static ArrayList<Regime> allRegimes = new ArrayList<Regime>();
 
     static void addRegime(Regime regime){
         regime.index = allRegimes.size();
         regime.isActive = false;
+        regime.toDelete = false;
         allRegimes.add(regime);
     }
 

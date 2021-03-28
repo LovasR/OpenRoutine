@@ -1,7 +1,6 @@
 package tk.lakatstudio.timeallocator;
 
 import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
@@ -20,7 +19,6 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.FragmentActivity;
 
 import com.google.android.material.timepicker.MaterialTimePicker;
-import com.google.android.material.timepicker.TimeFormat;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -38,6 +36,13 @@ public class DayItemActivity extends FragmentActivity {
 
     DayItem dayItem;
 
+
+    int startHour;
+    int startMinute;
+
+    int endHour;
+    int endMinute;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -47,12 +52,9 @@ public class DayItemActivity extends FragmentActivity {
 
         final EditText itemName = findViewById(R.id.addDayItemEditName);
 
-        final int startHour;
-        final int startMinute;
         final Button startTimeButton = findViewById(R.id.addDayItemStartTime);
+        int setStartHour;
 
-        final int endHour;
-        final int endMinute;
         final Button endTimeButton = findViewById(R.id.addDayItemEndTime);
 
         final Button activityButton = findViewById(R.id.addDayItemActivity);
@@ -72,7 +74,7 @@ public class DayItemActivity extends FragmentActivity {
             }
         }
 
-        Log.v("intent_debug", "" + getIntent().getExtras().getInt("index", -1));
+        Log.v("intent_debug", "index: " + getIntent().getExtras().getInt("index", -1) + " fragmentIndex: " + focusedFragment);
         int dayItemIndex = getIntent().getExtras().getInt("index", -1);
         if(dayItemIndex >= 0) {
             dayItem = focusedDay.dayItems.get(dayItemIndex);
@@ -88,12 +90,12 @@ public class DayItemActivity extends FragmentActivity {
             calendar.setTime(dayItem.start);
             startHour = calendar.get(Calendar.HOUR_OF_DAY);
             startMinute = calendar.get(Calendar.MINUTE);
-            startTimeButton.setText(new SimpleDateFormat("HH:mm").format(calendar.getTime()));
+            startTimeButton.setText(new SimpleDateFormat(DayInit.getHourFormat(getBaseContext()), Locale.getDefault()).format(calendar.getTime()));
 
             calendar.setTime(dayItem.end);
             endHour = calendar.get(Calendar.HOUR_OF_DAY);
             endMinute = calendar.get(Calendar.MINUTE);
-            endTimeButton.setText(new SimpleDateFormat("HH:mm").format(calendar.getTime()));
+            endTimeButton.setText(new SimpleDateFormat(DayInit.getHourFormat(getBaseContext()), Locale.getDefault()).format(calendar.getTime()));
 
             activityButton.setText(dayItem.type.name);
             Drawable drawable = getDrawable(R.drawable.spinner_background);
@@ -101,16 +103,19 @@ public class DayItemActivity extends FragmentActivity {
             drawable.setColorFilter(dayItem.type.color, PorterDuff.Mode.SRC);
             activityButton.setBackground(drawable);
         } else {
+            Calendar calendar = Calendar.getInstance();
             startHour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY);
             startMinute = 0;
-            startTimeButton.setText(new SimpleDateFormat("HH:00", Locale.getDefault()).format(Calendar.getInstance().getTime()));
+            calendar.set(Calendar.MINUTE, startMinute);
+            startTimeButton.setText(new SimpleDateFormat(DayInit.getHourFormat(getBaseContext()), Locale.getDefault()).format(calendar.getTime()));
 
             //TODO set end time to the preferred length of the activityType
-            endHour = startHour + 1;
-            endMinute = 0;
+            endHour = startHour + (selectedActivity.preferredLength > 0 ? selectedActivity.preferredLength / 60 : 1);
+            endMinute = (selectedActivity.preferredLength > 0 ? selectedActivity.preferredLength % 60 : 0);
             final Calendar future = Calendar.getInstance();
             future.set(Calendar.HOUR_OF_DAY, endHour);
-            endTimeButton.setText(new SimpleDateFormat("HH:00", Locale.getDefault()).format(future.getTime()));
+            future.set(Calendar.MINUTE, endMinute);
+            endTimeButton.setText(new SimpleDateFormat(DayInit.getHourFormat(getBaseContext()), Locale.getDefault()).format(future.getTime()));
 
             activityButton.setText(selectedActivity.name);
             Drawable drawable = getDrawable(R.drawable.spinner_background);
@@ -119,7 +124,7 @@ public class DayItemActivity extends FragmentActivity {
         }
 
         startTimePicker = new MaterialTimePicker.Builder()
-                .setTimeFormat(TimeFormat.CLOCK_24H)
+                .setTimeFormat(DayInit.getMaterialTimeFormat(getBaseContext()))
                 .setHour(startHour).setMinute(startMinute).build();
 
 
@@ -128,27 +133,22 @@ public class DayItemActivity extends FragmentActivity {
             public void onClick(View view) {
                 startTimePicker.show(getSupportFragmentManager(), "fragment_tag");
                 startPickerClicked = true;
-                startTimePicker.addOnCancelListener(new DialogInterface.OnCancelListener() {
-                    @Override
-                    public void onCancel(DialogInterface dialogInterface) {
-                        startTimePicker = new MaterialTimePicker.Builder()
-                                .setTimeFormat(TimeFormat.CLOCK_24H)
-                                .setHour(startHour).setMinute(00).build();
-                    }
-                });
                 startTimePicker.addOnPositiveButtonClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
                         Calendar startTime = Calendar.getInstance();
                         startTime.set(Calendar.HOUR_OF_DAY, startTimePicker.getHour());
                         startTime.set(Calendar.MINUTE, startTimePicker.getMinute());
-                        SimpleDateFormat simple = new SimpleDateFormat("HH:mm", Locale.getDefault());
+                        SimpleDateFormat simple = new SimpleDateFormat(DayInit.getHourFormat(getBaseContext()), Locale.getDefault());
                         startTimeButton.setText(simple.format(startTime.getTime()));
 
                         // when user selects first time, the second updates
                         endTimePicker = new MaterialTimePicker.Builder()
-                                .setTimeFormat(TimeFormat.CLOCK_24H)
-                                .setHour(startTimePicker.getHour() + 1).setMinute(00).build();
+                                .setTimeFormat(DayInit.getMaterialTimeFormat(getBaseContext()))
+                                .setHour(endHour).setMinute(endMinute).build();
+                        startTimePicker = new MaterialTimePicker.Builder()
+                                .setTimeFormat(DayInit.getMaterialTimeFormat(getBaseContext()))
+                                .setHour(startHour).setMinute(startMinute).build();
                     }
                 });
             }
@@ -156,7 +156,7 @@ public class DayItemActivity extends FragmentActivity {
 
 
         endTimePicker = new MaterialTimePicker.Builder()
-                .setTimeFormat(TimeFormat.CLOCK_24H)
+                .setTimeFormat(DayInit.getMaterialTimeFormat(getBaseContext()))
                 .setHour(endHour).setMinute(endMinute).build();
 
         endTimeButton.setOnClickListener(new View.OnClickListener() {
@@ -164,14 +164,6 @@ public class DayItemActivity extends FragmentActivity {
             public void onClick(View view) {
                 endTimePicker.show(getSupportFragmentManager(), "fragment_tag");
                 endPickerClicked = true;
-                endTimePicker.addOnCancelListener(new DialogInterface.OnCancelListener() {
-                    @Override
-                    public void onCancel(DialogInterface dialogInterface) {
-                        endTimePicker = new MaterialTimePicker.Builder()
-                                .setTimeFormat(TimeFormat.CLOCK_24H)
-                                .setHour(startHour).setMinute(00).build();
-                    }
-                });
                 endTimePicker.addOnPositiveButtonClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
@@ -179,7 +171,7 @@ public class DayItemActivity extends FragmentActivity {
                         Calendar endTime = Calendar.getInstance();
                         endTime.set(Calendar.HOUR_OF_DAY, endTimePicker.getHour());
                         endTime.set(Calendar.MINUTE, endTimePicker.getMinute());
-                        SimpleDateFormat simple = new SimpleDateFormat("HH:mm", Locale.getDefault());
+                        SimpleDateFormat simple = new SimpleDateFormat(DayInit.getHourFormat(getBaseContext()), Locale.getDefault());
                         endTimeButton.setText(simple.format(endTime.getTime()));
                     }
                 });
@@ -232,9 +224,9 @@ public class DayItemActivity extends FragmentActivity {
                             final Calendar future = Calendar.getInstance();
                             future.set(Calendar.HOUR_OF_DAY, endHourPreferred);
                             future.set(Calendar.MINUTE, endMinutePreferred);
-                            endTimeButton.setText(new SimpleDateFormat("HH:mm", Locale.getDefault()).format(future.getTime()));
+                            endTimeButton.setText(new SimpleDateFormat(DayInit.getHourFormat(getBaseContext()), Locale.getDefault()).format(future.getTime()));
                             endTimePicker = new MaterialTimePicker.Builder()
-                                    .setTimeFormat(TimeFormat.CLOCK_24H)
+                                    .setTimeFormat(DayInit.getMaterialTimeFormat(getBaseContext()))
                                     .setHour(endHourPreferred).setMinute(endMinutePreferred).build();
                         }
 
@@ -253,22 +245,31 @@ public class DayItemActivity extends FragmentActivity {
 
                 //messy code for setting Calendars with the two options being if the user the material dialog or not
                 Calendar startTime = Calendar.getInstance();
-                if (startPickerClicked) {
+                /*if (startPickerClicked) {
                     startTime.set(Calendar.HOUR_OF_DAY, startTimePicker.getHour());
                     startTime.set(Calendar.MINUTE, startTimePicker.getMinute());
-                } else {
+                } else {*/
+                if(startPickerClicked){
+                    startHour = startTimePicker.getHour();
+                    startMinute = startTimePicker.getMinute();
+                }
                     startTime.set(Calendar.HOUR_OF_DAY, startHour);
                     startTime.set(Calendar.MINUTE, startMinute);
-                }
+                //}
 
                 Calendar endTime = (Calendar) startTime.clone();
-                if (endPickerClicked) {
+                /*if (endPickerClicked) {
                     endTime.set(Calendar.HOUR_OF_DAY, endTimePicker.getHour());
                     endTime.set(Calendar.MINUTE, endTimePicker.getMinute());
-                } else {
+                } else {*/
+
+                if(endPickerClicked){
+                    endHour = endTimePicker.getHour();
+                    endMinute = endTimePicker.getMinute();
+                }
                     endTime.set(Calendar.HOUR_OF_DAY, endHour);
                     endTime.set(Calendar.MINUTE, endMinute);
-                }
+                //}
 
 
                 //if it was only started for editing, it only edits existing item

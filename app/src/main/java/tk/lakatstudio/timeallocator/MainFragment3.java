@@ -1,5 +1,7 @@
 package tk.lakatstudio.timeallocator;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -58,6 +60,11 @@ public class MainFragment3 extends Fragment {
 
                 final Regime regime = Regime.allRegimes.get(position);
 
+                //if regime is going to be deleted, don`t show anything
+                if(regime.toDelete){
+                    return new View(getContext());
+                }
+
                 Log.e("regime_test", "regime list init " + regime.name);
 
                 TextView itemName = convertView.findViewById(R.id.regimeItemName);
@@ -79,6 +86,30 @@ public class MainFragment3 extends Fragment {
                         Intent editIntent = new Intent(fragment.getContext(), RegimeActivity.class);
                         editIntent.putExtra("regimeIndex", position);
                         startActivity(editIntent);
+                    }
+                });
+                itemLayout.setOnLongClickListener(new View.OnLongClickListener() {
+                    @Override
+                    public boolean onLongClick(View view) {
+                        DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                switch (which){
+                                    case DialogInterface.BUTTON_POSITIVE:
+                                        regime.toDelete = true;
+                                        notifyDataSetChanged();
+                                        break;
+                                    case DialogInterface.BUTTON_NEGATIVE:
+                                        break;
+                                }
+                            }
+                        };
+
+                        AlertDialog.Builder builder = new AlertDialog.Builder(fragment.getContext());
+                        builder.setMessage(getString(R.string.remove_activity,
+                                getString(R.string.regime_singular))).setPositiveButton(getString(R.string.yes),
+                                dialogClickListener).setNegativeButton(getString(R.string.no), dialogClickListener).show();
+                        return true;
                     }
                 });
 

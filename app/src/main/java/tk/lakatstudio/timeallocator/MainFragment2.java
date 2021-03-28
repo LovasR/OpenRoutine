@@ -1,5 +1,7 @@
 package tk.lakatstudio.timeallocator;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
@@ -37,7 +39,7 @@ public class MainFragment2 extends Fragment {
         View view = inflater.inflate(R.layout.main_fragment_2, container, false);
 
         Log.e("UI_test", "oncreateview_fragment2");
-        TextView todoDateText = view.findViewById(R.id.todoDate);
+        //TextView todoDateText = view.findViewById(R.id.todoDate);
         todoList = view.findViewById(R.id.todoListview);
         noTodoText = view.findViewById(R.id.todoNoTodo);
         //todoListInit(this);
@@ -46,7 +48,7 @@ public class MainFragment2 extends Fragment {
 
 
         //TODO settings
-        SpannableString dateText = new SpannableString(new SimpleDateFormat("y.M.d.", Locale.getDefault()).format(day.start));
+        SpannableString dateText = new SpannableString(new SimpleDateFormat(DayInit.getDateFormat(getContext()), Locale.getDefault()).format(day.start));
         Calendar today = Calendar.getInstance();
         today.set(Calendar.HOUR_OF_DAY, 0);
         today.set(Calendar.MINUTE, 0);
@@ -55,7 +57,7 @@ public class MainFragment2 extends Fragment {
         if(day.start.getTime() == today.getTime().getTime()) {
             dateText.setSpan(new UnderlineSpan(), 0, dateText.length(), 0);
         }
-        todoDateText.setText(dateText);
+        //todoDateText.setText(dateText);
 
         return view;
     }
@@ -89,7 +91,7 @@ public class MainFragment2 extends Fragment {
 
                 if(todo.dayItem != null) {
                     TextView itemStart = convertView.findViewById(R.id.todoItemStart);
-                    itemStart.setText(new SimpleDateFormat("HH:mm", Locale.getDefault()).format(todo.dayItem.start.getTime()));
+                    itemStart.setText(new SimpleDateFormat(DayInit.getHourFormat(getContext()), Locale.getDefault()).format(todo.dayItem.start.getTime()));
 
                     TextView itemType = convertView.findViewById(R.id.todoItemActivity);
                     itemType.setText(todo.dayItem.type.name);
@@ -115,9 +117,27 @@ public class MainFragment2 extends Fragment {
                 convertView.setOnLongClickListener(new View.OnLongClickListener() {
                     @Override
                     public boolean onLongClick(View view) {
-                        TodoItem.removeItem(todo);
-                        day.removeTodoItem(todo);
-                        notifyDataSetChanged();
+                        //TodoItem.removeItem(todo);
+                        //day.removeTodoItem(todo);
+
+                        DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                switch (which){
+                                    case DialogInterface.BUTTON_POSITIVE:
+                                        day.removeTodoItem(todo);
+                                        notifyDataSetChanged();
+                                        break;
+                                    case DialogInterface.BUTTON_NEGATIVE:
+                                        break;
+                                }
+                            }
+                        };
+
+                        AlertDialog.Builder builder = new AlertDialog.Builder(fragment.getContext());
+                        builder.setMessage(getString(R.string.remove_activity,
+                                getString(R.string.todo_singular))).setPositiveButton(getString(R.string.yes),
+                                dialogClickListener).setNegativeButton(getString(R.string.no), dialogClickListener).show();
                         return false;
                     }
                 });

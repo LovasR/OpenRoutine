@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen
+    xmlns:android="http://schemas.android.com/apk/res/android">
+    <PreferenceCategory
+        android:title="@string/format_settings_title">
+        <EditTextPreference
+            android:key="date_format"
+            android:title="@string/date_format_setting_title"
+            android:defaultValue="y.M.d."
+            android:summary="@string/date_format_setting_summary"/>
+        <Preference
+            android:key="color"
+            android:title="@string/date_format_setting_info_title">
+            <intent
+                android:action="android.intent.action.VIEW"
+                android:data="@string/date_format_setting_info_data"/>
+        </Preference>
+        <ListPreference
+            android:defaultValue="1"
+            android:entries="@array/hour_format_setting_entries"
+            android:entryValues="@array/hour_format_setting_entries"
+            android:key="hour_format"
+            android:title="@string/hour_format_setting_title"
+            android:summary="@string/hour_format_setting_summary"/>
+    </PreferenceCategory>
+    <PreferenceCategory
+        android:title="">
+        <Preference
+            android:key="color_picker">
+        </Preference>
+    </PreferenceCategory>
+</PreferenceScreen>

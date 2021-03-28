@@ -17,8 +17,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/regimeItemName"
-            android:textSize="20sp"
-            />
+            android:textSize="20sp"/>
     </LinearLayout>
     <LinearLayout
         android:layout_width="match_parent"
