@@ -59,7 +59,7 @@ public class MainFragment1 extends Fragment {
         viewPager.setCurrentItem(1);
         viewPager.setSaveEnabled(false);
         //viewPager.setCurrentItem(viewPager.getChildCount() * 1000 / 2);
-        //dayFragments[0].onStart();7821111111111
+        //dayFragments[0].onStart();
 
         //only sets current day on first run
         if(fragmentIndex == -1){
@@ -194,9 +194,9 @@ public class MainFragment1 extends Fragment {
             //put the value not yet in the hashmap
             DayInit.daysHashMap.put(newIndex, dayFragments[index].fragmentDay);
         } else {
-            Log.v("fragment_preload", "loaded from hashmap: " + new SimpleDateFormat("D").format(dayFragments[index].fragmentDay.dayItems.size()));
+            Log.v("fragment_preload", "loaded from hashmap: " + new SimpleDateFormat("D", Locale.getDefault()).format(dayFragments[index].fragmentDay.dayItems.size()));
 
-            Regime.removeRegimeDays(dayFragments[index].fragmentDay);
+            //Regime.removeRegimeDays(dayFragments[index].fragmentDay);
         }
         if(!dayFragments[index].fragmentDay.isRegimeSet){
             Regime.setAllActiveRegimesDays(dayFragments[index].fragmentDay);

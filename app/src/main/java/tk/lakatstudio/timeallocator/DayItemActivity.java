@@ -141,14 +141,21 @@ public class DayItemActivity extends FragmentActivity {
                         startTime.set(Calendar.MINUTE, startTimePicker.getMinute());
                         SimpleDateFormat simple = new SimpleDateFormat(DayInit.getHourFormat(getBaseContext()), Locale.getDefault());
                         startTimeButton.setText(simple.format(startTime.getTime()));
+                        startHour = startTime.get(Calendar.HOUR_OF_DAY);
+                        startMinute = startTime.get(Calendar.MINUTE);
+
+                        endHour = startHour + (selectedActivity.preferredLength > 0 ? selectedActivity.preferredLength / 60 : 1);
+                        endMinute = (selectedActivity.preferredLength > 0 ? selectedActivity.preferredLength % 60 : 0);
+
+                        startTime.set(Calendar.HOUR_OF_DAY, endHour);
+                        startTime.set(Calendar.MINUTE, endMinute);
+                        SimpleDateFormat simpleEnd = new SimpleDateFormat(DayInit.getHourFormat(getBaseContext()), Locale.getDefault());
+                        endTimeButton.setText(simpleEnd.format(startTime.getTime()));
 
                         // when user selects first time, the second updates
                         endTimePicker = new MaterialTimePicker.Builder()
                                 .setTimeFormat(DayInit.getMaterialTimeFormat(getBaseContext()))
                                 .setHour(endHour).setMinute(endMinute).build();
-                        startTimePicker = new MaterialTimePicker.Builder()
-                                .setTimeFormat(DayInit.getMaterialTimeFormat(getBaseContext()))
-                                .setHour(startHour).setMinute(startMinute).build();
                     }
                 });
             }
@@ -245,31 +252,20 @@ public class DayItemActivity extends FragmentActivity {
 
                 //messy code for setting Calendars with the two options being if the user the material dialog or not
                 Calendar startTime = Calendar.getInstance();
-                /*if (startPickerClicked) {
-                    startTime.set(Calendar.HOUR_OF_DAY, startTimePicker.getHour());
-                    startTime.set(Calendar.MINUTE, startTimePicker.getMinute());
-                } else {*/
                 if(startPickerClicked){
                     startHour = startTimePicker.getHour();
                     startMinute = startTimePicker.getMinute();
                 }
-                    startTime.set(Calendar.HOUR_OF_DAY, startHour);
-                    startTime.set(Calendar.MINUTE, startMinute);
-                //}
+                startTime.set(Calendar.HOUR_OF_DAY, startHour);
+                startTime.set(Calendar.MINUTE, startMinute);
 
                 Calendar endTime = (Calendar) startTime.clone();
-                /*if (endPickerClicked) {
-                    endTime.set(Calendar.HOUR_OF_DAY, endTimePicker.getHour());
-                    endTime.set(Calendar.MINUTE, endTimePicker.getMinute());
-                } else {*/
-
                 if(endPickerClicked){
                     endHour = endTimePicker.getHour();
                     endMinute = endTimePicker.getMinute();
                 }
-                    endTime.set(Calendar.HOUR_OF_DAY, endHour);
-                    endTime.set(Calendar.MINUTE, endMinute);
-                //}
+                endTime.set(Calendar.HOUR_OF_DAY, endHour);
+                endTime.set(Calendar.MINUTE, endMinute);
 
 
                 //if it was only started for editing, it only edits existing item
@@ -279,7 +275,6 @@ public class DayItemActivity extends FragmentActivity {
                     dayItem.start = startTime.getTime();
                     dayItem.end = endTime.getTime();
                 } else {
-
                     Log.v("fragment_preload", "focusedFragment: "  + focusedFragment);
                     focusedDay.addDayItem(new DayItem(itemName.getText().toString(), startTime.getTime(), endTime.getTime(), selectedActivity));
                 }

@@ -120,14 +120,19 @@ public class DayFragment extends Fragment {
         hours -= calendar.get(Calendar.HOUR_OF_DAY);
         minutes -= calendar.get(Calendar.MINUTE);
 
+
+        calendar.set(Calendar.HOUR_OF_DAY, 2);
+        Log.v("adaptertest", hours + " 1 " + calendar.getTime());
         calendar.set(Calendar.HOUR_OF_DAY, hours);
+        Log.v("adaptertest", hours + " 2 " + calendar.getTime());
         calendar.set(Calendar.MINUTE, minutes);
 
-        Log.e("adaptertest", minutes + " ");
-
+        //very weird error with the calendar, when set to 2 it returns 3 when get
         String out = "";
-        if(hours > 0){
-            out += new SimpleDateFormat("H", Locale.getDefault()).format(calendar.getTime()) + " " + getString(R.string.hour_short) + " ";
+        if(hours > 0 && hours != 2){
+            out += new SimpleDateFormat("k", Locale.getDefault()).format(calendar.getTime()) + " " + getString(R.string.hour_short) + " ";
+        } else if(hours == 2){
+            out += hours + " " + getString(R.string.hour_short) + " ";
         }
         if(minutes > 0 || (hours == 0 && minutes == 0)){
             out += new SimpleDateFormat("mm", Locale.getDefault()).format(calendar.getTime()) + " " + getString(R.string.minutes_short);
