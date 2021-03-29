@@ -1,5 +1,6 @@
 package tk.lakatstudio.timeallocator;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -122,10 +123,11 @@ public class MainFragment1 extends Fragment {
                 public void run() {
                     Log.v("fragment_preload", "start load: " + finalIndex);
                     setFragmentDay(finalIndex);
+                    final boolean[] failedSetDateText = {false};
+                    final Context context = getContext();
                     try{
                         synchronized (this){
                                 Log.v("fragment_preload", "dayPlannerInit " + finalIndex);
-
                                 getActivity().runOnUiThread(new Runnable() {
                                     @Override
                                     public void run() {
@@ -133,7 +135,7 @@ public class MainFragment1 extends Fragment {
                                             dayFragments[finalIndex].dayPlannerInit(dayFragments[finalIndex]);
                                         }
                                         Log.v("fragment_date", "dateindex: " + todayIndex + " " + fragmentIndex);
-                                        dayFragments[finalIndex].setDateText(fragmentIndex + (finalIndex - 1), todayIndex, requireContext());
+                                        failedSetDateText[0] = dayFragments[finalIndex].setDateText(fragmentIndex + (finalIndex - 1), todayIndex, context);
                                     }
                                 });
 

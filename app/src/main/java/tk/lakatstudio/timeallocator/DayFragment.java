@@ -88,7 +88,7 @@ public class DayFragment extends Fragment {
         super.onDestroy();
     }
 
-    void setDateText(int fragmentIndex, int todayIndex, Context context){
+    boolean setDateText(int fragmentIndex, int todayIndex, Context context){
         //TODO settings_todo make this user selectable format
         SpannableString dateText = new SpannableString(new SimpleDateFormat(DayInit.getDateFormat(context), Locale.getDefault()).format(fragmentDay.start.getTime()));;
         if(fragmentIndex == todayIndex){
@@ -109,6 +109,7 @@ public class DayFragment extends Fragment {
         } catch (NullPointerException np){
             np.printStackTrace();
         }
+        return true;
     }
 
     private String lengthAdapter(Date start, Date end){

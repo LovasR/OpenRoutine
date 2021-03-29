@@ -26,6 +26,8 @@ import java.util.Locale;
 
 public class RegimeTodoFragment extends Fragment {
 
+    TextView todoDateText;
+
     TextView noTodoText;
     ListView todoList;
     Day day;
@@ -38,7 +40,7 @@ public class RegimeTodoFragment extends Fragment {
         View view = inflater.inflate(R.layout.main_fragment_2, container, false);
 
         Log.e("UI_test", "oncreateview_fragment2");
-        TextView todoDateText = view.findViewById(R.id.todoDate);
+        todoDateText = view.findViewById(R.id.todoDate);
         todoList = view.findViewById(R.id.todoListview);
         noTodoText = view.findViewById(R.id.todoNoTodo);
 
@@ -56,14 +58,21 @@ public class RegimeTodoFragment extends Fragment {
         super.onResume();
     }
 
+    void refreshFragment(){
+        todoDateText.setText(regime.dayNames[dayIndex]);
+        todoListInit(this);
+    }
+
     void todoListInit(final Fragment fragment){
 
         if(day.todoItems.size() == 0){
             noTodoText.setVisibility(View.VISIBLE);
+            todoList.setAdapter(null);
             return;
         } else {
             noTodoText.setVisibility(View.GONE);
         }
+
         final ArrayAdapter<TodoItem> arrayAdapter = new ArrayAdapter<TodoItem>(fragment.getContext(), R.layout.todo_item, day.todoItems) {
             @NonNull
             @Override

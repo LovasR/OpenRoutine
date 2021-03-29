@@ -252,7 +252,7 @@ public class DayItemActivity extends FragmentActivity {
 
                 //messy code for setting Calendars with the two options being if the user the material dialog or not
                 Calendar startTime = Calendar.getInstance();
-                if(startPickerClicked){
+                if(startPickerClicked && startTimePicker != null){
                     startHour = startTimePicker.getHour();
                     startMinute = startTimePicker.getMinute();
                 }
@@ -260,7 +260,7 @@ public class DayItemActivity extends FragmentActivity {
                 startTime.set(Calendar.MINUTE, startMinute);
 
                 Calendar endTime = (Calendar) startTime.clone();
-                if(endPickerClicked){
+                if(endPickerClicked && endTimePicker != null){
                     endHour = endTimePicker.getHour();
                     endMinute = endTimePicker.getMinute();
                 }

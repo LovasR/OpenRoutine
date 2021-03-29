@@ -84,7 +84,8 @@ public class RegimeActivity extends AppCompatActivity {
                         regimeFrame.setVisibility(View.VISIBLE);
                         regimeViewPager.setVisibility(View.GONE);
                         todoFragment.day = regime.days[regimeViewPager.getCurrentItem()];
-                        //fragmentChange(todoFragment);
+                        todoFragment.dayIndex = regimeViewPager.getCurrentItem();
+                        todoFragment.refreshFragment();
                         return true;
                 }
                 return false;
