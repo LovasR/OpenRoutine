@@ -53,15 +53,14 @@
         android:layout_marginTop="30dp"
         android:visibility="gone"
         android:gravity="center"/>
-
-    <ListView
+    <androidx.recyclerview.widget.RecyclerView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:id="@+id/dayPlanner"
+        android:id="@+id/rDayPlanner"
         android:dividerHeight="10dp"
         android:layout_marginTop="20dp"
         android:layout_marginHorizontal="10dp"
-        android:divider="#FFFFFF"/>
+        android:divider="@android:color/transparent"/>
 
 
 </LinearLayout>

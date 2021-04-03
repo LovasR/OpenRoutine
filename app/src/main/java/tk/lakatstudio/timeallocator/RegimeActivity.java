@@ -14,14 +14,14 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
-import androidx.viewpager.widget.ViewPager;
+import androidx.viewpager2.widget.ViewPager2;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 public class RegimeActivity extends AppCompatActivity {
 
-    ViewPager regimeViewPager;
+    ViewPager2 regimeViewPager;
     CollectionPagerAdapter collectionPagerAdapter;
     boolean isRunning = false;
 
@@ -66,7 +66,7 @@ public class RegimeActivity extends AppCompatActivity {
             dayFragments[i].fragmentIndex = i;
             dayFragments[i].regime = regime;
         }
-        collectionPagerAdapter = new CollectionPagerAdapter(getSupportFragmentManager(), dayFragments);
+        collectionPagerAdapter = new CollectionPagerAdapter(getSupportFragmentManager(), this.getLifecycle(), dayFragments);
         regimeViewPager.setAdapter(collectionPagerAdapter);
         regimeViewPager.setSaveEnabled(false);
 

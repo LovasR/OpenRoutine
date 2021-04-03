@@ -4,7 +4,7 @@
     <string name="format_24_hour" translatable="false">HH:mm</string>
     <string name="format_12_hour" translatable="false">hh:mm aa</string>
 
-    <string name="default_date_format" translatable="false">y.M.d.</string>
+    <string name="default_date_format" translatable="false">y.MM.dd.</string>
 
     <!--Not to be translated-->
 
@@ -90,7 +90,7 @@
     <string name="set_day_name_start">Set start</string>
     <string name="set_day_name_end">Set end</string>
 
-    <string name="day_no_item">Nothing to do on this day!</string>
+    <string name="day_no_item">No plans for this day!</string>
 
     <string name="preposition1">From:</string>
     <string name="preposition2">To:</string>

@@ -148,7 +148,6 @@ public class MainActivity extends AppCompatActivity {
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         transaction.replace(R.id.mainFrame, fragment);
         transaction.setReorderingAllowed(true);
-        //transaction.addToBackStack(null);
         transaction.show(fragment);
         transaction.commit();
     }

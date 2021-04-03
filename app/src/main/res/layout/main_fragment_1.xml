@@ -8,14 +8,10 @@
         android:layout_height="match_parent"
         android:orientation="vertical">
 
-        <!--Spinner
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/testCycleSpinner"/-->
-        <androidx.viewpager.widget.ViewPager
+        <androidx.viewpager2.widget.ViewPager2
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:id="@+id/verticalViewPager"/>
+            android:id="@+id/daysViewPager"/>
 
         <!--ListView
             android:layout_width="match_parent"

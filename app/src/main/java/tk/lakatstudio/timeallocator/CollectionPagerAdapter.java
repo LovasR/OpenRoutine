@@ -6,19 +6,20 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentStatePagerAdapter;
+import androidx.lifecycle.Lifecycle;
+import androidx.viewpager2.adapter.FragmentStateAdapter;
 
-public class CollectionPagerAdapter extends FragmentStatePagerAdapter {
+public class CollectionPagerAdapter extends FragmentStateAdapter {
     Fragment fragments[];
 
-    public CollectionPagerAdapter(@NonNull FragmentManager fm, Fragment fragmentsIn[]) {
-        super(fm, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT);
+    public CollectionPagerAdapter(FragmentManager fm, Lifecycle lc, Fragment[] fragmentsIn) {
+        super(fm, lc);
         fragments = fragmentsIn;
     }
 
     @NonNull
     @Override
-    public Fragment getItem(int position) {
+    public Fragment createFragment(int position) {
         Log.e("UI_test", position + fragments[0].toString());
         Fragment fragment = fragments[position];
         Bundle args = new Bundle();
@@ -27,7 +28,7 @@ public class CollectionPagerAdapter extends FragmentStatePagerAdapter {
     }
 
     @Override
-    public int getCount() {
+    public int getItemCount() {
         return fragments.length;
     }
 }

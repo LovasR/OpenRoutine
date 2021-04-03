@@ -173,6 +173,7 @@ public class MainFragment4 extends Fragment {
         colorSheet.setLayoutManager(new GridLayoutManager(fragment.getContext(), 3));
         ArrayList<Integer> colorList = new ArrayList<Integer>();
         for(int color : getResources().getIntArray(R.array.default_colors)) colorList.add(color);
+
         final ColorPickerAdapter adapter = new ColorPickerAdapter(fragment.getContext(), colorList);
         adapter.setClickListener(new ColorPickerAdapter.ItemClickListener() {
             @Override

@@ -11,6 +11,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.viewpager.widget.ViewPager;
+import androidx.viewpager2.widget.ViewPager2;
 
 import com.google.gson.Gson;
 
@@ -21,7 +22,7 @@ import java.util.Locale;
 
 public class MainFragment1 extends Fragment {
 
-    ViewPager viewPager;
+    ViewPager2 viewPager;
     CollectionPagerAdapter collectionPagerAdapter;
     boolean isRunning = false;
 
@@ -39,8 +40,6 @@ public class MainFragment1 extends Fragment {
         View view = inflater.inflate(R.layout.main_fragment_1, container, false);
 
         Log.e("UI_test", "oncreateview main_fragment1");
-        //dayPlanner = view.findViewById(R.id.testDayPlanner);
-        //dayPlannerInit(this);
 
         Calendar calendar = Calendar.getInstance();
         calendar.set(Calendar.DAY_OF_YEAR, 1);
@@ -54,9 +53,10 @@ public class MainFragment1 extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         Log.e("UI_test", "onviewcreated main_fragment1");
         dayFragments = new DayFragment[]{new DayFragment(), new DayFragment(), new DayFragment()};
-        collectionPagerAdapter = new CollectionPagerAdapter(getChildFragmentManager(), dayFragments);
-        viewPager = view.findViewById(R.id.verticalViewPager);
+        collectionPagerAdapter = new CollectionPagerAdapter(getChildFragmentManager(), this.getLifecycle(), dayFragments);
+        viewPager = view.findViewById(R.id.daysViewPager);
         viewPager.setAdapter(collectionPagerAdapter);
+
         viewPager.setCurrentItem(1);
         viewPager.setSaveEnabled(false);
         //viewPager.setCurrentItem(viewPager.getChildCount() * 1000 / 2);
@@ -67,7 +67,33 @@ public class MainFragment1 extends Fragment {
             fragmentIndex = Calendar.getInstance().get(Calendar.DAY_OF_YEAR);
         }
 
-        viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+        viewPager.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+                super.onPageScrolled(position, positionOffset, positionOffsetPixels);
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+                focusedPage = position;
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+                Log.v("fragment_preload_", "focusedPAge: " + focusedPage);
+                if(state == ViewPager.SCROLL_STATE_IDLE) {
+                    if (focusedPage == 0) {
+                        fragmentIndex--;
+                        refreshAllFragments(SCROLL_BACKWARD);
+                    } else if (focusedPage == 2) {
+                        fragmentIndex++;
+                        refreshAllFragments(SCROLL_FORWARD);
+                    }
+                }
+            }
+        });
+
+        /*viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
 
@@ -85,14 +111,14 @@ public class MainFragment1 extends Fragment {
                 if(state == ViewPager.SCROLL_STATE_IDLE){
                     if(focusedPage == 0){
                         fragmentIndex--;
-                        refreshAllFragments();
+                        refreshAllFragments(SCROLL_BACKWARD);
                     } else if(focusedPage == 2){
                         fragmentIndex++;
-                        refreshAllFragments();
+                        refreshAllFragments(SCROLL_FORWARD);
                     }
 
                     //prevent flashing of old ListView
-                    try {
+                    /*try {
                         Thread.sleep(50);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
@@ -104,20 +130,27 @@ public class MainFragment1 extends Fragment {
 
                     //this is a joke
                     //dayFragments[0].fragmentDay = DayInit.daysHashMap.get(fragmentIndex - 1) != null ? DayInit.daysHashMap.get(fragmentIndex - 1) : new Gson().fromJson(DayInit.readFromFile(getContext(), "day_" + new SimpleDateFormat("y.M.d", Locale.getDefault()).format(calendar.getTime())).get(0), Day.class);
-                    viewPager.setCurrentItem(1, false);
+                    //viewPager.setCurrentItem(1, false);
                 }
             }
-        });
+        });*/
         viewPager.setOffscreenPageLimit(3);
 
         super.onViewCreated(view, savedInstanceState);
         todayIndex = Calendar.getInstance().get(Calendar.DAY_OF_YEAR);
-        refreshAllFragments();
+        refreshAllFragments(SCROLL_BACKWARD);
     }
 
-    void refreshAllFragments(){
-        for(int i = 0; i < 3; i++){
-            final int finalIndex = i;
+    final private static int SCROLL_FORWARD = -1;
+    final private static int SCROLL_BACKWARD = 1;
+    final private static int FRAGMENTS_N = 3;
+
+    void refreshAllFragments(int direction){
+
+        for(int i = 0; i < FRAGMENTS_N; i++){
+            final int finalIndex = direction > 0 ? i : FRAGMENTS_N - i - 1;
+
+            Log.v("index_debug", finalIndex + "");
             new Thread(){
                 @Override
                 public void run() {
@@ -131,11 +164,15 @@ public class MainFragment1 extends Fragment {
                                 getActivity().runOnUiThread(new Runnable() {
                                     @Override
                                     public void run() {
+                                        dayFragments[finalIndex].setDateText(fragmentIndex + (finalIndex - 1), todayIndex, context);
                                         if(dayFragments[finalIndex].getContext() != null) {
                                             dayFragments[finalIndex].dayPlannerInit(dayFragments[finalIndex]);
                                         }
+                                        if(finalIndex == 1) {
+                                            viewPager.setCurrentItem(1, false);
+                                        }
                                         Log.v("fragment_date", "dateindex: " + todayIndex + " " + fragmentIndex);
-                                        failedSetDateText[0] = dayFragments[finalIndex].setDateText(fragmentIndex + (finalIndex - 1), todayIndex, context);
+
                                     }
                                 });
 
@@ -160,7 +197,8 @@ public class MainFragment1 extends Fragment {
     }
 
     void setFragmentDay(int index){
-        //new index offsets to the two positons realative to the changed fragmentIndex
+        //new index offsets to the two positon
+        // realative to the changed fragmentIndex
         //newIndex is the position of the day to be loaded
         int newIndex = fragmentIndex + (index - 1);
         Log.v("fragment_preload", "newindex: " + newIndex + " index: " + index + " fragmentIndex: " + fragmentIndex);
