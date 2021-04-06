@@ -4,7 +4,7 @@
     <string name="format_24_hour" translatable="false">HH:mm</string>
     <string name="format_12_hour" translatable="false">hh:mm aa</string>
 
-    <string name="default_date_format" translatable="false">y.MM.dd.</string>
+    <string name="default_date_format" translatable="false">MM.dd. EEEE</string>
 
     <!--Not to be translated-->
 

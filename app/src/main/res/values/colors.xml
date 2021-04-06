@@ -8,13 +8,13 @@
     <color name="color_app_bar_item_selected">#FFFFFF</color>
     <color name="color_app_bar_item_unselected">#A0A0A0</color>
 
-    <color name="color_text_default">#202020</color>
+    <color name="color_text_default">#bb202020</color>
 
     <color name="color_error">#FF0000</color>
 
     <color name="color_box_default">#D1D1D1</color>
 
-    <color name="default_color_1">#845ec2</color>
+    <color name="default_color_1">#f1cdc1</color>
     <color name="default_color_2">#ffc75f</color>
     <color name="default_color_3">#f9f871</color>
     <color name="default_color_4">#ff5e78</color>
@@ -23,6 +23,14 @@
     <color name="default_color_7">#8ce2ff</color>
     <color name="default_color_8">#ff8c8c</color>
     <color name="default_color_9">#9fbcf5</color>
+
+    <!--More saturated colors-->
+    <color name="default_color_10">#e2133f</color>
+    <color name="default_color_11">#04a0d1</color>
+    <color name="default_color_12">#41b914</color>
+    <color name="default_color_13">#f4e767</color>
+    <color name="default_color_14">#e64d82</color>
+    <color name="default_color_15">#845ec2</color>
     <array name="default_colors">
         <item>@color/default_color_1</item>
         <item>@color/default_color_2</item>
@@ -33,5 +41,12 @@
         <item>@color/default_color_7</item>
         <item>@color/default_color_8</item>
         <item>@color/default_color_9</item>
+
+        <item>@color/default_color_10</item>
+        <item>@color/default_color_11</item>
+        <item>@color/default_color_12</item>
+        <item>@color/default_color_13</item>
+        <item>@color/default_color_14</item>
+        <item>@color/default_color_15</item>
     </array>
 </resources>

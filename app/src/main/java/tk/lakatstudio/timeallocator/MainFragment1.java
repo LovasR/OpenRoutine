@@ -27,12 +27,15 @@ public class MainFragment1 extends Fragment {
     boolean isRunning = false;
 
     DayFragment[] dayFragments;
-    static int fragmentIndex = -1;
+    static int  fragmentIndex = -1;
     int todayIndex;
     int dayStartIndex;
     int dayRange;
 
     int focusedPage;
+
+    //there is only one instance of this class
+    static public MainFragment1 staticClass;
 
     @Nullable
     @Override
@@ -40,6 +43,8 @@ public class MainFragment1 extends Fragment {
         View view = inflater.inflate(R.layout.main_fragment_1, container, false);
 
         Log.e("UI_test", "oncreateview main_fragment1");
+
+        staticClass = this;
 
         Calendar calendar = Calendar.getInstance();
         calendar.set(Calendar.DAY_OF_YEAR, 1);
@@ -64,7 +69,9 @@ public class MainFragment1 extends Fragment {
 
         //only sets current day on first run
         if(fragmentIndex == -1){
-            fragmentIndex = Calendar.getInstance().get(Calendar.DAY_OF_YEAR);
+            Calendar calendar = Calendar.getInstance();
+            //support for multi-year loading
+            fragmentIndex = calendar.get(Calendar.YEAR) * 365 + calendar.get(Calendar.DAY_OF_YEAR);
         }
 
         viewPager.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
@@ -137,7 +144,7 @@ public class MainFragment1 extends Fragment {
         viewPager.setOffscreenPageLimit(3);
 
         super.onViewCreated(view, savedInstanceState);
-        todayIndex = Calendar.getInstance().get(Calendar.DAY_OF_YEAR);
+        todayIndex = fragmentIndex;
         refreshAllFragments(SCROLL_BACKWARD);
     }
 
@@ -201,10 +208,10 @@ public class MainFragment1 extends Fragment {
         // realative to the changed fragmentIndex
         //newIndex is the position of the day to be loaded
         int newIndex = fragmentIndex + (index - 1);
-        Log.v("fragment_preload", "newindex: " + newIndex + " index: " + index + " fragmentIndex: " + fragmentIndex);
+        //Log.v("fragment_preload", "newindex: " + newIndex + " index: " + index + " fragmentIndex: " + fragmentIndex);
 
         Calendar calendar = Calendar.getInstance();
-        calendar.set(Calendar.DAY_OF_YEAR, newIndex);
+        calendar.set(Calendar.DAY_OF_YEAR, newIndex - (calendar.get(Calendar.YEAR) * 365));
 
         Gson gson = new Gson();
         SimpleDateFormat dateFormat = new SimpleDateFormat("y.M.d", Locale.getDefault());
@@ -223,7 +230,7 @@ public class MainFragment1 extends Fragment {
                 dayFragments[index].fragmentDay = new Day();
 
                 Calendar date = Calendar.getInstance();
-                date.set(Calendar.DAY_OF_YEAR, newIndex);
+                date.set(Calendar.DAY_OF_YEAR, newIndex - (date.get(Calendar.YEAR) * 365));
                 date.set(Calendar.HOUR_OF_DAY, 0);
                 date.set(Calendar.MINUTE, 0);
                 date.set(Calendar.SECOND, 0);

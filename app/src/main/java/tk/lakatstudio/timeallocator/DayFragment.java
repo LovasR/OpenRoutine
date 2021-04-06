@@ -4,6 +4,8 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.PorterDuff;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.text.SpannableString;
 import android.text.style.UnderlineSpan;
@@ -21,11 +23,15 @@ import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.material.datepicker.MaterialDatePicker;
+import com.google.android.material.datepicker.MaterialPickerOnPositiveButtonClickListener;
+
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
+import java.util.TimeZone;
 
 public class DayFragment extends Fragment {
 
@@ -36,6 +42,7 @@ public class DayFragment extends Fragment {
     boolean isRunning = false;
 
     TextView dayDateText;
+    ImageButton daySelect;
 
     int fragmentIndex;
 
@@ -57,6 +64,41 @@ public class DayFragment extends Fragment {
             dayDateText.setText(dateText);
         }
 
+        daySelect = view.findViewById(R.id.daySelect);
+        daySelect.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Calendar calendar = Calendar.getInstance();
+                calendar.setTime(fragmentDay.start);
+                calendar.set(Calendar.DAY_OF_YEAR, calendar.get(Calendar.DAY_OF_YEAR) + 1);
+                final MaterialDatePicker datePicker = MaterialDatePicker.Builder.datePicker()
+                        .setSelection(calendar.getTime().getTime()).setTitleText("Select day").build();
+
+                datePicker.show(getFragmentManager(), "datePicker");
+                final Calendar calendarOut = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
+                datePicker.addOnPositiveButtonClickListener(new MaterialPickerOnPositiveButtonClickListener() {
+                    @Override
+                    public void onPositiveButtonClick(Object selection) {
+                        calendarOut.setTimeInMillis((Long) selection);
+
+                        MainFragment1.fragmentIndex = calendarOut.get(Calendar.YEAR) * 365 + calendarOut.get(Calendar.DAY_OF_YEAR);
+                        final int SCROLL_FORWARD = -1;
+                        MainFragment1.staticClass.refreshAllFragments(SCROLL_FORWARD);
+                    }
+                });
+            }
+        });
+        daySelect.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View view) {
+                final Calendar calendar = Calendar.getInstance();
+                MainFragment1.fragmentIndex = calendar.get(Calendar.YEAR) * 365 + calendar.get(Calendar.DAY_OF_YEAR);
+                final int SCROLL_FORWARD = -1;
+                MainFragment1.staticClass.refreshAllFragments(SCROLL_FORWARD);
+                return true;
+            }
+        });
+
         ImageButton daySettings = view.findViewById(R.id.daySettings);
         daySettings.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -65,6 +107,7 @@ public class DayFragment extends Fragment {
                 startActivity(settingsIntent);
             }
         });
+
 
 
         rDayPlanner.setLayoutManager(new LinearLayoutManager(getContext()));
@@ -135,15 +178,22 @@ public class DayFragment extends Fragment {
         SpannableString dateText = new SpannableString(new SimpleDateFormat(DayInit.getDateFormat(context), Locale.getDefault()).format(fragmentDay.start.getTime()));;
         if(fragmentIndex == todayIndex){
             Log.v("fragment_date", "underline void");
-            dateText.setSpan(new UnderlineSpan(), 0, dateText.length(), 0);
+            //dateText.setSpan(new UnderlineSpan(), 0, dateText.length(), 0);
 
-            //TODO set to user color to underline
-            /*Paint paint = new Paint();
-            paint.setColor(getResources().getColor(R.color.colorPrimary));
-            paint.setFlags(Paint.UNDERLINE_TEXT_FLAG);
-            dayDateText.setPaintFlags(paint.getFlags());
-            dayDateText.setLayerPaint(paint);
-            dateText.setSpan(new ForegroundColorSpan(paint.getColor()), 0, dateText.length(), 0);*/
+            Drawable drawable = context.getResources().getDrawable(R.drawable.selected_background);
+            assert drawable != null;
+            drawable.setColorFilter(context.getResources().getColor(R.color.colorAccent), PorterDuff.Mode.SRC);
+            try{
+                daySelect.setBackground(drawable);
+            } catch (NullPointerException np){
+                np.printStackTrace();
+            }
+        } else {
+            try{
+                daySelect.setBackground(context.getResources().getDrawable(R.drawable.selected_background));
+            } catch (NullPointerException np){
+                np.printStackTrace();
+            }
         }
 
         try {

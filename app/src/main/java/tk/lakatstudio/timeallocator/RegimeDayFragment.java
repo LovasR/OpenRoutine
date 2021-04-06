@@ -47,6 +47,9 @@ public class RegimeDayFragment extends DayFragment {
             regime = Regime.allRegimes.get(regimeIndex);
         }*/
 
+        daySelect = view.findViewById(R.id.daySelect);
+        daySelect.setVisibility(View.GONE);
+
         //when the setDateText was called before the view was inflated
         dayDateText.setText(regime.dayNames[fragmentIndex]);
         fragmentDay = regime.days[fragmentIndex];
@@ -55,7 +58,7 @@ public class RegimeDayFragment extends DayFragment {
         dayPlanner.setLayoutManager(new LinearLayoutManager(getContext()));
         DividerItemDecoration itemDecor = new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL);
         itemDecor.setDrawable(getResources().getDrawable(R.drawable.divider_nothing));
-        rDayPlanner.addItemDecoration(itemDecor);
+        dayPlanner.addItemDecoration(itemDecor);
         ArrayList<DayItem> dayItems = fragmentDay.dayItems;
 
         adapter = new DayItemAdapter(getContext(), dayItems, this);

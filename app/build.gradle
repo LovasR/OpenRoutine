@@ -7,8 +7,8 @@ android {
         applicationId "tk.lakatstudio.timeallocator"
         minSdkVersion 21
         targetSdkVersion 29
-        versionCode 4
-        versionName "a1s3"
+        versionCode 6
+        versionName "a1s0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }

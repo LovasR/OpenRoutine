@@ -5,6 +5,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import androidx.preference.EditTextPreference;
 import androidx.preference.ListPreference;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
@@ -32,5 +33,6 @@ public class SettingsFragment extends PreferenceFragmentCompat {
         ListPreference hourFormatP = findPreference("hour_format");
         //hourFormatP.setValueIndex(0);
         Preference colorPreference = findPreference("color");
+        EditTextPreference editTextPreference = findPreference("date_format");
     }
 }
