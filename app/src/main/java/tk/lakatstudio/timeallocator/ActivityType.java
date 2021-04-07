@@ -8,6 +8,7 @@ public class ActivityType {
     String name;
     int ID;
     int color;
+    boolean isColorCustom;
     int preferredLength;
 
     boolean isSaved;
@@ -32,6 +33,7 @@ public class ActivityType {
         at.ID = ID;
         at.color = color;
         at.isSaved = false;
+        at.isColorCustom = false;
         //at.preferredLength = -1;
         allActivityTypes.add(at);
         Log.e("AT_test", name + "\t" + String.valueOf(color) + "\t" + allActivityTypes.get(allActivityTypes.size() - 1).name);

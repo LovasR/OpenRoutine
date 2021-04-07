@@ -101,9 +101,9 @@ public class MainFragment1 extends Fragment {
         });
         viewPager.setOffscreenPageLimit(3);
 
-        super.onViewCreated(view, savedInstanceState);
         todayIndex = fragmentIndex;
         refreshAllFragments(SCROLL_BACKWARD);
+        super.onViewCreated(view, savedInstanceState);
     }
 
     final private static int SCROLL_FORWARD = -1;

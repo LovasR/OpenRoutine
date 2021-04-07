@@ -7,6 +7,7 @@
     <string name="default_date_format" translatable="false">MM.dd. EEEE</string>
 
     <string name="allowed_characters_date_format" translatable="false">GyYMLwWDdFEu</string>
+    <string name="allowed_characters_color" translatable="false">0123456789abcdefABCDEF</string>
 
     <!--Not to be translated-->
 
@@ -120,6 +121,9 @@
     <string name="activity_name">Activity name</string>
     <string name="remove_activity">Do you want to remove this %1$s?</string>
     <string name="activity_preferred_time_length">Length of activity (optional)</string>
+
+    <string name="color_prefix" translatable="false">#</string>
+    <string name="activity_custom_color">Custom color</string>
     <string name="activity_pick_color">Pick color</string>
     <string name="activity_pick_A_color">Pick a color</string>
 

@@ -70,6 +70,10 @@ public class ColorPickerAdapter extends RecyclerView.Adapter<ColorPickerAdapter.
         }
     }
 
+    public void deselectAny (){
+        lastClicked.setBackground(null);
+    }
+
     public int getItem(int position) {
         return colors.get(position);
     }
