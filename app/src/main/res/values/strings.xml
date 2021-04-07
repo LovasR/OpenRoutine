@@ -6,6 +6,8 @@
 
     <string name="default_date_format" translatable="false">MM.dd. EEEE</string>
 
+    <string name="allowed_characters_date_format" translatable="false">GyYMLwWDdFEu</string>
+
     <!--Not to be translated-->
 
     <string name="app_name">Open Routine</string>
@@ -107,6 +109,8 @@
 
     <string name="regime_menu_1_title">Days</string>
     <string name="regime_menu_2_title">To-Dos</string>
+
+    <string name="regime_dialog_title">Set-up routine</string>
 
     <string name="regime_name_hint">Name the routine</string>
 

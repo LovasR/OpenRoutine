@@ -252,21 +252,24 @@ public class DayItemActivity extends FragmentActivity {
 
                 //messy code for setting Calendars with the two options being if the user the material dialog or not
                 Calendar startTime = Calendar.getInstance();
-                if(startPickerClicked && startTimePicker != null){
-                    startHour = startTimePicker.getHour();
-                    startMinute = startTimePicker.getMinute();
-                }
-                startTime.set(Calendar.HOUR_OF_DAY, startHour);
-                startTime.set(Calendar.MINUTE, startMinute);
-
                 Calendar endTime = (Calendar) startTime.clone();
-                if(endPickerClicked && endTimePicker != null){
-                    endHour = endTimePicker.getHour();
-                    endMinute = endTimePicker.getMinute();
-                }
-                endTime.set(Calendar.HOUR_OF_DAY, endHour);
-                endTime.set(Calendar.MINUTE, endMinute);
+                try {
+                    if (startPickerClicked && startTimePicker != null) {
+                        startHour = startTimePicker.getHour();
+                        startMinute = startTimePicker.getMinute();
+                    }
+                    startTime.set(Calendar.HOUR_OF_DAY, startHour);
+                    startTime.set(Calendar.MINUTE, startMinute);
 
+                    if (endPickerClicked && endTimePicker != null) {
+                        endHour = endTimePicker.getHour();
+                        endMinute = endTimePicker.getMinute();
+                    }
+                    endTime.set(Calendar.HOUR_OF_DAY, endHour);
+                    endTime.set(Calendar.MINUTE, endMinute);
+                } catch (Exception e) {
+                    //damn
+                }
 
                 //if it was only started for editing, it only edits existing item
                 if (dayItem != null) {
@@ -277,6 +280,7 @@ public class DayItemActivity extends FragmentActivity {
                 } else {
                     Log.v("fragment_preload", "focusedFragment: "  + focusedFragment);
                     focusedDay.addDayItem(new DayItem(itemName.getText().toString(), startTime.getTime(), endTime.getTime(), selectedActivity));
+                    //if()
                 }
                 finish();
             }

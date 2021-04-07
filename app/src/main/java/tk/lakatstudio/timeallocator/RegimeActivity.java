@@ -136,6 +136,8 @@ public class RegimeActivity extends AppCompatActivity {
                 if(nameEditText.getText().length() > 0) {
                     regime.name = nameEditText.getText().toString();
                     alertDialog.cancel();
+
+                    finish();
                 }
             }
         });

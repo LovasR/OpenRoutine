@@ -139,15 +139,7 @@ public class RegimeTodoFragment extends Fragment {
 
 
                 ImageButton itemCheck = convertView.findViewById(R.id.todoItemCheck);
-                itemCheck.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        Log.v("__debug", "check clicked");
-                        //TodoItem.removeItem();
-                        day.removeTodoItem(todo);
-                        notifyDataSetChanged();
-                    }
-                });
+                itemCheck.setVisibility(View.GONE);
 
                 return convertView;
             }

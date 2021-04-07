@@ -160,10 +160,8 @@ public class DayFragment extends Fragment {
         Log.e("UI_test", "onresume_fragment " + fragmentIndex);
         if(!isRunning){
             isRunning = true;
-            dayPlannerInit(this);
-        } else {
-            dayPlannerInit(this);
         }
+        dayPlannerInit(this);
         super.onResume();
     }
 

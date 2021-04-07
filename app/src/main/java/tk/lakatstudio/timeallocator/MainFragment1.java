@@ -99,48 +99,6 @@ public class MainFragment1 extends Fragment {
                 }
             }
         });
-
-        /*viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
-            @Override
-            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-
-            }
-
-            @Override
-            public void onPageSelected(int position) {
-                Log.v("fragment_preload_", "position: " + position);
-                focusedPage = position;
-            }
-
-            @Override
-            public void onPageScrollStateChanged(int state) {
-                Log.v("fragment_preload_", "focusedPAge: " + focusedPage);
-                if(state == ViewPager.SCROLL_STATE_IDLE){
-                    if(focusedPage == 0){
-                        fragmentIndex--;
-                        refreshAllFragments(SCROLL_BACKWARD);
-                    } else if(focusedPage == 2){
-                        fragmentIndex++;
-                        refreshAllFragments(SCROLL_FORWARD);
-                    }
-
-                    //prevent flashing of old ListView
-                    /*try {
-                        Thread.sleep(50);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-
-
-                    //dayFragments[0].fragmentDay = DayInit.daysHashMap.get(fragmentIndex - 1) != null ? DayInit.daysHashMap.get(fragmentIndex - 1) :
-                    //gson.fromJson(DayInit.readFromFile(getContext(), "day_" + dateFormat.format(calendar.getTime())).get(0), Day.class);
-
-                    //this is a joke
-                    //dayFragments[0].fragmentDay = DayInit.daysHashMap.get(fragmentIndex - 1) != null ? DayInit.daysHashMap.get(fragmentIndex - 1) : new Gson().fromJson(DayInit.readFromFile(getContext(), "day_" + new SimpleDateFormat("y.M.d", Locale.getDefault()).format(calendar.getTime())).get(0), Day.class);
-                    //viewPager.setCurrentItem(1, false);
-                }
-            }
-        });*/
         viewPager.setOffscreenPageLimit(3);
 
         super.onViewCreated(view, savedInstanceState);
@@ -216,16 +174,17 @@ public class MainFragment1 extends Fragment {
         Gson gson = new Gson();
         SimpleDateFormat dateFormat = new SimpleDateFormat("y.M.d", Locale.getDefault());
 
-        //retrieve Day from the hashmap, if null, try to load from file
+        //retrieve day from the hashmap, if null, try to load from file
         if((dayFragments[index].fragmentDay = DayInit.daysHashMap.get(newIndex)) == null){
 
             ArrayList<String> dayJsons = DayInit.readFromFile(getContext(), "day_" + dateFormat.format(calendar.getTime()));
 
             if(dayJsons != null){
+                //load from file if read returned not null
                 dayFragments[index].fragmentDay = gson.fromJson(dayJsons.get(0), Day.class);
                 Log.v("fragment_preload", "loaded from file: " + new SimpleDateFormat("D").format(dayFragments[index].fragmentDay.start.getTime()));
-                dayFragments[index].fragmentDay.isSaved = true;
             } else {
+                //create new day if no file of this day was found
                 Log.v("fragment_preload", "new Day");
                 dayFragments[index].fragmentDay = new Day();
 
@@ -236,8 +195,8 @@ public class MainFragment1 extends Fragment {
                 date.set(Calendar.SECOND, 0);
                 dayFragments[index].fragmentDay.start = date.getTime();
 
-                dayFragments[index].fragmentDay.isSaved = true;
             }
+            dayFragments[index].fragmentDay.isSaved = true;
             //put the value not yet in the hashmap
             DayInit.daysHashMap.put(newIndex, dayFragments[index].fragmentDay);
         } else {
@@ -249,6 +208,12 @@ public class MainFragment1 extends Fragment {
             Regime.setAllActiveRegimesDays(dayFragments[index].fragmentDay);
         }
         dayFragments[index].fragmentIndex = newIndex;
+    }
+
+    @Override
+    public void onResume() {
+        Log.e("UI_test", "onResume main_fragment1");
+        super.onResume();
     }
 
     @Override
