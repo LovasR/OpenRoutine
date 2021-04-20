@@ -6,7 +6,7 @@
 
     <string name="default_date_format" translatable="false">MM.dd. EEEE</string>
 
-    <string name="allowed_characters_date_format" translatable="false">GyYMLwWDdFEu</string>
+    <string name="allowed_characters_date_format" translatable="false">GyYMLwWDdFEu .,()</string>
     <string name="allowed_characters_color" translatable="false">0123456789abcdefABCDEF</string>
 
     <!--Not to be translated-->
@@ -22,15 +22,25 @@
 
     <!--Notification-->
     <string name="channel_name">Open Routine</string>
-    <string name="channel_description">Test description</string>
 
     <string name="notification_title">Hey!</string>
     <string name="notification_content_text">Are you doing, %1$s?</string>
 
 
     <string name="notification_action">Already on it</string>
+    <string name="notification_show_before">Coming up, %1$s (%2$s)</string>
     <string name="notification_action_other_activity">Doing something else</string>
     <string name="notification_other_activity">Choose other activity:</string>
+
+
+    <string-array name="silence_length">
+        <item>1 hour</item>
+        <item>2 hours</item>
+        <item>6 hours</item>
+        <item>12 hours</item>
+        <item>24 hours</item>
+        <item>Other:</item>
+    </string-array>
 
     <!-- Settings -->
     <string name="cycle_setting">Set the intervals of notifications:</string>
@@ -50,7 +60,8 @@
     <string name="yes">Yes</string>
     <string name="no">No</string>
 
-    <string name="at">At:</string>
+    <string name="at_colon">At:</string>
+    <string name="at">At</string>
     <string name="minutes">minutes</string>
 
     <string name="day_of_week_1">Monday</string>
@@ -69,6 +80,14 @@
         <item>@string/day_of_week_6</item>
         <item>@string/day_of_week_7</item>
     </string-array>
+
+    <string name="day_short">d</string>
+    <string name="hour_short">h</string>
+    <string name="minute_short">m</string>
+
+    <string name="day_long">Day</string>
+    <string name="hour_long">Hour</string>
+    <string name="minute_long">Minute</string>
 
     <!--Main activity-->
 
@@ -99,10 +118,30 @@
     <string name="preposition2">To:</string>
     <string name="preposition3"></string>
 
-    <string name="hour_short">h</string>
-    <string name="minutes_short">m</string>
-
     <string name="activity_picker_title">Select a type of activity:</string>
+
+    <string name="notifications">Notifications</string>
+    <string name="add_notification">Add notification</string>
+    <string name="notification_at_start">At start</string>
+    <string name="notification_at_end">At end</string>
+
+    <string name="notification_start">start</string>
+    <string name="notification_end">end</string>
+    <string name="notification_before">Before</string>
+    <string name="notification_after">After</string>
+
+    <bool name="notification_time_order">true</bool>
+
+    <string-array name="notification_times_pre">
+        <item>@string/at</item>
+        <item>@string/notification_before</item>
+        <item>@string/notification_after</item>
+    </string-array>
+    <string-array name="notification_times">
+        <item>@string/notification_start</item>
+        <item>@string/notification_end</item>
+    </string-array>
+
 
     <!--Regime strings-->
     <string name="regime_title">Routines</string>

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TextView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/outline_background"
+    android:paddingStart="15dp"
+    android:paddingVertical="10dp"
+    android:textColor="@color/color_text_default"
+    android:textSize="18sp"
+    android:foreground="?android:attr/selectableItemBackground">
+
+</TextView>

@@ -1,10 +1,14 @@
 package tk.lakatstudio.timeallocator;
 
+import android.app.AlarmManager;
+import android.app.PendingIntent;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.text.format.DateFormat;
 import android.util.Log;
 
+import androidx.core.app.AlarmManagerCompat;
 import androidx.preference.PreferenceManager;
 
 import com.google.android.material.timepicker.TimeFormat;
@@ -20,15 +24,20 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Locale;
+import java.util.UUID;
 
 public class DayInit {
 
     static HashMap<Integer, Day> daysHashMap = new HashMap<>();
     static SharedPreferences sharedPreferences;
+    
+    static Day currentDay;
+    static HashMap<UUID, DayItem> currentDayItems = new HashMap<>();
+    //log each set alarm
+    static int notificationRequestID;
+    static INotificationService notificationService;
 
-    static void init(Context context, MainActivity mainActivity){
-
-
+    static void init(final Context context){
         if (!loadAll(context)) {
             Day today;
             today = new Day();
@@ -42,7 +51,7 @@ public class DayInit {
 
             today.isSaved = false;
 
-            CycleManager.currentDay = today;
+            currentDay = today;
             CycleManager.currentItem = today.getDayItem(Calendar.getInstance().getTime());
 
 
@@ -52,7 +61,7 @@ public class DayInit {
                 ActivityType.addActivityType(names[i], defaultColors[i]);
             }
         } else {
-            Log.v("save_debug_load", "Loading finished " + CycleManager.currentDay.dayItems.size());
+            Log.v("save_debug_load", "Loading finished " + currentDay.dayItems.size());
             //mainActivity.fragment1.dayPlannerInit(mainActivity.fragment1);
         }
 
@@ -61,7 +70,101 @@ public class DayInit {
         }
 
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
-        Log.v("shared_preferences_test", sharedPreferences.getString("hour_format", "null"));
+
+
+        //Other less-important initialization
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                sharedPreferences.getInt("requestID", 0);
+                ATNotificationManager.createNotificationChannel(context);
+                //am = (AlarmManager) context.getApplicationContext().getSystemService(Context.ALARM_SERVICE);
+                pendingIntentCleanup(context);
+            }
+        }).run();
+    }
+
+    static void increaseNotificationRequestID(){
+        if(notificationRequestID <= 2000000000){
+            sharedPreferences.edit().putInt("requestID", ++notificationRequestID).apply();
+        } else {
+            sharedPreferences.edit().putInt("requestID", (notificationRequestID = 1)).apply();
+        }
+
+    }
+
+    static void pendingIntentCleanup(Context context){
+        Intent alarmIntent = new Intent(context, ATBroadcastReceiver.class);
+        alarmIntent.setAction("Notification.Create");
+        alarmIntent.putExtra("dayItemID", "");
+        final PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 0, alarmIntent,PendingIntent.FLAG_NO_CREATE);
+        if (pendingIntent != null) {
+            Log.v("notification", "pendingIntent existed ");
+            pendingIntent.cancel();
+        }
+    }
+
+    //static AlarmManager am;
+    static void setAlarm(Context context, String dayItemID, long alarmTime){
+        AlarmManager am = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+
+        Intent intent = new Intent(context, NotificationReceiver.class);
+        intent.setPackage(context.getPackageName());
+        intent.setAction("Notification.Create");
+        intent.putExtra("dayItemID", dayItemID);
+        //(int) ((alarmTime / 1000) & 0xFFFFFF)
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 0, intent, 0);
+
+        Log.v("notification", "setting alarm: " + alarmTime + " " + dayItemID + " " + (int) ((alarmTime / 1000) & 0xFFFFFF));
+        Log.v("notification", "pendingIntent: " + intent.toString() + (pendingIntent != null ? " !null" : " null"));
+
+        AlarmManagerCompat.setExactAndAllowWhileIdle(am, AlarmManager.RTC_WAKEUP, alarmTime, pendingIntent);
+
+        if(am.getNextAlarmClock() != null)
+            Log.v("notification", "alarm: " + am.getNextAlarmClock().toString());
+        /*if(am.getNextAlarmClock() != null) {
+            Log.v("notification", "NextAlarmClock is not null");
+            if (am.getNextAlarmClock().getShowIntent().equals(pendingIntent)) {
+                Log.v("notification", "same intent: ");
+            }
+        } else {
+            Log.v("notification", "NextAlarmClock is null");
+        }*/
+    }
+
+    static void addAlarm(Context context, DayItem dayItem){
+        if(dayItem.notificationTimesOA.size() > 0){
+            DayItem dayItem_ = currentDayItems.get(UUID.fromString(dayItem.ID.toString()));
+            Log.v("notifications", (dayItem_ == null ? "dayItem_ is null " : "dayItem_ is !!!null "));
+            AlarmManager am = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+
+            Intent notificationIntent = new Intent(context, NotificationReceiver.class);
+
+            notificationIntent.setPackage(context.getPackageName());
+            notificationIntent.setAction("Notification.Create");
+            notificationIntent.putExtra("dayItemID", dayItem.ID.toString());
+            notificationIntent.putExtra("dayItemTypeName", dayItem.type.name);
+
+            for(DayItem.NotificationTime timeOffset : dayItem.notificationTimesOA){
+                notificationIntent.putExtra("requestID", notificationRequestID);
+                notificationIntent.putExtra("dayItemStart", dayItem.start.getTime());
+
+                Log.v("notification", "offset: " + timeOffset.offset);
+
+                PendingIntent pendingIntent = PendingIntent.getBroadcast(context, notificationRequestID, notificationIntent, 0);
+
+                AlarmManagerCompat.setExactAndAllowWhileIdle(am, AlarmManager.RTC_WAKEUP, dayItem.start.getTime() + (timeOffset.offset * 1000), pendingIntent);
+
+                increaseNotificationRequestID();
+            }
+        }
+    }
+
+    static void cancelAlarm(Context context, int requestID){
+        Intent intent = new Intent(context, ATBroadcastReceiver.class);
+        PendingIntent sender = PendingIntent.getBroadcast(context, requestID, intent, 0);
+        AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+        alarmManager.cancel(sender);
 
     }
 
@@ -166,6 +269,8 @@ public class DayInit {
             writeToFile(context, outJson, "regimes");
         }
 
+
+        sharedPreferences.edit().putInt("requestID", notificationRequestID).apply();
     }
     static void writeToFile(Context context, String json, String fileName){
         File dir = new File(context.getFilesDir(), "saves");
@@ -196,13 +301,16 @@ public class DayInit {
 
         Gson gson = new Gson();
         for(String dayJson : days){
-            CycleManager.currentDay = gson.fromJson(dayJson, Day.class);
-            daysHashMap.put(Calendar.getInstance().get(Calendar.DAY_OF_YEAR), CycleManager.currentDay);
-            for(DayItem dayItem : CycleManager.currentDay.dayItems){
-                DayItem.allDayItemHashes.put(dayItem.hashCode(), dayItem);
-                Log.v("hash_debug", dayItem.hashCode() + "");
+            currentDay = gson.fromJson(dayJson, Day.class);
+            Calendar calendar = Calendar.getInstance();
+            daysHashMap.put(calendar.get(Calendar.DAY_OF_YEAR) + calendar.get(Calendar.YEAR) * 365, currentDay);
+            for(DayItem dayItem : currentDay.dayItems){
+                dayItem.nullCheck();
+                Log.v("uuid_debug", dayItem.ID.toString());
+                DayInit.currentDayItems.put(dayItem.ID, dayItem);
+                DayItem.allDayItemHashes.put(dayItem.ID, dayItem);
             }
-            Log.v("save_debug_load", "load day: " + CycleManager.currentDay.dayItems.size() + " " + (CycleManager.currentDay.dayItems.size() > 0 ? CycleManager.currentDay.dayItems.get(0).type.name : "null"));
+            Log.v("save_debug_load", "load day: " + currentDay.dayItems.size() + " " + (currentDay.dayItems.size() > 0 ? currentDay.dayItems.get(0).type.name : "null"));
         }
 
         ArrayList<String> activityList = readFromFile(context, "activities");
@@ -242,7 +350,7 @@ public class DayInit {
             reader.close();
             Log.v("save_debug_load", "successful read" + out.size());
         } catch (Exception e){
-            e.printStackTrace();
+            //e.printStackTrace();
             Log.v("save_debug_load", "file error");
             return null;
         }

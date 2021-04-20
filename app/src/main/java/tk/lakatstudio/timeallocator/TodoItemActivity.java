@@ -154,7 +154,7 @@ public class TodoItemActivity extends FragmentActivity {
 
                             removeDayItem.setVisibility(View.VISIBLE);
 
-                            dayItemTime.setText(getString(R.string.at) + " " + new SimpleDateFormat("HH:mm", Locale.getDefault()).format(assoc.start.getTime()));
+                            dayItemTime.setText(getString(R.string.at_colon) + " " + new SimpleDateFormat("HH:mm", Locale.getDefault()).format(assoc.start.getTime()));
                             dayItemTime.setVisibility(View.VISIBLE);
                         }
                         alertDialog.cancel();
@@ -176,7 +176,7 @@ public class TodoItemActivity extends FragmentActivity {
 
                 removeDayItem.setVisibility(View.VISIBLE);
 
-                dayItemTime.setText(getString(R.string.at) + " " + new SimpleDateFormat("HH:mm", Locale.getDefault()).format(assoc.start.getTime()));
+                dayItemTime.setText(getString(R.string.at_colon) + " " + new SimpleDateFormat("HH:mm", Locale.getDefault()).format(assoc.start.getTime()));
                 dayItemTime.setVisibility(View.VISIBLE);
             }
         }

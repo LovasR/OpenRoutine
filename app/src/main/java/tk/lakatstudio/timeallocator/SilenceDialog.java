@@ -2,18 +2,16 @@ package tk.lakatstudio.timeallocator;
 
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.Dialog;
 import android.app.NotificationManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.ArrayAdapter;
-import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 
-public class OtherActivityDialog extends Activity {
+public class SilenceDialog extends Activity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -21,9 +19,8 @@ public class OtherActivityDialog extends Activity {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle(getString(R.string.notification_other_activity));
 
-        final ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(this, android.R.layout.select_dialog_singlechoice, getResources().getStringArray(R.array.default_activities));
-        //TODO add users activities
-        //arrayAdapter.add("Hardik");
+        final ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(this, android.R.layout.select_dialog_singlechoice, getResources().getStringArray(R.array.silence_length));
+
 
         builder.setAdapter(arrayAdapter, new DialogInterface.OnClickListener() {
             @Override
@@ -34,7 +31,7 @@ public class OtherActivityDialog extends Activity {
                 NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
                 notificationManager.cancel(getIntent().getIntExtra("notificationID", 0));
 
-                if(!OtherActivityDialog.this.isFinishing()){
+                if(!SilenceDialog.this.isFinishing()){
                     finish();
                 }
             }
@@ -45,13 +42,13 @@ public class OtherActivityDialog extends Activity {
 
 
     public void onCancel(DialogInterface dialogInterface) {
-        if(!OtherActivityDialog.this.isFinishing()){
+        if(!SilenceDialog.this.isFinishing()){
             finish();
         }
     }
 
     public void onDismiss(DialogInterface dialogInterface) {
-        if(!OtherActivityDialog.this.isFinishing()){
+        if(!SilenceDialog.this.isFinishing()){
             finish();
         }
     }

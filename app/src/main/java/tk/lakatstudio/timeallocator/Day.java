@@ -31,7 +31,6 @@ public class Day {
 
 
     int cycleIndex;
-    int dayItemIndex;
 
     boolean isSaved;
     //for when regime`s dayItems are set
@@ -100,6 +99,12 @@ public class Day {
     void removeTodoItem(TodoItem todoItem){
         todoItems.remove(todoItem);
         isSaved = false;
+    }
+
+    void nullCheck(){
+        for(DayItem dayItem : dayItems){
+            dayItem.nullCheck();
+        }
     }
 
     void addRegimeDays(Regime regime){

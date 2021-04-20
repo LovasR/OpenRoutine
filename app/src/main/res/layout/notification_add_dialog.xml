@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical">
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/add_notification"
+        android:textStyle="bold"
+        android:textSize="22sp"
+        android:layout_marginHorizontal="10dp"
+        android:layout_marginTop="10dp"/>
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="2dp"
+        android:layout_marginHorizontal="6dp"
+        android:background="#D1D1D1"
+        android:layout_marginBottom="10dp"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <Spinner
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:id="@+id/addNotificationRelativeSpinnerpre"
+            android:paddingStart="10dp"
+            android:paddingEnd="20dp"
+            android:paddingVertical="15dp"
+            android:foreground="@drawable/outline_background"
+            android:layout_margin="10dp"
+
+            android:dropDownVerticalOffset="5dp"/>
+        <Spinner
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:id="@+id/addNotificationRelativeSpinner"
+            android:paddingStart="10dp"
+            android:paddingEnd="20dp"
+            android:paddingVertical="15dp"
+            android:foreground="@drawable/outline_background"
+            android:layout_margin="10dp"
+
+            android:dropDownVerticalOffset="5dp"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:id="@+id/addNotificationOffsets">
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/outlinedTextField"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:hint="@string/day_long"
+            style="@style/TAOutlinedEditText"
+            app:suffixText="@string/day_short"
+            android:layout_weight="3"
+            android:layout_margin="10dp">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/addNotificationOffsetDay"
+                android:singleLine="true"
+                android:inputType="number"/>
+        </com.google.android.material.textfield.TextInputLayout>
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:hint="@string/hour_long"
+            style="@style/TAOutlinedEditText"
+            app:suffixText="@string/hour_short"
+            android:layout_weight="3"
+            android:layout_margin="10dp">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/addNotificationOffsetHour"
+                android:singleLine="true"
+                android:inputType="number"/>
+        </com.google.android.material.textfield.TextInputLayout>
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:hint="@string/minute_long"
+            style="@style/TAOutlinedEditText"
+            app:suffixText="@string/minute_short"
+            android:layout_weight="3"
+            android:layout_margin="10dp">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/addNotificationOffsetMinute"
+                android:singleLine="true"
+                android:inputType="number"/>
+        </com.google.android.material.textfield.TextInputLayout>
+    </LinearLayout>
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="15dp"
+        android:background="@drawable/spinner_background"
+        android:id="@+id/addNotificationDone"
+        android:layout_gravity="end"
+        android:text="@string/buttonDone"
+        android:layout_margin="10dp"/>
+
+</LinearLayout>

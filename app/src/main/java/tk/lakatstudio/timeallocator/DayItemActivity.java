@@ -1,28 +1,44 @@
 package tk.lakatstudio.timeallocator;
 
 import android.app.AlertDialog;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.KeyEvent;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.EditorInfo;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.FragmentActivity;
+import androidx.recyclerview.widget.DividerItemDecoration;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
 import com.google.android.material.timepicker.MaterialTimePicker;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Locale;
+
+import tk.lakatstudio.timeallocator.DayItem.NotificationTime;
 
 public class DayItemActivity extends FragmentActivity {
 
@@ -42,6 +58,26 @@ public class DayItemActivity extends FragmentActivity {
 
     int endHour;
     int endMinute;
+
+    NotificationAdapter notificationAdapter;
+    ArrayList<NotificationTime> notificationTimes;
+    int dayItemLength;
+
+    /*class NotificationTime{
+        int offset;
+        boolean fromEnd;
+        NotificationTime(int offset, boolean fromEnd){
+            this.offset = offset;
+            this.fromEnd = fromEnd;
+        }
+        ArrayList<NotificationTime> fromIntArray(ArrayList<Integer> offsets){
+            ArrayList<NotificationTime> out = new ArrayList<>();
+            for (Integer offset : offsets){
+                out.add(new NotificationTime(offsets, ))
+            }
+        }
+    }*/
+
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -102,6 +138,9 @@ public class DayItemActivity extends FragmentActivity {
             assert drawable != null;
             drawable.setColorFilter(dayItem.type.color, PorterDuff.Mode.SRC);
             activityButton.setBackground(drawable);
+
+            notificationTimes = dayItem.notificationTimesOA;
+            dayItemLength = (int) (dayItem.start.getTime() - dayItem.end.getTime());
         } else {
             Calendar calendar = Calendar.getInstance();
             startHour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY);
@@ -110,8 +149,10 @@ public class DayItemActivity extends FragmentActivity {
             startTimeButton.setText(new SimpleDateFormat(DayInit.getHourFormat(getBaseContext()), Locale.getDefault()).format(calendar.getTime()));
 
             //TODO set end time to the preferred length of the activityType
-            endHour = startHour + (selectedActivity.preferredLength > 0 ? selectedActivity.preferredLength / 60 : 1);
-            endMinute = (selectedActivity.preferredLength > 0 ? selectedActivity.preferredLength % 60 : 0);
+            int preferredHours = (selectedActivity.preferredLength > 0 ? selectedActivity.preferredLength / 60 : 1);
+            endHour = startHour + preferredHours;
+            int preferredMinutes = (selectedActivity.preferredLength > 0 ? selectedActivity.preferredLength % 60 : 0);
+            endMinute = preferredMinutes;
             final Calendar future = Calendar.getInstance();
             future.set(Calendar.HOUR_OF_DAY, endHour);
             future.set(Calendar.MINUTE, endMinute);
@@ -121,6 +162,10 @@ public class DayItemActivity extends FragmentActivity {
             Drawable drawable = getDrawable(R.drawable.spinner_background);
             drawable.setColorFilter(selectedActivity.color, PorterDuff.Mode.SRC);
             activityButton.setBackground(drawable);
+
+            notificationTimes = new ArrayList<>();
+            dayItemLength = dayItemLengthCalc(startHour, endHour, startMinute, endMinute);
+            Log.v("dayItemLength", "init length:  " + dayItemLengthCalc(startHour, endHour, startMinute, endMinute));
         }
 
         startTimePicker = new MaterialTimePicker.Builder()
@@ -156,6 +201,9 @@ public class DayItemActivity extends FragmentActivity {
                         endTimePicker = new MaterialTimePicker.Builder()
                                 .setTimeFormat(DayInit.getMaterialTimeFormat(getBaseContext()))
                                 .setHour(endHour).setMinute(endMinute).build();
+
+                        notificationRefresh(notificationTimes, dayItemLength, dayItemLengthCalc(startHour, endHour, startMinute, endMinute));
+                        dayItemLength = dayItemLengthCalc(startHour, endHour, startMinute, endMinute);
                     }
                 });
             }
@@ -180,6 +228,12 @@ public class DayItemActivity extends FragmentActivity {
                         endTime.set(Calendar.MINUTE, endTimePicker.getMinute());
                         SimpleDateFormat simple = new SimpleDateFormat(DayInit.getHourFormat(getBaseContext()), Locale.getDefault());
                         endTimeButton.setText(simple.format(endTime.getTime()));
+
+                        endHour = endTimePicker.getHour();
+                        endMinute = endTimePicker.getMinute();
+
+                        notificationRefresh(notificationTimes, dayItemLength, dayItemLengthCalc(startHour, endHour, startMinute, endMinute));
+                        dayItemLength = dayItemLengthCalc(startHour, endHour, startMinute, endMinute);
                     }
                 });
             }
@@ -245,13 +299,227 @@ public class DayItemActivity extends FragmentActivity {
             }
         });
 
-        final Button done = findViewById(R.id.addDayItemDone);
+        final ImageButton notificationAdd = findViewById(R.id.addDayItemNotification);
+        notificationAdd.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                final AlertDialog.Builder builder = new AlertDialog.Builder(DayItemActivity.this);
+                View dialogView = getLayoutInflater().inflate(R.layout.notification_add_dialog, null);
+                builder.setView(dialogView);
+
+                final Spinner relativeSpinner = dialogView.findViewById(R.id.addNotificationRelativeSpinner);
+                final Spinner relativeSpinnerPre = dialogView.findViewById(R.id.addNotificationRelativeSpinnerpre);
+
+                final LinearLayout offsets = dialogView.findViewById(R.id.addNotificationOffsets);
+
+                final EditText offsetDay = dialogView.findViewById(R.id.addNotificationOffsetDay);
+                final EditText offsetHour = dialogView.findViewById(R.id.addNotificationOffsetHour);
+                final EditText offsetMinute = dialogView.findViewById(R.id.addNotificationOffsetMinute);
+
+                Button done = dialogView.findViewById(R.id.addNotificationDone);
+
+                final AlertDialog alertDialog = builder.create();
+
+                ArrayAdapter<CharSequence> preadapter = ArrayAdapter.createFromResource(DayItemActivity.this, R.array.notification_times_pre, R.layout.spinner_item);
+                preadapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                relativeSpinnerPre.setAdapter(preadapter);
+                relativeSpinnerPre.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener(){
+                    @Override
+                    public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                        if(i == 0){
+                            offsets.setVisibility(View.GONE);
+                        } else {
+                            offsets.setVisibility(View.VISIBLE);
+                        }
+                    }
+
+                    @Override
+                    public void onNothingSelected(AdapterView<?> adapterView) {}
+                });
+
+                ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(DayItemActivity.this, R.array.notification_times, R.layout.spinner_item);
+                adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                relativeSpinner.setAdapter(adapter);
+                relativeSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener(){
+                    @Override
+                    public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+
+                    }
+
+                    @Override
+                    public void onNothingSelected(AdapterView<?> adapterView) {
+
+                    }
+                });
+
+                offsetHour.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+                    @Override
+                    public boolean onEditorAction(TextView textView, int actionID, KeyEvent keyEvent) {
+                        if (actionID == EditorInfo.IME_ACTION_SEARCH ||
+                                actionID == EditorInfo.IME_ACTION_DONE ||
+                                keyEvent != null && keyEvent.getAction() == KeyEvent.ACTION_DOWN
+                                        && keyEvent.getKeyCode() == KeyEvent.KEYCODE_ENTER) {
+                            if (keyEvent == null || !keyEvent.isShiftPressed()) {
+                                String resultS = offsetHour.getText().toString();
+                                int result = Integer.parseInt(resultS.length() == 0 ? "0" : resultS);
+                                if(result > 23){
+                                    String offsetDayT = offsetDay.getText().toString();
+                                    if(offsetDayT.length() > 0){
+                                        offsetDay.setText(String.valueOf(Integer.parseInt(offsetDayT) + result / 24));
+                                    } else{
+                                        offsetDay.setText(String.valueOf(result / 24));
+                                    }
+                                    offsetHour.setText(String.valueOf(result % 24));
+                                }
+                                return true;
+                            }
+                        }
+                        return false;
+                    }
+                });
+                offsetHour.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+                    @Override
+                    public void onFocusChange(View view, boolean b) {
+                        String resultS = offsetHour.getText().toString();
+                        int result = Integer.parseInt(resultS.length() == 0 ? "0" : resultS);
+                        if(result > 23){
+                            String offsetDayT = offsetDay.getText().toString();
+                            if(offsetDayT.length() > 0){
+                                offsetDay.setText(String.valueOf(Integer.parseInt(offsetDayT) + result / 24));
+                            } else{
+                                offsetDay.setText(String.valueOf(result / 24));
+                            }
+                            offsetHour.setText(String.valueOf(result % 24));
+                        }
+                    }
+                });
+
+                offsetMinute.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+                    @Override
+                    public boolean onEditorAction(TextView textView, int actionID, KeyEvent keyEvent) {
+                        if (actionID == EditorInfo.IME_ACTION_SEARCH ||
+                                actionID == EditorInfo.IME_ACTION_DONE ||
+                                actionID == EditorInfo.IME_ACTION_NEXT ||
+                                actionID == EditorInfo.IME_ACTION_PREVIOUS ||
+                                keyEvent != null && keyEvent.getAction() == KeyEvent.ACTION_DOWN
+                                        && keyEvent.getKeyCode() == KeyEvent.KEYCODE_ENTER) {
+                            if (keyEvent == null || !keyEvent.isShiftPressed()) {
+                                String resultS = offsetMinute.getText().toString();
+                                int result = Integer.parseInt(resultS.length() == 0 ? "0" : resultS);
+                                if(result > 59){
+                                    String offsetHourT = offsetHour.getText().toString();
+                                    if(offsetHourT.length() > 0){
+                                        offsetHour.setText(String.valueOf(Integer.parseInt(offsetHourT) + result / 60));
+                                    } else{
+                                        offsetHour.setText(String.valueOf(result / 60));
+                                    }
+                                    offsetMinute.setText(String.valueOf(result % 60));
+                                }
+                                return true;
+                            }
+                        }
+                        return false;
+                    }
+                });
+
+                offsetMinute.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+                    @Override
+                    public void onFocusChange(View view, boolean b) {
+                        String resultS = offsetMinute.getText().toString();
+                        int result = Integer.parseInt(resultS.length() == 0 ? "0" : resultS);
+                        if(result > 59){
+                            String offsetHourT = offsetHour.getText().toString();
+                            if(offsetHourT.length() > 0){
+                                offsetHour.setText(String.valueOf(Integer.parseInt(offsetHourT) + result / 60));
+                            } else{
+                                offsetHour.setText(String.valueOf(result / 60));
+                            }
+                            offsetMinute.setText(String.valueOf(result % 60));
+                        }
+                    }
+                });
+
+                done.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        String dayOffsetString = offsetDay.getText().toString();
+                        String hourOffsetString = offsetHour.getText().toString();
+                        String minuteOffsetString = offsetMinute.getText().toString();
+                        int notificationTime = Integer.parseInt(dayOffsetString.length() == 0 ? "0" : dayOffsetString) * 60 * 60 * 24
+                                + Integer.parseInt(hourOffsetString.length() == 0 ? "0" : hourOffsetString) * 60 * 60
+                                + Integer.parseInt(minuteOffsetString.length() == 0 ? "0" : minuteOffsetString) * 60;
+                        //if user selected before
+                        if(relativeSpinnerPre.getSelectedItem().equals(getString(R.string.notification_before))){
+                            Log.v("dayItemLength", "before");
+                            notificationTime = -notificationTime;
+                        }
+                        //if user selected end
+                        if(relativeSpinner.getSelectedItem().equals(getString(R.string.notification_end))){
+                            Log.v("dayItemLength", "end");
+                            notificationTime += dayItemLength;
+                            notificationTimes.add(new NotificationTime(notificationTime, true));
+                        } else {
+                            notificationTimes.add(new NotificationTime(notificationTime, false));
+                        }
+                        Toast.makeText(DayItemActivity.this, String.valueOf(notificationTime) + " " + relativeSpinnerPre.getSelectedItem(), Toast.LENGTH_SHORT).show();
+                        notificationAdapter.notifyItemInserted(notificationTimes.size() - 1);
+                        alertDialog.cancel();
+                    }
+                });
+
+                alertDialog.show();
+            }
+        });
+
+        RecyclerView notificationList = findViewById(R.id.addDayItemNotificationsList);
+        notificationList.setLayoutManager(new LinearLayoutManager(this));
+        DividerItemDecoration itemDecor = new DividerItemDecoration(this, DividerItemDecoration.VERTICAL);
+        itemDecor.setDrawable(getResources().getDrawable(R.drawable.divider_nothing));
+        notificationList.addItemDecoration(itemDecor);
+
+        notificationAdapter = new NotificationAdapter(this, notificationTimes, dayItemLength/*, (int) (dayItem.end.getTime() - dayItem.start.getTime()), dayItem.start.getTime()*/);
+        notificationAdapter.setClickListener(new NotificationAdapter.ItemClickListener() {
+            @Override
+            public void onItemClick(View view, int position) {
+                /*Intent editIntent = new Intent(this, DayItemActivity.class);
+                editIntent.putExtra("index", position);
+                //editIntent.putExtra("fragmentIndex", fragmentIndex);
+                startActivity(editIntent);*/
+            }
+        });
+        notificationAdapter.setLongClickListener(new NotificationAdapter.ItemLongClickListener() {
+            @Override
+            public void onItemLongClick(View view, final int position) {
+                DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        switch (which){
+                            case DialogInterface.BUTTON_POSITIVE:
+                                notificationTimes.remove(position);
+                                notificationAdapter.notifyItemRemoved(position);
+                                break;
+                            case DialogInterface.BUTTON_NEGATIVE:
+                                break;
+                        }
+                    }
+                };
+
+                AlertDialog.Builder builder = new AlertDialog.Builder(DayItemActivity.this);
+                builder.setMessage(getString(R.string.remove_activity,
+                        getString(R.string.day_item_singular))).setPositiveButton(getString(R.string.yes),
+                        dialogClickListener).setNegativeButton(getString(R.string.no), dialogClickListener).show();
+            }
+        });
+        notificationList.setAdapter(notificationAdapter);
+
+        final ExtendedFloatingActionButton done = findViewById(R.id.addDayItemDone);
         done.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
                 //messy code for setting Calendars with the two options being if the user the material dialog or not
                 Calendar startTime = Calendar.getInstance();
+                startTime.setTime(focusedDay.start);
                 Calendar endTime = (Calendar) startTime.clone();
                 try {
                     if (startPickerClicked && startTimePicker != null) {
@@ -277,13 +545,182 @@ public class DayItemActivity extends FragmentActivity {
                     dayItem.type = selectedActivity;
                     dayItem.start = startTime.getTime();
                     dayItem.end = endTime.getTime();
+                    dayItem.notificationTimesOA = notificationTimes;
                 } else {
                     Log.v("fragment_preload", "focusedFragment: "  + focusedFragment);
-                    focusedDay.addDayItem(new DayItem(itemName.getText().toString(), startTime.getTime(), endTime.getTime(), selectedActivity));
-                    //if()
+                    final DayItem newDayItem = new DayItem(itemName.getText().toString(), startTime.getTime(), endTime.getTime(), selectedActivity, notificationTimes);
+                    focusedDay.addDayItem(newDayItem);
+                    if(focusedFragment == MainFragment1.staticClass.todayIndex){
+                        notificationSend(newDayItem, DayItemActivity.this);
+                    }
                 }
                 finish();
             }
         });
+    }
+    void notificationRefresh(ArrayList<NotificationTime> notificationTimes, int oldLength, int newLength){
+        notificationAdapter.dayItemLength = newLength;
+        for(int i = 0; i < notificationTimes.size(); i++){
+            if(notificationTimes.get(i).offset == oldLength){
+                notificationTimes.get(i).offset = newLength;
+            } else {
+                if(notificationTimes.get(i).fromEnd){
+                    notificationTimes.get(i).offset += (newLength - oldLength);
+                }
+                //notificationTimes.set(i, notificationTimes.get(i) + (newLength - oldLength));
+            }
+        }
+        notificationAdapter.notifyDataSetChanged();
+    }
+
+    int dayItemLengthCalc(int startHour, int endHour, int startMinute, int endMinute){
+        Log.v("dayItemLength", startHour + " " + endHour + " " + startMinute + " " + endMinute);
+        int minutes = endMinute - startMinute;
+        return (endHour - startHour + (minutes < 0 ? -1 : 0)) * 60 * 60 + (minutes < 0 ? 60 + minutes : minutes) * 60;
+    }
+
+    void notificationSend(final DayItem dayItem, final Context context) {
+        //inits notification if the add is today
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                DayInit.currentDayItems.put(dayItem.ID, dayItem);
+
+                //dayItem.notificationTimes.add(0);
+
+                DayInit.addAlarm(context, dayItem);
+            }
+        }).run();
+    }
+}
+
+class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapter.ViewHolder> {
+
+    ArrayList<NotificationTime> notifications;
+    LayoutInflater inflater;
+    ItemClickListener clickListener;
+    ItemLongClickListener longClickListener;
+    Context context;
+
+    int dayItemLength;
+    long dayItemStart;
+
+    NotificationAdapter(Context context, ArrayList<NotificationTime> notifications, int dayItemLength/*, long dayItemStart*/) {
+        this.inflater = LayoutInflater.from(context);
+        this.notifications = notifications;
+        Log.v("recyclerView_test", notifications.size() + "");
+        this.context = context;
+        this.dayItemLength = dayItemLength;
+        //this.dayItemStart = dayItemStart;
+    }
+
+    void refreshContents(ArrayList<Integer> newDayItems){
+        //dayItemLength = newDayItems;
+        notifyDataSetChanged();
+    }
+
+    String offsetFormat(int offset){
+        String out = "";
+        int dayOffset = offset / (24 * 60 * 60);
+        offset -= dayOffset * (24 * 60 * 60);
+        int hourOffset = offset / (60 * 60);
+        offset -= hourOffset * (60 * 60);
+        int minuteOffset = offset / (60);
+        offset -= minuteOffset * (60);
+        Log.v("offsetDump", "offset: " + dayOffset + "dayOffset: " + dayOffset + "hourOffset: " + hourOffset + "minuteOffset: " + minuteOffset);
+        if (dayOffset != 0){
+            out += Math.abs(dayOffset) + context.getString(R.string.day_short) + " ";
+        }
+        if (hourOffset != 0){
+            out += Math.abs(hourOffset) + context.getString(R.string.hour_short) + " ";
+        }
+        if (minuteOffset != 0){
+            out += Math.abs(minuteOffset) + context.getString(R.string.minute_short);
+        }
+        return out;
+    }
+
+    @NonNull
+    @Override
+    public NotificationAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        View view = inflater.inflate(R.layout.notification_item, parent, false);
+        return new ViewHolder(view);
+    }
+
+    @Override
+    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+        final NotificationTime notificationTime = notifications.get(position);
+        TextView notificationView = (TextView) holder.itemView;
+        String notificationText = null;
+        if(!notificationTime.fromEnd && notificationTime.offset == 0){
+            notificationText = context.getString(R.string.notification_at_start);
+        } else if(notificationTime.fromEnd && notificationTime.offset == dayItemLength) {
+            notificationText = context.getString(R.string.notification_at_end);
+        } else if(!notificationTime.fromEnd){
+            if(notificationTime.offset > 0){
+                notificationText = context.getString(R.string.notification_after);
+            } else if(notificationTime.offset < 0){
+                notificationText = context.getString(R.string.notification_before);
+            }
+            notificationText += " " + context.getString(R.string.notification_start) + ": " + offsetFormat(notificationTime.offset);
+        } else if(notificationTime.fromEnd){
+            if(notificationTime.offset > dayItemLength){
+                notificationText = context.getString(R.string.notification_after);
+            } else if(notificationTime.offset < dayItemLength){
+                notificationText = context.getString(R.string.notification_before);
+            }
+            notificationText += " " + context.getString(R.string.notification_end) + ": " + offsetFormat(notificationTime.offset - dayItemLength);
+        }
+        /*else if(notificationTime == dayItemLength){
+            notificationText = context.getString(R.string.notification_at_end);
+        }*/
+        notificationView.setText(notificationText);
+    }
+
+    @Override
+    public int getItemCount() {
+        return notifications.size();
+    }
+
+    public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener {
+
+        ViewHolder(View itemView) {
+            super(itemView);
+            itemView.setOnClickListener(this);
+            itemView.setOnLongClickListener(this);
+        }
+
+        @Override
+        public void onClick(View view) {
+            if (clickListener != null) {
+                clickListener.onItemClick(view, getAdapterPosition());
+            }
+        }
+
+        @Override
+        public boolean onLongClick(View view) {
+            if (longClickListener != null) {
+                longClickListener.onItemLongClick(view, getAdapterPosition());
+            }
+            return true;
+        }
+    }
+
+    public NotificationTime getItem(int position) {
+        return notifications.get(position);
+    }
+    // allows clicks events to be caught
+    void setClickListener(ItemClickListener itemClickListener) {
+        this.clickListener = itemClickListener;
+    }
+    void setLongClickListener(ItemLongClickListener itemLongClickListener) {
+        this.longClickListener = itemLongClickListener;
+    }
+    // parent activity will implement this method to respond to click events
+    public interface ItemClickListener {
+        void onItemClick(View view, int position);
+    }
+    public interface ItemLongClickListener{
+        void onItemLongClick(View view, int position);
     }
 }

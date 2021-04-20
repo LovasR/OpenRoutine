@@ -8,7 +8,6 @@ import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.text.SpannableString;
-import android.text.style.UnderlineSpan;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -57,14 +56,18 @@ public class DayFragment extends Fragment {
         Log.e("UI_test", "oncreateview fragment " + fragmentIndex);
 
 
+        daySelect = view.findViewById(R.id.daySelect);
+
         //when the setDateText was called before the view was inflated
         if(dayDateText.getText().length() == 0) {
-            SpannableString dateText = new SpannableString(new SimpleDateFormat(DayInit.getDateFormat(getContext()), Locale.getDefault()).format(Calendar.getInstance().getTime()));
-            dateText.setSpan(new UnderlineSpan(), 0, dateText.length(), 0);
+            String dateText = new SimpleDateFormat(DayInit.getDateFormat(getContext()), Locale.getDefault()).format(Calendar.getInstance().getTime());
             dayDateText.setText(dateText);
+            Drawable drawable = getResources().getDrawable(R.drawable.selected_background);
+            assert drawable != null;
+            drawable.setColorFilter(getResources().getColor(R.color.colorAccent), PorterDuff.Mode.SRC);
+            daySelect.setBackground(drawable);
         }
 
-        daySelect = view.findViewById(R.id.daySelect);
         daySelect.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -114,9 +117,26 @@ public class DayFragment extends Fragment {
         DividerItemDecoration itemDecor = new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL);
         itemDecor.setDrawable(getResources().getDrawable(R.drawable.divider_nothing));
         rDayPlanner.addItemDecoration(itemDecor);
-        ArrayList<DayItem> dayItems = fragmentDay.dayItems;
 
-        adapter = new DayItemAdapter(getContext(), dayItems, this);
+        if(fragmentDay == null){
+            adapter = new DayItemAdapter(getContext(), new ArrayList<DayItem>(), this);
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        Thread.sleep(100);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    if(fragmentDay != null) {
+                        adapter.dayItems = fragmentDay.dayItems;
+                    }
+                }
+            });
+        } else {
+            adapter = new DayItemAdapter(getContext(), fragmentDay.dayItems, this);
+        }
+
         adapter.setClickListener(new DayItemAdapter.ItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
@@ -150,7 +170,6 @@ public class DayFragment extends Fragment {
             }
         });
         rDayPlanner.setAdapter(adapter);
-
 
         return view;
     }
@@ -226,7 +245,7 @@ public class DayFragment extends Fragment {
             out += hours + " " + getString(R.string.hour_short) + " ";
         }
         if(minutes > 0 || (hours == 0 && minutes == 0)){
-            out += new SimpleDateFormat("mm", Locale.getDefault()).format(calendar.getTime()) + " " + getString(R.string.minutes_short);
+            out += new SimpleDateFormat("mm", Locale.getDefault()).format(calendar.getTime()) + " " + getString(R.string.minute_short);
         }
         return out;
     }

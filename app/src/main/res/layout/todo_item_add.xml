@@ -15,15 +15,9 @@
             android:id="@+id/addTodoEditNameLayout"
             android:hint="@string/todo_hint"
             app:hintTextColor="@android:color/black"
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
 
             app:boxStrokeColor="@color/color_box_default"
-            app:boxCornerRadiusTopStart="8dp"
-            app:boxCornerRadiusTopEnd="8dp"
-            app:boxCornerRadiusBottomStart="8dp"
-            app:boxCornerRadiusBottomEnd="8dp"
-            app:boxStrokeWidth="2dp"
-            app:boxStrokeWidthFocused="2dp"
+            style="@style/TAOutlinedEditText"
             android:layout_margin="10dp"
 
             app:errorEnabled="true"

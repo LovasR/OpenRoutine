@@ -1,5 +1,6 @@
 package tk.lakatstudio.timeallocator;
 
+import android.content.BroadcastReceiver;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.SpannableString;
@@ -34,6 +35,8 @@ public class MainActivity extends AppCompatActivity {
 
     TextView mainTitle;
     LinearLayout mainTitleLayout;
+
+    BroadcastReceiver alarmReceiver;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -118,7 +121,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        DayInit.init(this, this);
+        DayInit.init(this);
     }
 
     void setMainTitle(String title){
@@ -157,5 +160,11 @@ public class MainActivity extends AppCompatActivity {
         DayInit.saveAll(this);
         isRunning = false;
         super.onPause();
+    }
+
+    @Override
+    protected void onDestroy() {
+        //unregisterReceiver(alarmReceiver);
+        super.onDestroy();
     }
 }

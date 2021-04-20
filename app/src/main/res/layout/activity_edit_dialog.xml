@@ -14,14 +14,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="@string/activity_name"
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-            app:boxStrokeColor="#D1D1D1"
-            app:boxCornerRadiusTopStart="8dp"
-            app:boxCornerRadiusTopEnd="8dp"
-            app:boxCornerRadiusBottomStart="8dp"
-            app:boxCornerRadiusBottomEnd="8dp"
-            app:boxStrokeWidth="2dp"
-            app:boxStrokeWidthFocused="2dp"
+            style="@style/TAOutlinedEditText"
             android:layout_margin="10dp">
 
             <com.google.android.material.textfield.TextInputEditText
@@ -39,16 +32,9 @@
                 android:layout_height="match_parent"
                 android:layout_weight="4"
                 android:hint="@string/activity_preferred_time_length"
-                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
 
                 app:suffixText="@string/minutes"
-                app:boxStrokeColor="#D1D1D1"
-                app:boxCornerRadiusTopStart="8dp"
-                app:boxCornerRadiusTopEnd="8dp"
-                app:boxCornerRadiusBottomStart="8dp"
-                app:boxCornerRadiusBottomEnd="8dp"
-                app:boxStrokeWidth="2dp"
-                app:boxStrokeWidthFocused="2dp"
+                style="@style/TAOutlinedEditText"
                 android:layout_margin="10dp">
 
                 <com.google.android.material.textfield.TextInputEditText
