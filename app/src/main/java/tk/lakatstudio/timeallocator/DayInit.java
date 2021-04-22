@@ -35,7 +35,6 @@ public class DayInit {
     static HashMap<UUID, DayItem> currentDayItems = new HashMap<>();
     //log each set alarm
     static int notificationRequestID;
-    static INotificationService notificationService;
 
     static void init(final Context context){
         if (!loadAll(context)) {
@@ -76,7 +75,7 @@ public class DayInit {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                sharedPreferences.getInt("requestID", 0);
+                notificationRequestID = sharedPreferences.getInt("requestID", 0);
                 ATNotificationManager.createNotificationChannel(context);
                 //am = (AlarmManager) context.getApplicationContext().getSystemService(Context.ALARM_SERVICE);
                 pendingIntentCleanup(context);
@@ -85,12 +84,20 @@ public class DayInit {
     }
 
     static void increaseNotificationRequestID(){
+        if(notificationRequestID <= 60){
+            sharedPreferences.edit().putInt("requestID", (notificationRequestID = 67)).apply();
+        }
         if(notificationRequestID <= 2000000000){
             sharedPreferences.edit().putInt("requestID", ++notificationRequestID).apply();
         } else {
             sharedPreferences.edit().putInt("requestID", (notificationRequestID = 1)).apply();
         }
+    }
 
+    static void decreaseNotificationRequestID(){
+        if(notificationRequestID > 0){
+            sharedPreferences.edit().putInt("requestID", --notificationRequestID).apply();
+        }
     }
 
     static void pendingIntentCleanup(Context context){
@@ -146,26 +153,26 @@ public class DayInit {
             notificationIntent.putExtra("dayItemTypeName", dayItem.type.name);
 
             for(DayItem.NotificationTime timeOffset : dayItem.notificationTimesOA){
-                notificationIntent.putExtra("requestID", notificationRequestID);
+                notificationIntent.putExtra("requestID", timeOffset.requestID);
                 notificationIntent.putExtra("dayItemStart", dayItem.start.getTime());
 
-                Log.v("notification", "offset: " + timeOffset.offset);
-
-                PendingIntent pendingIntent = PendingIntent.getBroadcast(context, notificationRequestID, notificationIntent, 0);
+                PendingIntent pendingIntent = PendingIntent.getBroadcast(context, timeOffset.requestID, notificationIntent, 0);
 
                 AlarmManagerCompat.setExactAndAllowWhileIdle(am, AlarmManager.RTC_WAKEUP, dayItem.start.getTime() + (timeOffset.offset * 1000), pendingIntent);
 
-                increaseNotificationRequestID();
             }
         }
     }
 
     static void cancelAlarm(Context context, int requestID){
-        Intent intent = new Intent(context, ATBroadcastReceiver.class);
+        Intent intent = new Intent(context, NotificationReceiver.class);
+        intent.setPackage(context.getPackageName());
+        intent.setAction("Notification.Create");
+        intent.putExtra("dayItemID", "");
         PendingIntent sender = PendingIntent.getBroadcast(context, requestID, intent, 0);
         AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         alarmManager.cancel(sender);
-
+        decreaseNotificationRequestID();
     }
 
     static String getHourFormat(Context context){

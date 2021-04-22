@@ -130,6 +130,7 @@
     <string name="notification_before">Before</string>
     <string name="notification_after">After</string>
 
+    <!-- Here true means english ordering, "At start"-->
     <bool name="notification_time_order">true</bool>
 
     <string-array name="notification_times_pre">

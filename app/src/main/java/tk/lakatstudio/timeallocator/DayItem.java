@@ -37,9 +37,11 @@ public class DayItem {
     static class NotificationTime{
         int offset;
         boolean fromEnd;
-        NotificationTime(int offset, boolean fromEnd){
+        int requestID;
+        NotificationTime(int offset, boolean fromEnd, int requestID){
             this.offset = offset;
             this.fromEnd = fromEnd;
+            this.requestID = requestID;
         }
     } 
 
