@@ -248,12 +248,12 @@ public class DayItemActivity extends FragmentActivity {
                 builder.setView(dialogView);
                 final AlertDialog alertDialog = builder.create();
 
-                ArrayAdapter<ActivityType> adapter = new ArrayAdapter<ActivityType>(getBaseContext(), R.layout.spinner_item, ActivityType.allActivityTypes){
+                ArrayAdapter<ActivityType> adapter = new ArrayAdapter<ActivityType>(getBaseContext(), R.layout.activity_item, ActivityType.allActivityTypes){
                     @NonNull
                     @Override
                     public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
                         if(convertView==null){
-                            convertView = getLayoutInflater().inflate(R.layout.spinner_item, null);
+                            convertView = getLayoutInflater().inflate(R.layout.activity_item, null);
                         }
                         ActivityType activityType = ActivityType.allActivityTypes.get(position);
 

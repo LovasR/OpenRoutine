@@ -32,7 +32,6 @@ public class MainFragment3 extends Fragment {
         View view = inflater.inflate(R.layout.main_fragment_3, container, false);
 
         regimeList = view.findViewById(R.id.regimeListview);
-        Log.e("UI_test", "oncreateview_fragment3");
 
         return view;
     }

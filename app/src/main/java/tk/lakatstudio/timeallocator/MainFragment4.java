@@ -52,12 +52,12 @@ public class MainFragment4 extends Fragment {
     }
 
     void activityPickerInit(final Fragment fragment){
-        pickerAdapter = new ArrayAdapter<ActivityType>(fragment.getContext(), R.layout.spinner_item, ActivityType.allActivityTypes){
+        pickerAdapter = new ArrayAdapter<ActivityType>(fragment.getContext(), R.layout.activity_item, ActivityType.allActivityTypes){
             @NonNull
             @Override
             public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
                 if(convertView==null){
-                    convertView = getLayoutInflater().inflate(R.layout.spinner_item, null);
+                    convertView = getLayoutInflater().inflate(R.layout.activity_item, null);
                 }
                 ActivityType activityType = ActivityType.allActivityTypes.get(position);
 

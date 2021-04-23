@@ -86,7 +86,7 @@ public class ATNotificationManager {
         int offset = extras.getInt("notificationOffset", -1);
         boolean fromEnd = extras.getBoolean("notificationOffsetR", false);
 
-        Log.v("uuid_debug", dayItemID.toString());
+        //Log.v("uuid_debug", dayItemID.toString());
         DayInit.sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
 
         String contentText;
