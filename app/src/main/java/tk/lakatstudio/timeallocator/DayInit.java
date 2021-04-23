@@ -51,7 +51,6 @@ public class DayInit {
             today.isSaved = false;
 
             currentDay = today;
-            CycleManager.currentItem = today.getDayItem(Calendar.getInstance().getTime());
 
 
             int[] defaultColors = context.getResources().getIntArray(R.array.default_colors);

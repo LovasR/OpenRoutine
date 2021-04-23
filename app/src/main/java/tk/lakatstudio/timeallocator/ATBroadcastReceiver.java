@@ -30,9 +30,6 @@ public class ATBroadcastReceiver extends android.content.BroadcastReceiver {
                 int i = 0;
 
                 switch(intent.getAction()){
-                    case ATNotificationManager.ACTION_ACTION:
-                        CycleManager.cycleChecked();
-                        break;
                     case ATNotificationManager.ACTION_OTHER_ACTIVITY:
                         Intent intent1 = new Intent(context, SilenceDialog.class);
                         intent1.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);

@@ -16,7 +16,6 @@ import java.util.Locale;
 public class Day {
     Date start;         //Start of day to serve as base line for cycles
 
-    ArrayList<Cycle> cycles = new ArrayList<Cycle>();
     ArrayList<DayItem> dayItems = new ArrayList<DayItem>();
 
 

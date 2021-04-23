@@ -385,7 +385,6 @@ public class DayItemActivity extends FragmentActivity {
                     dayItem.end = endTime.getTime();
                     dayItem.notificationTimesOA = notificationTimes;
                 } else {
-                    Log.v("fragment_preload", "focusedFragment: "  + focusedFragment);
                     final DayItem newDayItem = new DayItem(itemName.getText().toString(), startTime.getTime(), endTime.getTime(), selectedActivity, notificationTimes);
                     focusedDay.addDayItem(newDayItem);
                     if(focusedFragment == MainFragment1.staticClass.todayIndex){

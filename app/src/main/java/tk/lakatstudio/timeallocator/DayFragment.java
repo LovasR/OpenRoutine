@@ -223,29 +223,19 @@ public class DayFragment extends Fragment {
 
     String lengthAdapter(Date start, Date end){
         Calendar calendar = Calendar.getInstance();
-        calendar.setTime(end);
-        int hours = calendar.get(Calendar.HOUR_OF_DAY);
+        calendar.setTimeInMillis(end.getTime() - start.getTime());
+        int hours = calendar.get(Calendar.HOUR_OF_DAY) - 1;
         int minutes = calendar.get(Calendar.MINUTE);
-        calendar.setTime(start);
-        hours -= calendar.get(Calendar.HOUR_OF_DAY);
-        minutes -= calendar.get(Calendar.MINUTE);
-
-
-        calendar.set(Calendar.HOUR_OF_DAY, 2);
-        Log.v("adaptertest", hours + " 1 " + calendar.getTime());
-        calendar.set(Calendar.HOUR_OF_DAY, hours);
-        Log.v("adaptertest", hours + " 2 " + calendar.getTime());
-        calendar.set(Calendar.MINUTE, minutes);
 
         //very weird error with the calendar, when set to 2 it returns 3 when get
         String out = "";
         if(hours > 0 && hours != 2){
-            out += new SimpleDateFormat("k", Locale.getDefault()).format(calendar.getTime()) + " " + getString(R.string.hour_short) + " ";
+            out += hours + " " + getString(R.string.hour_short) + " ";
         } else if(hours == 2){
             out += hours + " " + getString(R.string.hour_short) + " ";
         }
         if(minutes > 0 || (hours == 0 && minutes == 0)){
-            out += new SimpleDateFormat("mm", Locale.getDefault()).format(calendar.getTime()) + " " + getString(R.string.minute_short);
+            out += minutes + " " + getString(R.string.minute_short);
         }
         return out;
     }
