@@ -448,8 +448,21 @@ public class DayItemActivity extends FragmentActivity {
         View dialogView = getLayoutInflater().inflate(R.layout.notification_add_dialog, null);
         builder.setView(dialogView);
 
-        final Spinner relativeSpinner = dialogView.findViewById(R.id.addNotificationRelativeSpinner);
-        final Spinner relativeSpinnerPre = dialogView.findViewById(R.id.addNotificationRelativeSpinnerpre);
+
+        Spinner spinner1;
+        Spinner spinner2;
+        if(getResources().getBoolean(R.bool.notification_time_order)){
+            spinner1 = dialogView.findViewById(R.id.addNotificationRelativeSpinner);
+            spinner2 = dialogView.findViewById(R.id.addNotificationRelativeSpinnerpre);
+        } else {
+            spinner1 = dialogView.findViewById(R.id.addNotificationRelativeSpinnerpre);
+            spinner2 = dialogView.findViewById(R.id.addNotificationRelativeSpinner);
+        }
+
+
+
+        final Spinner relativeSpinner = spinner1;
+        final Spinner relativeSpinnerPre = spinner2;
 
         final LinearLayout offsets = dialogView.findViewById(R.id.addNotificationOffsets);
 
@@ -461,7 +474,7 @@ public class DayItemActivity extends FragmentActivity {
 
         final AlertDialog alertDialog = builder.create();
 
-
+        //localization
 
         ArrayAdapter<CharSequence> preadapter = ArrayAdapter.createFromResource(DayItemActivity.this, R.array.notification_times_pre, R.layout.spinner_item);
         preadapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);

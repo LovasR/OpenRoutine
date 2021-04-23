@@ -28,7 +28,13 @@
 
 
     <string name="notification_action">Already on it</string>
-    <string name="notification_show_before">Coming up, %1$s (%2$s)</string>
+    <string name="notification_show_before_start">Coming up in %3$s, %1$s (%2$s)</string>
+    <string name="notification_show_at_start">Starting now, %1$s (%2$s)</string>
+    <string name="notification_show_after_start">Started %3$s ago, %1$s (%2$s)</string>
+
+    <string name="notification_show_before_end">Ending in %3$s, %1$s (%2$s)</string>
+    <string name="notification_show_at_end">Ending now, %1$s (%2$s)</string>
+    <string name="notification_show_after_end">Ended %3$s ago, %1$s (%2$s)</string>
     <string name="notification_action_other_activity">Doing something else</string>
     <string name="notification_other_activity">Choose other activity:</string>
 
@@ -142,6 +148,7 @@
         <item>@string/notification_start</item>
         <item>@string/notification_end</item>
     </string-array>
+
 
 
     <!--Regime strings-->

@@ -12,8 +12,6 @@ public class NotificationReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
         Log.v("notification", "onReceive NotifRec");
-        ATNotificationManager.dayItemNotification(context, intent.getStringExtra("dayItemID"),
-                intent.getStringExtra("dayItemTypeName"), intent.getLongExtra("dayItemStart", -1),
-                intent.getIntExtra("requestID", -1));
+        ATNotificationManager.dayItemNotification(context, intent.getExtras());
     }
 }

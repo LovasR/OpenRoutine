@@ -155,6 +155,8 @@ public class DayInit {
             for(DayItem.NotificationTime timeOffset : dayItem.notificationTimesOA){
                 notificationIntent.putExtra("requestID", timeOffset.requestID);
                 notificationIntent.putExtra("dayItemStart", dayItem.start.getTime());
+                notificationIntent.putExtra("notificationOffset", timeOffset.offset);
+                notificationIntent.putExtra("notificationOffsetR", timeOffset.fromEnd);
 
                 PendingIntent pendingIntent = PendingIntent.getBroadcast(context, timeOffset.requestID, notificationIntent, 0);
 
