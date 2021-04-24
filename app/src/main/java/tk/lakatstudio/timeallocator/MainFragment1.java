@@ -133,7 +133,7 @@ public class MainFragment1 extends Fragment {
                                     public void run() {
                                         dayFragments[finalIndex].setDateText(fragmentIndex + (finalIndex - 1), todayIndex, context);
                                         if(dayFragments[finalIndex].getContext() != null) {
-                                            dayFragments[finalIndex].dayPlannerInit(dayFragments[finalIndex]);
+                                            dayFragments[finalIndex].dayPlannerInit();
                                         }
                                         if(finalIndex == 1) {
                                             viewPager.setCurrentItem(1, false);
@@ -212,6 +212,15 @@ public class MainFragment1 extends Fragment {
         }
         dayFragments[index].fragmentIndex = newIndex;
         dayFragments[index].fragmentDay.nullCheck();
+    }
+
+    static DayFragment getFragment(int index){
+        for(int i = 0; i < FRAGMENTS_N; i++){
+            if(staticClass.dayFragments[i].fragmentIndex == index){
+                return staticClass.dayFragments[i];
+            }
+        }
+        return null;
     }
 
     @Override

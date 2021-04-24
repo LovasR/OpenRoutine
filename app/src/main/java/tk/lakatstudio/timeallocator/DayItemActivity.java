@@ -385,10 +385,15 @@ public class DayItemActivity extends FragmentActivity {
                     dayItem.end = endTime.getTime();
                     dayItem.notificationTimesOA = notificationTimes;
                 } else {
+                    Log.v("refresh_test", "refreshing " + focusedDay.dayItems.size());
                     final DayItem newDayItem = new DayItem(itemName.getText().toString(), startTime.getTime(), endTime.getTime(), selectedActivity, notificationTimes);
                     focusedDay.addDayItem(newDayItem);
                     if(focusedFragment == MainFragment1.staticClass.todayIndex){
                         notificationSend(newDayItem, DayItemActivity.this);
+                    }
+                    DayFragment dayFragment;
+                    if((dayFragment = MainFragment1.getFragment(focusedFragment)) != null){
+                        dayFragment.dayPlannerInit();
                     }
                 }
                 finish();
@@ -435,9 +440,6 @@ public class DayItemActivity extends FragmentActivity {
             @Override
             public void run() {
                 DayInit.currentDayItems.put(dayItem.ID, dayItem);
-
-                //dayItem.notificationTimes.add(0);
-
                 DayInit.addAlarm(context, dayItem);
             }
         }).run();
@@ -608,6 +610,7 @@ public class DayItemActivity extends FragmentActivity {
 
         alertDialog.show();
     }
+
 }
 
 class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapter.ViewHolder> {

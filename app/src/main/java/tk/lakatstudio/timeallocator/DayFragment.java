@@ -180,9 +180,10 @@ public class DayFragment extends Fragment {
         if(!isRunning){
             isRunning = true;
         }
-        dayPlannerInit(this);
+        dayPlannerInit();
         super.onResume();
     }
+
 
     @Override
     public void onDestroy() {
@@ -240,8 +241,12 @@ public class DayFragment extends Fragment {
         return out;
     }
 
+    /*void refreshDayPlanner(Arr){
+        Log.v("refresh_test", "refreshing " + adapter.dayItems.size());
+        adapter.refreshContents();
+    }*/
 
-    public void dayPlannerInit(final Fragment fragment){
+    public void dayPlannerInit(){
 
         if(fragmentDay == null){
             Log.v("fragment_preload", fragmentIndex + " fragmentDay null");

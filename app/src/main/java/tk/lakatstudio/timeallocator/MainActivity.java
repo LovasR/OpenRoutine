@@ -124,6 +124,10 @@ public class MainActivity extends AppCompatActivity {
         DayInit.init(this);
     }
 
+    void registerDAyItemActivity(){
+
+    }
+
     void setMainTitle(String title){
         mainTitleLayout.setVisibility(View.VISIBLE);
         mainTitle.setText(title);
