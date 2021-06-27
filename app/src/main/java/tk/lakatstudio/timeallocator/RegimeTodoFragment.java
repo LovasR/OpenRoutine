@@ -22,6 +22,7 @@ import androidx.appcompat.content.res.AppCompatResources;
 import androidx.fragment.app.Fragment;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Locale;
 
 public class RegimeTodoFragment extends Fragment {
@@ -73,7 +74,7 @@ public class RegimeTodoFragment extends Fragment {
             noTodoText.setVisibility(View.GONE);
         }
 
-        final ArrayAdapter<TodoItem> arrayAdapter = new ArrayAdapter<TodoItem>(fragment.getContext(), R.layout.todo_item, day.todoItems) {
+        final ArrayAdapter<TodoItem> arrayAdapter = new ArrayAdapter<TodoItem>(fragment.getContext(), R.layout.todo_item, new ArrayList<>(day.todoItems.values())) {
             @NonNull
             @Override
             public View getView(final int position, @Nullable View convertView, @NonNull ViewGroup parent) {
@@ -81,7 +82,7 @@ public class RegimeTodoFragment extends Fragment {
                     convertView = getLayoutInflater().inflate(R.layout.todo_item, null);
                 }
 
-                final TodoItem todo = day.todoItems.get(position);
+                final TodoItem todo = day.todoItems.get(getItem(position).ID);
 
                 TextView itemName = convertView.findViewById(R.id.todoItem);
                 itemName.setText(todo.name);
@@ -105,7 +106,7 @@ public class RegimeTodoFragment extends Fragment {
                     @Override
                     public void onClick(View view) {
                         Intent editIntent = new Intent(fragment.getContext(), TodoItemActivity.class);
-                        editIntent.putExtra("regimeIndex", regime.index);
+                        editIntent.putExtra("regimeIndex", regime.ID.toString());
                         editIntent.putExtra("regimeDayIndex", dayIndex);
                         editIntent.putExtra("regimeTodoIndex", position);
                         startActivity(editIntent);
@@ -120,7 +121,9 @@ public class RegimeTodoFragment extends Fragment {
                             public void onClick(DialogInterface dialog, int which) {
                                 switch (which){
                                     case DialogInterface.BUTTON_POSITIVE:
+                                        regime.todoItemsRemove.add(todo.ID);
                                         day.removeTodoItem(todo);
+                                        remove(todo);
                                         notifyDataSetChanged();
                                         break;
                                     case DialogInterface.BUTTON_NEGATIVE:

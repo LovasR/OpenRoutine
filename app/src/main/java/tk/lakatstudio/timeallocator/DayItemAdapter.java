@@ -15,6 +15,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Locale;
 
 public class DayItemAdapter extends RecyclerView.Adapter<DayItemAdapter.ViewHolder> {
@@ -27,17 +28,28 @@ public class DayItemAdapter extends RecyclerView.Adapter<DayItemAdapter.ViewHold
 
     DayFragment dayFragment;
 
-    DayItemAdapter(Context context, ArrayList<DayItem> dayItems, DayFragment dayFragment) {
+    DayItemAdapter(Context context, Collection<DayItem> dayItems, DayFragment dayFragment) {
         this.inflater = LayoutInflater.from(context);
-        this.dayItems = dayItems;
+
+        this.dayItems = new ArrayList<>();
+        this.dayItems.addAll(dayItems);
+        Day.defaultTimeSortDayItems(this.dayItems);
+
         Log.v("recyclerView_test", dayItems.size() + "");
         this.context = context;
         this.dayFragment = dayFragment;
     }
 
-    void refreshContents(ArrayList<DayItem> newDayItems){
-        dayItems = newDayItems;
+    void refreshContents(Collection<DayItem> newDayItems){
+        dayItems.clear();
+        dayItems.addAll(newDayItems);
+        Day.defaultTimeSortDayItems(dayItems);
         notifyDataSetChanged();
+    }
+
+    void removedDayItem(int position){
+        dayItems.remove(position);
+        notifyItemRemoved(position);
     }
 
     @NonNull

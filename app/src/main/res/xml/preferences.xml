@@ -6,7 +6,7 @@
         <EditTextPreference
             android:key="date_format"
             android:title="@string/date_format_setting_title"
-            android:defaultValue="y.M.d."
+            android:defaultValue="@string/default_date_format"
             android:summary="@string/date_format_setting_summary"/>
         <Preference
             android:key="color"

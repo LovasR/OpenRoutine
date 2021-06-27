@@ -3,8 +3,6 @@ package tk.lakatstudio.timeallocator;
 import android.content.BroadcastReceiver;
 import android.content.Intent;
 import android.os.Bundle;
-import android.text.SpannableString;
-import android.text.style.UnderlineSpan;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageButton;
@@ -18,11 +16,14 @@ import androidx.fragment.app.FragmentTransaction;
 import androidx.preference.PreferenceManager;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.android.material.datepicker.MaterialDatePicker;
+import com.google.android.material.datepicker.MaterialPickerOnPositiveButtonClickListener;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Locale;
+import java.util.TimeZone;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -34,6 +35,7 @@ public class MainActivity extends AppCompatActivity {
     MainFragment4 fragment4;
 
     TextView mainTitle;
+    ImageButton mainDaySelect;
     LinearLayout mainTitleLayout;
 
     BroadcastReceiver alarmReceiver;
@@ -43,7 +45,10 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        DayInit.init(this);
+
         mainTitle = findViewById(R.id.mainTitle);
+        mainDaySelect = findViewById(R.id.mainDaySelect);
         mainTitleLayout = findViewById(R.id.mainTitleLayout);
 
         fragment1 = new MainFragment1();
@@ -64,8 +69,9 @@ public class MainActivity extends AppCompatActivity {
                         fragmentChange(fragment1);
                         return true;
                     case R.id.main_menu_2:
-                        setMainTitle(MainFragment1.fragmentIndex);
                         fragmentChange(fragment2);
+                        setMainTitle(MainFragment1.fragmentIndex);
+                        fragment2.setDateText(mainTitle, mainDaySelect, fragment1.dayFragments[1].fragmentDay.start.getTime(), MainFragment1.fragmentIndex, fragment1.todayIndex, MainActivity.this);
                         return true;
                     case R.id.main_menu_3:
                         setMainTitle(getString(R.string.regime_title));
@@ -92,14 +98,16 @@ public class MainActivity extends AppCompatActivity {
                         startActivity(intent1);
                         break;
                     case R.id.main_menu_2:
+                        mainDaySelect.setVisibility(View.VISIBLE);
                         Intent intent2 = new Intent(MainActivity.this, TodoItemActivity.class);
                         intent2.putExtra("fragmentIndex", MainFragment1.fragmentIndex);
                         startActivity(intent2);
                         break;
                     case R.id.main_menu_3:
-                        Intent intent3 = new Intent(MainActivity.this, RegimeActivity.class);
+                        fragment3.regimeDialog();
+                        /*Intent intent3 = new Intent(MainActivity.this, RegimeActivity.class);
                         intent3.putExtra("regimeIndex", -1);
-                        startActivity(intent3);
+                        startActivity(intent3);*/
                         break;
                     case R.id.main_menu_4:
                         fragment4.activityTypeAdd(-1, fragment4);
@@ -121,7 +129,36 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        DayInit.init(this);
+        mainDaySelect.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Calendar calendar = Calendar.getInstance();
+                calendar.setTime(fragment2.day.start);
+                calendar.set(Calendar.DAY_OF_YEAR, calendar.get(Calendar.DAY_OF_YEAR) + 1);
+                final MaterialDatePicker datePicker = MaterialDatePicker.Builder.datePicker()
+                        .setSelection(calendar.getTime().getTime()).setTitleText("Select day").build();
+
+                //TODO refresh everything when this
+
+                datePicker.show(getSupportFragmentManager(), "datePicker");
+                final Calendar calendarOut = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
+                datePicker.addOnPositiveButtonClickListener(new MaterialPickerOnPositiveButtonClickListener() {
+                    @Override
+                    public void onPositiveButtonClick(Object selection) {
+                        calendarOut.setTimeInMillis((Long) selection);
+
+                        MainFragment1.fragmentIndex = calendarOut.get(Calendar.YEAR) * 366 + calendarOut.get(Calendar.DAY_OF_YEAR);
+
+                        fragment2.setDateText(mainTitle, mainDaySelect, calendarOut.getTime().getTime(), MainFragment1.fragmentIndex, MainFragment1.todayIndex, MainActivity.this);
+                        fragment2.changeDay(Day.getDay(MainFragment1.fragmentIndex));
+
+                        final int SCROLL_FORWARD = -1;
+                        MainFragment1.staticClass.refreshAllFragments(MainActivity.this, SCROLL_FORWARD);
+                    }
+                });
+            }
+        });
+
     }
 
     void registerDAyItemActivity(){
@@ -131,22 +168,19 @@ public class MainActivity extends AppCompatActivity {
     void setMainTitle(String title){
         mainTitleLayout.setVisibility(View.VISIBLE);
         mainTitle.setText(title);
+        mainDaySelect.setVisibility(View.GONE);
     }
 
     void setMainTitle(int dayIndex){
         mainTitleLayout.setVisibility(View.VISIBLE);
 
         Day day = DayInit.daysHashMap.get(dayIndex);
-        //TODO settings
-        SpannableString dateText = new SpannableString(new SimpleDateFormat(DayInit.getDateFormat(getBaseContext()), Locale.getDefault()).format(day.start));
-        Calendar today = Calendar.getInstance();
+        String dateText = new SimpleDateFormat(DayInit.getDateFormat(getBaseContext()), Locale.getDefault()).format(day.start);
+        /*Calendar today = Calendar.getInstance();
         today.set(Calendar.HOUR_OF_DAY, 0);
         today.set(Calendar.MINUTE, 0);
         today.set(Calendar.SECOND, 0);
-        today.set(Calendar.MILLISECOND, 0);
-        if(day.start.getTime() == today.getTime().getTime()) {
-            dateText.setSpan(new UnderlineSpan(), 0, dateText.length(), 0);
-        }
+        today.set(Calendar.MILLISECOND, 0);*/
         mainTitle.setText(dateText);
     }
 

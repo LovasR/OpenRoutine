@@ -2,23 +2,28 @@ package tk.lakatstudio.timeallocator;
 
 import android.util.Log;
 
-import com.google.gson.annotations.Expose;
-
 import java.util.ArrayList;
+import java.util.UUID;
 
 public class TodoItem {
     String name;
     int dayItemHash;
+    UUID ID;
+    UUID dayItemID;
 
-    @Expose
+    @DayInit.Exclude
     DayItem dayItem;
-
 
     static ArrayList<TodoItem> allTodoItems = new ArrayList<>();
 
-    TodoItem (String n, DayItem a){
-        name = n;
-        dayItem = a;
+    TodoItem (String name, UUID dayItemID){
+        this.name = name;
+        //this.dayItem = dayItem;
+        this.ID = UUID.randomUUID();
+        this.dayItemID = dayItemID;
+        if(DayInit.currentDayItems != null){
+            this.dayItem = DayInit.currentDayItems.get(dayItemID);
+        }
     }
 
     static void addItem(TodoItem item){

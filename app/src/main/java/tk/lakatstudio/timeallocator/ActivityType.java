@@ -13,7 +13,7 @@ public class ActivityType {
 
     boolean isSaved;
 
-    public final static ArrayList<ActivityType> allActivityTypes = new ArrayList<ActivityType>();
+    public final static ArrayList<ActivityType> allActivityTypes = new ArrayList<>();
     static int currentID;
 
     static ArrayList<ActivityType> userActivityTypes = new ArrayList<ActivityType>();

@@ -25,13 +25,18 @@ import androidx.fragment.app.FragmentActivity;
 import com.google.android.material.textfield.TextInputLayout;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Locale;
+import java.util.UUID;
 
 public class TodoItemActivity extends FragmentActivity {
 
     Day day;
     DayItem assoc;
     TodoItem todoItem;
+
+    boolean isRegimeDay = false;
+    Regime regime;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -47,11 +52,15 @@ public class TodoItemActivity extends FragmentActivity {
                 todoItem = day.todoItems.get(todoIndex);
             }
         } else {
-            int regimeIndex = getIntent().getExtras().getInt("regimeIndex", -1);
+            String rawRegimeIndex = getIntent().getExtras().getString("regimeIndex", "");
+            Log.v("regime_intent_debug", "" + getIntent().getExtras().getInt("regimeIndex", -1));
             int regimeDayIndex = getIntent().getExtras().getInt("regimeDayIndex", -1);
             int regimeTodoIndex = getIntent().getExtras().getInt("regimeTodoIndex", -1);
-            if(regimeIndex != -1){
-                day = Regime.allRegimes.get(regimeIndex).days[regimeDayIndex];
+            if(rawRegimeIndex.length() > 0) {
+                UUID regimeIndex = UUID.fromString(rawRegimeIndex);
+                regime = Regime.allRegimes.get(regimeIndex);
+                day = regime.days[regimeDayIndex];
+                isRegimeDay = true;
                 if(regimeTodoIndex != -1){
                     todoItem = day.todoItems.get(regimeTodoIndex);
                 }
@@ -103,18 +112,18 @@ public class TodoItemActivity extends FragmentActivity {
 
                 final AlertDialog.Builder builder = new AlertDialog.Builder(TodoItemActivity.this);
                 View dialogView = getLayoutInflater().inflate(R.layout.day_item_picker_dialog, null);
-                ListView pickerList = dialogView.findViewById(R.id.dayItemPickerDialogListview);
+                final ListView pickerList = dialogView.findViewById(R.id.dayItemPickerDialogListview);
                 builder.setView(dialogView);
                 final AlertDialog alertDialog = builder.create();
 
-                ArrayAdapter<DayItem> adapter = new ArrayAdapter<DayItem>(getBaseContext(), R.layout.dayplanner_item, day.dayItems) {
+                final ArrayAdapter<DayItem> adapter = new ArrayAdapter<DayItem>(getBaseContext(), R.layout.dayplanner_item, new ArrayList<>(day.dayItems.values())) {
                     @NonNull
                     @Override
                     public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
                         if (convertView == null) {
                             convertView = getLayoutInflater().inflate(R.layout.dayplanner_item, null);
                         }
-                        final DayItem dayItem = day.dayItems.get(position);
+                        final DayItem dayItem = day.dayItems.get(getItem(position).ID);
                         Log.v("save_debug_load", "a" + dayItem.type.name);
 
                         TextView itemStart = convertView.findViewById(R.id.dayPlannerItemStart);
@@ -144,7 +153,7 @@ public class TodoItemActivity extends FragmentActivity {
                 pickerList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                     @Override
                     public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                        assoc = day.dayItems.get(i);
+                        assoc = day.dayItems.get(((DayItem) pickerList.getAdapter().getItem(i)).ID);
 
                         if(assoc != null) {
                             selectDayItem.setText(assoc.type.name);
@@ -203,10 +212,16 @@ public class TodoItemActivity extends FragmentActivity {
                     if(todoItem != null){
                         todoItem.name = name;
                         todoItem.dayItem = assoc;
+                        todoItem.dayItemID = (assoc == null ? null : assoc.ID);
                     } else {
-                        TodoItem todoItem = new TodoItem(name, assoc);
+                        //if associated dayItem isn`t set, random uuid
+                        TodoItem todoItem = new TodoItem(name,
+                                (assoc == null ? null : assoc.ID));
                         TodoItem.addItem(todoItem);
                         day.addTodoItem(todoItem);
+                        if(isRegimeDay){
+                            regime.todoItemsAdd.add(todoItem);
+                        }
                     }
                     finish();
                 } else {

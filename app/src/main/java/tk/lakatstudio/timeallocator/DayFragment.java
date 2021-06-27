@@ -7,7 +7,6 @@ import android.content.Intent;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import android.text.SpannableString;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -84,9 +83,9 @@ public class DayFragment extends Fragment {
                     public void onPositiveButtonClick(Object selection) {
                         calendarOut.setTimeInMillis((Long) selection);
 
-                        MainFragment1.fragmentIndex = calendarOut.get(Calendar.YEAR) * 365 + calendarOut.get(Calendar.DAY_OF_YEAR);
+                        MainFragment1.fragmentIndex = calendarOut.get(Calendar.YEAR) * 366 + calendarOut.get(Calendar.DAY_OF_YEAR);
                         final int SCROLL_FORWARD = -1;
-                        MainFragment1.staticClass.refreshAllFragments(SCROLL_FORWARD);
+                        MainFragment1.staticClass.refreshAllFragments(null, SCROLL_FORWARD);
                     }
                 });
             }
@@ -95,9 +94,9 @@ public class DayFragment extends Fragment {
             @Override
             public boolean onLongClick(View view) {
                 final Calendar calendar = Calendar.getInstance();
-                MainFragment1.fragmentIndex = calendar.get(Calendar.YEAR) * 365 + calendar.get(Calendar.DAY_OF_YEAR);
+                MainFragment1.fragmentIndex = calendar.get(Calendar.YEAR) * 366 + calendar.get(Calendar.DAY_OF_YEAR);
                 final int SCROLL_FORWARD = -1;
-                MainFragment1.staticClass.refreshAllFragments(SCROLL_FORWARD);
+                MainFragment1.staticClass.refreshAllFragments(null, SCROLL_FORWARD);
                 return true;
             }
         });
@@ -129,19 +128,20 @@ public class DayFragment extends Fragment {
                         e.printStackTrace();
                     }
                     if(fragmentDay != null) {
-                        adapter.dayItems = fragmentDay.dayItems;
+                        adapter.dayItems = new ArrayList<>();
+                        adapter.dayItems.addAll(fragmentDay.dayItems.values());
                     }
                 }
             });
         } else {
-            adapter = new DayItemAdapter(getContext(), fragmentDay.dayItems, this);
+            adapter = new DayItemAdapter(getContext(), fragmentDay.dayItems.values(), this);
         }
 
         adapter.setClickListener(new DayItemAdapter.ItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
                 Intent editIntent = new Intent(getContext(), DayItemActivity.class);
-                editIntent.putExtra("index", position);
+                editIntent.putExtra("index", adapter.getItem(position).ID.toString());
                 editIntent.putExtra("fragmentIndex", fragmentIndex);
                 startActivity(editIntent);
             }
@@ -154,8 +154,12 @@ public class DayFragment extends Fragment {
                     public void onClick(DialogInterface dialog, int which) {
                         switch (which){
                             case DialogInterface.BUTTON_POSITIVE:
-                                fragmentDay.removeDayItem(position);
-                                adapter.notifyItemRemoved(position);
+                                fragmentDay.removeDayItem(getContext(), adapter.getItem(position).ID, false);
+                                adapter.removedDayItem(position);
+                                if(adapter.getItemCount() == 0){
+                                    rDayPlanner.setVisibility(View.GONE);
+                                    noDayItemText.setVisibility(View.VISIBLE);
+                                }
                                 break;
                             case DialogInterface.BUTTON_NEGATIVE:
                                 break;
@@ -192,8 +196,7 @@ public class DayFragment extends Fragment {
     }
 
     boolean setDateText(int fragmentIndex, int todayIndex, Context context){
-        //TODO settings_todo make this user selectable format
-        SpannableString dateText = new SpannableString(new SimpleDateFormat(DayInit.getDateFormat(context), Locale.getDefault()).format(fragmentDay.start.getTime()));;
+        String dateText = new SimpleDateFormat(DayInit.getDateFormat(context), Locale.getDefault()).format(fragmentDay.start.getTime());
         if(fragmentIndex == todayIndex){
             Log.v("fragment_date", "underline void");
             //dateText.setSpan(new UnderlineSpan(), 0, dateText.length(), 0);
@@ -262,7 +265,7 @@ public class DayFragment extends Fragment {
             noDayItemText.setVisibility(View.GONE);
         }
 
-        adapter.refreshContents(fragmentDay.dayItems);
+        adapter.refreshContents(fragmentDay.dayItems.values());
     }
 }
 

@@ -9,7 +9,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.CompoundButton;
+import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -20,11 +22,11 @@ import androidx.fragment.app.Fragment;
 
 import com.google.android.material.switchmaterial.SwitchMaterial;
 
+import java.util.ArrayList;
+
 public class MainFragment3 extends Fragment {
 
     ListView regimeList;
-
-
 
     @Nullable
     @Override
@@ -49,7 +51,13 @@ public class MainFragment3 extends Fragment {
             Log.e("regime_test", "regime size 0");
             return;
         }
-        ArrayAdapter<Regime> arrayAdapter = new ArrayAdapter<Regime>(fragment.getContext(), R.layout.regime_item, Regime.allRegimes){
+        ArrayList<Regime> regimeArrayList = new ArrayList<>(Regime.allRegimes.values());
+        for(Regime regime : regimeArrayList){
+            if(regime.toDelete){
+                regimeArrayList.remove(regime);
+            }
+        }
+        ArrayAdapter<Regime> arrayAdapter = new ArrayAdapter<Regime>(fragment.getContext(), R.layout.regime_item, regimeArrayList){
             @NonNull
             @Override
             public View getView(final int position, @Nullable View convertView, @NonNull ViewGroup parent) {
@@ -57,7 +65,7 @@ public class MainFragment3 extends Fragment {
                     convertView = getLayoutInflater().inflate(R.layout.regime_item, null);
                 }
 
-                final Regime regime = Regime.allRegimes.get(position);
+                final Regime regime = this.getItem(position);
 
                 //if regime is going to be deleted, don`t show anything
                 if(regime.toDelete){
@@ -75,6 +83,9 @@ public class MainFragment3 extends Fragment {
                     @Override
                     public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
                         regime.isActive = b;
+                        if(!b){
+                            regime.deleteItems(getContext());
+                        }
                     }
                 });
 
@@ -83,7 +94,7 @@ public class MainFragment3 extends Fragment {
                     @Override
                     public void onClick(View view) {
                         Intent editIntent = new Intent(fragment.getContext(), RegimeActivity.class);
-                        editIntent.putExtra("regimeIndex", position);
+                        editIntent.putExtra("regimeIndex", getItem(position).ID.toString());
                         startActivity(editIntent);
                     }
                 });
@@ -96,6 +107,7 @@ public class MainFragment3 extends Fragment {
                                 switch (which){
                                     case DialogInterface.BUTTON_POSITIVE:
                                         regime.toDelete = true;
+                                        regime.deleteItems(getContext());
                                         notifyDataSetChanged();
                                         break;
                                     case DialogInterface.BUTTON_NEGATIVE:
@@ -116,6 +128,33 @@ public class MainFragment3 extends Fragment {
             }
         };
         regimeList.setAdapter(arrayAdapter);
+    }
+
+
+    void regimeDialog(){
+        final AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+        View dialogView = getLayoutInflater().inflate(R.layout.regime_add_dialog, null);
+        final EditText nameEditText = dialogView.findViewById(R.id.addRegimeEditName);
+        Button done = dialogView.findViewById(R.id.addRegimeDone);
+
+        builder.setView(dialogView);
+        final AlertDialog alertDialog = builder.create();
+
+        final Regime regime = new Regime(getResources().getStringArray(R.array.days_of_week));
+
+        done.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(nameEditText.getText().length() > 0) {
+                    Regime.addRegime(regime);
+                    regime.name = nameEditText.getText().toString();
+                    regimeListInit(MainFragment3.this);
+                    alertDialog.cancel();
+                }
+            }
+        });
+
+        alertDialog.show();
     }
 
 }

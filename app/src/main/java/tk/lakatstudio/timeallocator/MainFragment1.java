@@ -13,8 +13,6 @@ import androidx.fragment.app.Fragment;
 import androidx.viewpager.widget.ViewPager;
 import androidx.viewpager2.widget.ViewPager2;
 
-import com.google.gson.Gson;
-
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -27,8 +25,8 @@ public class MainFragment1 extends Fragment {
     boolean isRunning = false;
 
     DayFragment[] dayFragments;
-    static int  fragmentIndex = -1;
-    int todayIndex;
+    static int fragmentIndex = -1;
+    static int todayIndex;
     int dayStartIndex;
     int dayRange;
 
@@ -70,8 +68,9 @@ public class MainFragment1 extends Fragment {
         if(fragmentIndex == -1){
             Calendar calendar = Calendar.getInstance();
             //support for multi-year loading
-            fragmentIndex = calendar.get(Calendar.YEAR) * 365 + calendar.get(Calendar.DAY_OF_YEAR);
+            fragmentIndex = calendar.get(Calendar.YEAR) * 366 + calendar.get(Calendar.DAY_OF_YEAR);
             Log.v("focusedPage_test",  " " + fragmentIndex);
+            todayIndex = fragmentIndex;
         }
 
         viewPager.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
@@ -90,10 +89,10 @@ public class MainFragment1 extends Fragment {
                 if(state == ViewPager.SCROLL_STATE_IDLE) {
                     if (focusedPage == 0) {
                         fragmentIndex--;
-                        refreshAllFragments(SCROLL_BACKWARD);
+                        refreshAllFragments(null, SCROLL_BACKWARD);
                     } else if (focusedPage == 2) {
                         fragmentIndex++;
-                        refreshAllFragments(SCROLL_FORWARD);
+                        refreshAllFragments(null, SCROLL_FORWARD);
                     }
                 }
                 Log.v("focusedPage_test", "focusedPage: " + focusedPage + " " + fragmentIndex);
@@ -102,9 +101,8 @@ public class MainFragment1 extends Fragment {
         viewPager.setOffscreenPageLimit(3);
         viewPager.setCurrentItem(1);
 
-        todayIndex = fragmentIndex;
         Log.v("focusedPage_test", "refresh: " + focusedPage + " " + fragmentIndex);
-        refreshAllFragments(SCROLL_BACKWARD);
+        refreshAllFragments(null, SCROLL_BACKWARD);
         super.onViewCreated(view, savedInstanceState);
     }
 
@@ -112,26 +110,29 @@ public class MainFragment1 extends Fragment {
     final private static int SCROLL_BACKWARD = 1;
     final private static int FRAGMENTS_N = 3;
 
-    void refreshAllFragments(int direction){
+    void refreshAllFragments(Context context, int direction){
+        if(context == null){
+            context = getContext();
+        }
 
         for(int i = 0; i < FRAGMENTS_N; i++){
             final int finalIndex = direction > 0 ? i : FRAGMENTS_N - i - 1;
 
             Log.v("index_debug", finalIndex + "");
+            final Context finalContext = context;
             new Thread(){
                 @Override
                 public void run() {
                     Log.v("fragment_preload", "start load: " + finalIndex);
-                    setFragmentDay(finalIndex);
+                    setFragmentDay(finalContext, finalIndex);
                     final boolean[] failedSetDateText = {false};
-                    final Context context = getContext();
                     try{
                         synchronized (this){
-                                Log.v("fragment_preload", "dayPlannerInit " + finalIndex);
+                                Log.v("fragment_preload", "dayPlannerInit " + fragmentIndex + " today: " + todayIndex);
                                 getActivity().runOnUiThread(new Runnable() {
                                     @Override
                                     public void run() {
-                                        dayFragments[finalIndex].setDateText(fragmentIndex + (finalIndex - 1), todayIndex, context);
+                                        dayFragments[finalIndex].setDateText(fragmentIndex + (finalIndex - 1), todayIndex, finalContext);
                                         if(dayFragments[finalIndex].getContext() != null) {
                                             dayFragments[finalIndex].dayPlannerInit();
                                         }
@@ -151,7 +152,7 @@ public class MainFragment1 extends Fragment {
                             getActivity().runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
-                                    dayFragments[finalIndex].setDateText(fragmentIndex + (finalIndex - 1), todayIndex, getContext());
+                                    dayFragments[finalIndex].setDateText(fragmentIndex + (finalIndex - 1), todayIndex, finalContext);
                                 }
                             });
                         } catch (Exception e) {
@@ -163,9 +164,9 @@ public class MainFragment1 extends Fragment {
         }
     }
 
-    void setFragmentDay(int index){
-        //new index offsets to the two positon
-        // realative to the changed fragmentIndex
+    void setFragmentDay(Context context, int index){
+        //new index offsets to the two position
+        //relative to the changed fragmentIndex
         //newIndex is the position of the day to be loaded
         int newIndex = fragmentIndex + (index - 1);
         //Log.v("fragment_preload", "newindex: " + newIndex + " index: " + index + " fragmentIndex: " + fragmentIndex);
@@ -174,44 +175,47 @@ public class MainFragment1 extends Fragment {
         calendar.set(Calendar.SECOND, 0);
         calendar.set(Calendar.MINUTE, 0);
         calendar.set(Calendar.HOUR_OF_DAY, 0);
-        calendar.set(Calendar.DAY_OF_YEAR, newIndex - (calendar.get(Calendar.YEAR) * 365));
+        //TODO check with leap years
+        calendar.set(Calendar.DAY_OF_YEAR, newIndex - (calendar.get(Calendar.YEAR) * 366));
 
-        Gson gson = new Gson();
         SimpleDateFormat dateFormat = new SimpleDateFormat("y.M.d");
 
         //retrieve day from the hashmap, if null, try to load from file
         if((dayFragments[index].fragmentDay = DayInit.daysHashMap.get(newIndex)) == null){
 
-            ArrayList<String> dayJsons = DayInit.readFromFile(getContext(), "day_" + dateFormat.format(calendar.getTime()));
+            ArrayList<String> dayJsons = DayInit.readFromFile(context, "day_" + dateFormat.format(calendar.getTime()));
 
             if(dayJsons != null){
                 //load from file if read returned not null
-                dayFragments[index].fragmentDay = gson.fromJson(dayJsons.get(0), Day.class);
-                Log.v("fragment_preload", "loaded from file: " + new SimpleDateFormat("D").format(dayFragments[index].fragmentDay.start.getTime()));
+                dayFragments[index].fragmentDay = DayInit.gson.fromJson(dayJsons.get(0), Day.class);
+                Log.v("fragment_preload_load", "loaded from file: " + new SimpleDateFormat("D").format(dayFragments[index].fragmentDay.start.getTime()));
             } else {
                 //create new day if no file of this day was found
                 dayFragments[index].fragmentDay = new Day();
+                dayFragments[index].fragmentDay.dayIndex = calendar.get(Calendar.DAY_OF_YEAR) + calendar.get(Calendar.YEAR) * 366;
+                Log.v("day_management", dayFragments[index].fragmentDay.dayIndex + " ");
 
                 Calendar date = (Calendar) calendar.clone();
                 /*date.clear();
-                date.set(Calendar.DAY_OF_YEAR, newIndex - (date.get(Calendar.YEAR) * 365));*/
+                date.set(Calendar.DAY_OF_YEAR, newIndex - (date.get(Calendar.YEAR) * 366));*/
                 dayFragments[index].fragmentDay.start = date.getTime();
-                Log.v("fragment_preload", "new Day " + dateFormat.format(date.getTime()));
+                Log.v("fragment_preload_load", "new Day " + dateFormat.format(date.getTime()));
 
             }
             dayFragments[index].fragmentDay.isSaved = true;
             //put the value not yet in the hashmap
             DayInit.daysHashMap.put(newIndex, dayFragments[index].fragmentDay);
         } else {
-            Log.v("fragment_preload", "loaded from hashmap: " + new SimpleDateFormat("D", Locale.getDefault()).format(dayFragments[index].fragmentDay.dayItems.size()));
+            Log.v("fragment_preload_load", "loaded from hashmap: " + new SimpleDateFormat("D", Locale.getDefault()).format(dayFragments[index].fragmentDay.start));
 
             //Regime.removeRegimeDays(dayFragments[index].fragmentDay);
         }
-        if(!dayFragments[index].fragmentDay.isRegimeSet){
-            Regime.setAllActiveRegimesDays(dayFragments[index].fragmentDay);
-        }
         dayFragments[index].fragmentIndex = newIndex;
         dayFragments[index].fragmentDay.nullCheck();
+        if(!dayFragments[index].fragmentDay.isRegimeSet){
+            Regime.setAllActiveRegimesDays(getContext(), dayFragments[index].fragmentDay);
+        }
+        //dayFragments[index].fragmentIndex = dayFragments[index].fragmentDay.dayIndex;
     }
 
     static DayFragment getFragment(int index){

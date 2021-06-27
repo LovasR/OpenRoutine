@@ -1,12 +1,9 @@
 package tk.lakatstudio.timeallocator;
 
-import android.app.AlertDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
-import android.widget.EditText;
 import android.widget.FrameLayout;
 
 import androidx.annotation.NonNull;
@@ -19,6 +16,8 @@ import androidx.viewpager2.widget.ViewPager2;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
+import java.util.UUID;
+
 public class RegimeActivity extends AppCompatActivity {
 
     ViewPager2 regimeViewPager;
@@ -28,9 +27,11 @@ public class RegimeActivity extends AppCompatActivity {
     RegimeDayFragment[] dayFragments;
 
     Regime regime;
-    int regimeIndex;
+    UUID regimeIndex;
 
     RegimeTodoFragment todoFragment;
+
+    private final int DAYS_N = 7;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -42,30 +43,26 @@ public class RegimeActivity extends AppCompatActivity {
         final FrameLayout regimeFrame = findViewById(R.id.regimeFrame);
         regimeViewPager = findViewById(R.id.regimeViewPager);
 
-
-
-        regimeIndex = getIntent().getExtras().getInt("regimeIndex", -1);
-        if(regimeIndex != -1){
+        String rawRegimeIndex = getIntent().getExtras().getString("regimeIndex", "");
+        if(rawRegimeIndex.length() > 0){
+            regimeIndex = UUID.fromString(rawRegimeIndex);
             regime = Regime.allRegimes.get(regimeIndex);
         } else {
-            //TODO popup regime config dialog
-            regimeDialog();
-            regime = new Regime();
-            regime.dayNames = getResources().getStringArray(R.array.days_of_week);
-            regime.days = new Day[]{new Day(), new Day(), new Day(), new Day(), new Day(), new Day(), new Day()};
+            regime = new Regime(getResources().getStringArray(R.array.days_of_week));
             Regime.addRegime(regime);
-            regimeIndex = Regime.allRegimes.size() - 1;
         }
         todoFragment.dayIndex = regimeViewPager.getCurrentItem();
         todoFragment.regime = regime;
         todoFragment.day = regime.days[regimeViewPager.getCurrentItem()];
         fragmentChange(todoFragment);
 
-        dayFragments = new RegimeDayFragment[]{new RegimeDayFragment(), new RegimeDayFragment(), new RegimeDayFragment(), new RegimeDayFragment(), new RegimeDayFragment(), new RegimeDayFragment(), new RegimeDayFragment()};
-        for(int i = 0; i < dayFragments.length; i++){
+        dayFragments = new RegimeDayFragment[DAYS_N];
+        for(int i = 0; i < DAYS_N; i++){
+            dayFragments[i] = new RegimeDayFragment();
             dayFragments[i].fragmentIndex = i;
             dayFragments[i].regime = regime;
         }
+
         collectionPagerAdapter = new CollectionPagerAdapter(getSupportFragmentManager(), this.getLifecycle(), dayFragments);
         regimeViewPager.setAdapter(collectionPagerAdapter);
         regimeViewPager.setSaveEnabled(false);
@@ -100,7 +97,7 @@ public class RegimeActivity extends AppCompatActivity {
                     case R.id.regime_menu_1:
                         Intent intent1 = new Intent(RegimeActivity.this, DayItemActivity.class);
                         intent1.putExtra("", -1);
-                        intent1.putExtra("regimeIndex", regime.index);
+                        intent1.putExtra("regimeIndex", regime.ID.toString());
                         intent1.putExtra("regimeDayIndex", regimeViewPager.getCurrentItem());
                         regime.isSaved = false;
                         startActivity(intent1);
@@ -120,30 +117,6 @@ public class RegimeActivity extends AppCompatActivity {
 
 
     }
-    void regimeDialog(){
-        final AlertDialog.Builder builder = new AlertDialog.Builder(RegimeActivity.this);
-        View dialogView = getLayoutInflater().inflate(R.layout.regime_add_dialog, null);
-        final EditText nameEditText = dialogView.findViewById(R.id.addRegimeEditName);
-        Button done = dialogView.findViewById(R.id.addRegimeDone);
-
-        
-        builder.setView(dialogView);
-        final AlertDialog alertDialog = builder.create();
-
-        done.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if(nameEditText.getText().length() > 0) {
-                    regime.name = nameEditText.getText().toString();
-                    alertDialog.cancel();
-
-                    finish();
-                }
-            }
-        });
-
-        alertDialog.show();
-    }
     
     void fragmentChange(Fragment fragment) {
         // load fragment
@@ -155,5 +128,10 @@ public class RegimeActivity extends AppCompatActivity {
         transaction.commit();
     }
 
-
+    @Override
+    protected void onPause() {
+        super.onPause();
+        regime.refreshDays(RegimeActivity.this);
+        DayInit.saveAll(RegimeActivity.this);
+    }
 }

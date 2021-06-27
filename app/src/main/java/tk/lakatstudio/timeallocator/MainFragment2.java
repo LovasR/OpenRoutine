@@ -1,6 +1,7 @@
 package tk.lakatstudio.timeallocator;
 
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.PorterDuff;
@@ -24,6 +25,7 @@ import androidx.appcompat.content.res.AppCompatResources;
 import androidx.fragment.app.Fragment;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Locale;
 
@@ -46,20 +48,56 @@ public class MainFragment2 extends Fragment {
 
         day = DayInit.daysHashMap.get(MainFragment1.fragmentIndex);
 
+        if(day == null){
+            Calendar calendar = Calendar.getInstance();
+            day = DayInit.daysHashMap.get(calendar.get(Calendar.YEAR) * 366 + calendar.get(Calendar.DAY_OF_YEAR));
+        }
 
-        //TODO settings
         SpannableString dateText = new SpannableString(new SimpleDateFormat(DayInit.getDateFormat(getContext()), Locale.getDefault()).format(day.start));
         Calendar today = Calendar.getInstance();
         today.set(Calendar.HOUR_OF_DAY, 0);
         today.set(Calendar.MINUTE, 0);
         today.set(Calendar.SECOND, 0);
         today.set(Calendar.MILLISECOND, 0);
-        if(day.start.getTime() == today.getTime().getTime()) {
+        if(day.dayIndex == (today.get(Calendar.YEAR) * 366 + today.get(Calendar.DAY_OF_YEAR))) {
             dateText.setSpan(new UnderlineSpan(), 0, dateText.length(), 0);
         }
         //todoDateText.setText(dateText);
 
         return view;
+    }
+
+    boolean setDateText(TextView title, ImageButton daySelect, long time, int fragmentIndex, int todayIndex, Context context){
+        //TODO settings_todo make this user selectable format
+        String dateText = new SimpleDateFormat(DayInit.getDateFormat(context), Locale.getDefault()).format(time);
+        if(fragmentIndex == todayIndex){
+            Log.v("fragment_date", "underline void");
+            //dateText.setSpan(new UnderlineSpan(), 0, dateText.length(), 0);
+
+            Drawable drawable = context.getResources().getDrawable(R.drawable.selected_background);
+            assert drawable != null;
+            drawable.setColorFilter(context.getResources().getColor(R.color.colorAccent), PorterDuff.Mode.SRC);
+            try{
+                daySelect.setBackground(drawable);
+            } catch (NullPointerException np){
+                np.printStackTrace();
+            }
+        } else {
+            try{
+                daySelect.setBackground(context.getResources().getDrawable(R.drawable.selected_background));
+            } catch (NullPointerException np){
+                np.printStackTrace();
+            }
+        }
+
+        daySelect.setVisibility(View.VISIBLE);
+
+        try {
+            title.setText(dateText);
+        } catch (NullPointerException np){
+            np.printStackTrace();
+        }
+        return true;
     }
 
     @Override
@@ -68,15 +106,22 @@ public class MainFragment2 extends Fragment {
         super.onResume();
     }
 
+    void changeDay(Day day){
+        this.day = day;
+        todoListInit(this);
+    }
+
     void todoListInit(final Fragment fragment){
 
         if(day.todoItems.size() == 0){
             noTodoText.setVisibility(View.VISIBLE);
+            todoList.setVisibility(View.GONE);
             return;
         } else {
             noTodoText.setVisibility(View.GONE);
+            todoList.setVisibility(View.VISIBLE);
         }
-        final ArrayAdapter<TodoItem> arrayAdapter = new ArrayAdapter<TodoItem>(fragment.getContext(), R.layout.todo_item, day.todoItems) {
+        final ArrayAdapter<TodoItem> arrayAdapter = new ArrayAdapter<TodoItem>(fragment.getContext(), R.layout.todo_item, new ArrayList<>(day.todoItems.values())) {
             @NonNull
             @Override
             public View getView(final int position, @Nullable View convertView, @NonNull ViewGroup parent) {
@@ -84,7 +129,7 @@ public class MainFragment2 extends Fragment {
                     convertView = getLayoutInflater().inflate(R.layout.todo_item, null);
                 }
 
-                final TodoItem todo = day.todoItems.get(position);
+                final TodoItem todo = day.todoItems.get(getItem(position).ID);
 
                 TextView itemName = convertView.findViewById(R.id.todoItem);
                 itemName.setText(todo.name);

@@ -10,12 +10,12 @@ import android.widget.Toast;
 import androidx.core.app.AlarmManagerCompat;
 import androidx.preference.PreferenceManager;
 
-import com.google.gson.Gson;
-
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Locale;
+
+import static tk.lakatstudio.timeallocator.DayInit.gson;
 
 public class ATBroadcastReceiver extends android.content.BroadcastReceiver {
     int notificationID = 8;
@@ -23,6 +23,7 @@ public class ATBroadcastReceiver extends android.content.BroadcastReceiver {
     @Override
     public void onReceive(final Context context, final Intent intent) {
         Log.v("notification", "onReceive ATBroadcastReceiver " + intent.getAction());
+        System.out.println("tk.lakatstudio onReceive ATBroadcastReceiver " + intent.getAction());
         Toast.makeText(context, "Boot TA", Toast.LENGTH_SHORT).show();
         final PendingResult result = goAsync();
         Thread thread = new Thread() {
@@ -40,7 +41,7 @@ public class ATBroadcastReceiver extends android.content.BroadcastReceiver {
                         //ATNotificationManager.dayItemNotification(context, intent.getStringExtra("dayItemID"));
                         break;
                     case Intent.ACTION_BOOT_COMPLETED:
-                        loadDay(context);
+                        Day.setAllNotifications(context);
                         break;
                 }
 
@@ -54,8 +55,6 @@ public class ATBroadcastReceiver extends android.content.BroadcastReceiver {
     void loadDay(Context context){
         ArrayList<String> days = DayInit.readFromFile(context, "day_" + new SimpleDateFormat("y.M.d", Locale.getDefault()).format(Calendar.getInstance().getTime()));
 
-        Log.v("tk.bootSetup", "afterread");
-
         if(days == null){
             return;
         }
@@ -66,13 +65,14 @@ public class ATBroadcastReceiver extends android.content.BroadcastReceiver {
         assert am != null;
         long nowMili = System.currentTimeMillis();
 
-        Gson gson = new Gson();
+        DayInit.initGson();
         for(String dayJson : days){
             currentDay = gson.fromJson(dayJson, Day.class);
-            for(DayItem dayItem : currentDay.dayItems){
+            for(DayItem dayItem : currentDay.dayItems.values()){
                 dayItem.nullCheck();
                 Log.v("uuid_debug", dayItem.ID.toString());
                 if(dayItem.start.getTime() > nowMili) {
+                    Log.v("notificationSet_boot", dayItem.type.name + " " + new SimpleDateFormat("dd. HH:mm").format(dayItem.start));
                     AlarmManagerCompat.setExactAndAllowWhileIdle(am, AlarmManager.RTC_WAKEUP, dayItem.start.getTime(), makeAlarm(context, dayItem));
                 }
             }

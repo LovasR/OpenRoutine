@@ -17,7 +17,9 @@ import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.HashMap;
+import java.util.UUID;
 
 public class RegimeDayFragment extends DayFragment {
 
@@ -59,15 +61,15 @@ public class RegimeDayFragment extends DayFragment {
         DividerItemDecoration itemDecor = new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL);
         itemDecor.setDrawable(getResources().getDrawable(R.drawable.divider_nothing));
         dayPlanner.addItemDecoration(itemDecor);
-        ArrayList<DayItem> dayItems = fragmentDay.dayItems;
+        final HashMap<UUID, DayItem> dayItems = fragmentDay.dayItems;
 
-        adapter = new DayItemAdapter(getContext(), dayItems, this);
+        adapter = new DayItemAdapter(getContext(), dayItems.values(), this);
         adapter.setClickListener(new DayItemAdapter.ItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
                 Intent editIntent = new Intent(getContext(), DayItemActivity.class);
-                editIntent.putExtra("index", position);
-                editIntent.putExtra("regimeIndex", regime.index);
+                editIntent.putExtra("index", adapter.getItem(position).ID.toString());
+                editIntent.putExtra("regimeIndex", regime.ID.toString());
                 editIntent.putExtra("regimeDayIndex", fragmentIndex);
                 Log.v("regime_intent_debug", "from: " + regime.index);
                 startActivity(editIntent);
@@ -81,8 +83,15 @@ public class RegimeDayFragment extends DayFragment {
                     public void onClick(DialogInterface dialog, int which) {
                         switch (which){
                             case DialogInterface.BUTTON_POSITIVE:
-                                fragmentDay.removeDayItem(position);
-                                adapter.notifyItemRemoved(position);
+                                //UUID ID = adapter.getItem(position).ID;
+                                //fragmentDay.removeDayItem(getContext(), ID, true);
+                                Calendar calendar = Calendar.getInstance();
+                                calendar.setFirstDayOfWeek(Calendar.MONDAY);
+                                calendar.setTimeInMillis(fragmentDay.start.getTime());
+                                Log.v("regime_refresh", "original size: " + fragmentDay.dayItems.size());
+                                regime.removeDayItem(adapter.getItem(position), (calendar.get(Calendar.DAY_OF_WEEK) == Calendar.SUNDAY ? 6 : calendar.get(Calendar.DAY_OF_WEEK) - 2));
+                                adapter.removedDayItem(position);
+                                Log.v("regime_refresh", "original size: " + fragmentDay.dayItems.size() + " " + fragmentDay.dayItems.toString());
                                 break;
                             case DialogInterface.BUTTON_NEGATIVE:
                                 break;
@@ -123,97 +132,7 @@ public class RegimeDayFragment extends DayFragment {
             //noDayItemText.setVisibility(View.GONE);
         }
 
-        adapter.refreshContents(fragmentDay.dayItems);
+        adapter.refreshContents(fragmentDay.dayItems.values());
     }
-
-
-    /*
-    public void dayPlannerInit(final Fragment fragment){
-
-        if(fragmentDay == null){
-            Log.v("fragment_preload", fragmentIndex + " fragmentDay null");
-            return;
-        }
-        if(fragmentDay.dayItems.size() == 0){
-            Log.v("fragment_preload", fragmentIndex + " b " + fragmentDay.dayItems.size());
-            dayPlanner.setAdapter(null);
-            return;
-        }
-
-
-
-        /*
-        final ArrayAdapter<DayItem> arrayAdapter = new ArrayAdapter<DayItem>(requireContext(), R.layout.dayplanner_item, fragmentDay.dayItems){
-            @NonNull
-            @Override
-            public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
-                if(convertView==null){
-                    convertView = getLayoutInflater().inflate(R.layout.dayplanner_item, null);
-                }
-
-                //Log.v("fragment_preload", fragmentIndex + " a " + fragmentDay.dayItems.size() + " postion " + position);
-                final DayItem dayItem = fragmentDay.dayItems.get(position);
-
-                TextView itemStart = convertView.findViewById(R.id.dayPlannerItemStart);
-                itemStart.setText(new SimpleDateFormat("HH:mm", Locale.getDefault()).format(dayItem.start.getTime()));
-
-                TextView itemLength = convertView.findViewById(R.id.dayPlannerItemLength);
-                itemLength.setText(lengthAdapter(dayItem.start, dayItem.end));
-
-                TextView itemName = convertView.findViewById(R.id.dayPlannerItem);
-                if (dayItem.name.length() != 0){
-                    itemName.setText(dayItem.name);
-                    itemName.setVisibility(View.VISIBLE);
-                } else {
-                    itemName.setVisibility(View.GONE);
-                }
-
-                TextView itemType = convertView.findViewById(R.id.dayPlannerItemActivity);
-                itemType.setText(dayItem.type.name);
-                final Drawable textBackground = AppCompatResources.getDrawable(fragment.getContext(), R.drawable.spinner_background);
-                textBackground.setColorFilter(dayItem.type.color, PorterDuff.Mode.SRC);
-                itemType.setBackground(textBackground);
-                return convertView;
-            }
-        };
-        dayPlanner.setAdapter(arrayAdapter);
-        dayPlanner.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                Intent editIntent = new Intent(fragment.getContext(), DayItemActivity.class);
-                editIntent.putExtra("index", i);
-                editIntent.putExtra("regimeIndex", regime.index);
-                editIntent.putExtra("regimeDayIndex", fragmentIndex);
-                Log.v("regime_intent_debug", "from: " + regime.index);
-                startActivity(editIntent);
-            }
-        });
-        dayPlanner.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
-            @Override
-            public boolean onItemLongClick(AdapterView<?> adapterView, View view, final int i, long l) {
-                Log.e("Day_list", "Item removed @: " + i);
-                DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        switch (which){
-                            case DialogInterface.BUTTON_POSITIVE:
-                                fragmentDay.removeDayItem(i);
-                                arrayAdapter.notifyDataSetChanged();
-                                break;
-                            case DialogInterface.BUTTON_NEGATIVE:
-                                break;
-                        }
-                    }
-                };
-
-                AlertDialog.Builder builder = new AlertDialog.Builder(fragment.getContext());
-                builder.setMessage(getString(R.string.remove_activity,
-                        getString(R.string.day_item_singular))).setPositiveButton(getString(R.string.yes),
-                        dialogClickListener).setNegativeButton(getString(R.string.no), dialogClickListener).show();
-                return true;
-            }
-        });
-        */
-//    }
 
 }

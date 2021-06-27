@@ -12,12 +12,19 @@ import androidx.core.app.AlarmManagerCompat;
 import androidx.preference.PreferenceManager;
 
 import com.google.android.material.timepicker.TimeFormat;
+import com.google.gson.ExclusionStrategy;
+import com.google.gson.FieldAttributes;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -36,7 +43,13 @@ public class DayInit {
     //log each set alarm
     static int notificationRequestID;
 
+    //main Gson
+    static Gson gson;
+
     static void init(final Context context){
+
+        initGson();
+
         if (!loadAll(context)) {
             Day today;
             today = new Day();
@@ -52,14 +65,13 @@ public class DayInit {
 
             currentDay = today;
 
-
             int[] defaultColors = context.getResources().getIntArray(R.array.default_colors);
             String[] names = context.getResources().getStringArray(R.array.default_activities);
             for(int i = 0; i < names.length; i++) {
                 ActivityType.addActivityType(names[i], defaultColors[i]);
             }
         } else {
-            Log.v("save_debug_load", "Loading finished " + currentDay.dayItems.size());
+            //Log.v("save_debug_load", "Loading finished " + currentDay.dayItems.size());
             //mainActivity.fragment1.dayPlannerInit(mainActivity.fragment1);
         }
 
@@ -79,13 +91,27 @@ public class DayInit {
                 //am = (AlarmManager) context.getApplicationContext().getSystemService(Context.ALARM_SERVICE);
                 pendingIntentCleanup(context);
             }
-        }).run();
+        }).start();
+    }
+
+    static void initGson(){
+
+        ExclusionStrategy strategy = new ExclusionStrategy() {
+            @Override
+            public boolean shouldSkipClass(Class<?> clazz) {
+                return false;
+            }
+
+            @Override
+            public boolean shouldSkipField(FieldAttributes field) {
+                return field.getAnnotation(Exclude.class) != null;
+            }
+        };
+
+        gson = new GsonBuilder().addSerializationExclusionStrategy(strategy).create();
     }
 
     static void increaseNotificationRequestID(){
-        if(notificationRequestID <= 60){
-            sharedPreferences.edit().putInt("requestID", (notificationRequestID = 67)).apply();
-        }
         if(notificationRequestID <= 2000000000){
             sharedPreferences.edit().putInt("requestID", ++notificationRequestID).apply();
         } else {
@@ -139,7 +165,7 @@ public class DayInit {
     }
 
     static void addAlarm(Context context, DayItem dayItem){
-        if(dayItem.notificationTimesOA.size() > 0){
+        if(dayItem.notificationTimes.size() > 0){
             DayItem dayItem_ = currentDayItems.get(UUID.fromString(dayItem.ID.toString()));
             Log.v("notifications", (dayItem_ == null ? "dayItem_ is null " : "dayItem_ is !!!null "));
             AlarmManager am = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
@@ -151,7 +177,7 @@ public class DayInit {
             notificationIntent.putExtra("dayItemID", dayItem.ID.toString());
             notificationIntent.putExtra("dayItemTypeName", dayItem.type.name);
 
-            for(DayItem.NotificationTime timeOffset : dayItem.notificationTimesOA){
+            for(DayItem.NotificationTime timeOffset : dayItem.notificationTimes.values()){
                 notificationIntent.putExtra("requestID", timeOffset.requestID);
                 notificationIntent.putExtra("dayItemStart", dayItem.start.getTime());
                 notificationIntent.putExtra("notificationOffset", timeOffset.offset);
@@ -173,7 +199,6 @@ public class DayInit {
         PendingIntent sender = PendingIntent.getBroadcast(context, requestID, intent, 0);
         AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         alarmManager.cancel(sender);
-        decreaseNotificationRequestID();
     }
 
     static String getHourFormat(Context context){
@@ -220,15 +245,14 @@ public class DayInit {
     }
 
     static void saveAll(Context context){
-        Gson gson = new Gson();
         String outJson = "";
 
         //save modified days
         for(Day day : daysHashMap.values()){
             if(!day.isSaved){
                 //remove dayItems added by the regimes to make regimes usable
-                if(day.start.getTime() > Calendar.getInstance().getTime().getTime()){
-                    Regime.removeRegimeDays(day);
+                if(day.start.getTime() > System.currentTimeMillis()){
+                    Regime.removeRegimeDays(context, day);
                 }
                 outJson = "";
                 outJson += gson.toJson(day);
@@ -259,13 +283,14 @@ public class DayInit {
             writeToFile(context, outJson, "activities");
         }
         ArrayList<String> testRead = readFromFile(context, "activities");
-        for(int i = 0; i < testRead.size(); i++){
-            Log.e("testreads", testRead.get(i));
+        if(testRead != null) {
+            for (int i = 0; i < testRead.size(); i++) {
+                Log.e("testreads", testRead.get(i));
+            }
         }
 
         outJson = "";
-        for(int i = 0; i < Regime.allRegimes.size(); i++){
-            Regime regime = Regime.allRegimes.get(i);
+        for(Regime regime : Regime.allRegimes.values()){
             if(!regime.toDelete) {
                 regime.isSaved = true;
                 outJson += gson.toJson(regime);
@@ -293,52 +318,66 @@ public class DayInit {
             writer.append(json);
             writer.flush();
             writer.close();
-            Log.v("save_debug", "successful file write" + json.length());
+            Log.v("save_debug", "successful file write: " + json.length() + " @: " + file.getAbsolutePath());
         } catch (Exception e){
-            e.printStackTrace();
+            //e.printStackTrace();
             Log.v("save_debug", "file writing exception");
         }
     }
 
     static boolean loadAll(Context context){
+        loadRegimes(context);
+
         ArrayList<String> days = readFromFile(context, "day_" + new SimpleDateFormat("y.M.d", Locale.getDefault()).format(Calendar.getInstance().getTime()));
 
-        if(days == null){
-            return false;
-        }
-
-        Gson gson = new Gson();
-        for(String dayJson : days){
-            currentDay = gson.fromJson(dayJson, Day.class);
-            Calendar calendar = Calendar.getInstance();
-            daysHashMap.put(calendar.get(Calendar.DAY_OF_YEAR) + calendar.get(Calendar.YEAR) * 365, currentDay);
-            for(DayItem dayItem : currentDay.dayItems){
-                dayItem.nullCheck();
-                Log.v("uuid_debug", dayItem.ID.toString());
-                DayInit.currentDayItems.put(dayItem.ID, dayItem);
-                DayItem.allDayItemHashes.put(dayItem.ID, dayItem);
+        if(days != null) {
+            for (String dayJson : days) {
+                currentDay = gson.fromJson(dayJson, Day.class);
+                Calendar calendar = Calendar.getInstance();
+                daysHashMap.put(calendar.get(Calendar.DAY_OF_YEAR) + calendar.get(Calendar.YEAR) * 366, currentDay);
+                for (DayItem dayItem : currentDay.dayItems.values()) {
+                    dayItem.nullCheck();
+                    Log.v("uuid_debug", dayItem.ID.toString());
+                    DayInit.currentDayItems.put(dayItem.ID, dayItem);
+                    DayItem.allDayItemHashes.put(dayItem.ID, dayItem);
+                }
+                currentDay.isRegimeSet = false;
+                //Log.v("save_debug_load", "load day: " + currentDay.dayItems.size() + " " + (currentDay.dayItems.size() > 0 ? currentDay.dayItems.g.type.name : "null"));
             }
-            Log.v("save_debug_load", "load day: " + currentDay.dayItems.size() + " " + (currentDay.dayItems.size() > 0 ? currentDay.dayItems.get(0).type.name : "null"));
         }
 
         ArrayList<String> activityList = readFromFile(context, "activities");
-        Log.v("save_debug_load", "load activities: " + activityList.size());
-        for(String activityJson : activityList){
-            ActivityType.addActivityType(gson.fromJson(activityJson, ActivityType.class));
-            Log.v("save_debug_load", "load activity: \t" + activityJson);
-        }
-
-        ArrayList<String> regimeList = readFromFile(context, "regimes");
-        if(regimeList != null) {
-            for (String regimeJson : regimeList) {
-                Regime.addRegime(gson.fromJson(regimeJson, Regime.class));
+        if(activityList != null) {
+            Log.v("save_debug_load", "load activities: " + activityList.size());
+            for (String activityJson : activityList) {
+                ActivityType.addActivityType(gson.fromJson(activityJson, ActivityType.class));
+                Log.v("save_debug_load", "load activity: \t" + activityJson);
             }
         }
+
 
         return true;
     }
 
+    static void loadRegimes(Context context){
+        Regime.allRegimes = new HashMap<>();
+        Log.v("regime_null", "loadRegimes");
+        ArrayList<String> regimeList = readFromFile(context, "regimes");
+        if(regimeList != null) {
+            Log.v("save_Debug_load", "regime file lines: " + regimeList.size());
+            for (String regimeJson : regimeList) {
+                Regime regime = gson.fromJson(regimeJson, Regime.class);
+                regime.nullCheck();
+                Regime.addRegime(regime);
+            }
+        } else {
+            Log.v("save_Debug_load", "regime file null");
+        }
+    }
+
     static ArrayList<String> readFromFile(Context context, String fileName){
+        if(context == null)
+            Log.v("context_null", "2 YIL");
         File dir = new File(context.getFilesDir(), "saves");
         if(!dir.exists()){
             Log.v("save_debug_load", "directory !exist");
@@ -359,9 +398,13 @@ public class DayInit {
             Log.v("save_debug_load", "successful read" + out.size());
         } catch (Exception e){
             //e.printStackTrace();
-            Log.v("save_debug_load", "file error");
+            Log.v("save_debug_load", "file error: " + e.toString());
             return null;
         }
         return out;
     }
+
+    @Retention(RetentionPolicy.RUNTIME)
+    @Target(ElementType.FIELD)
+    public @interface Exclude {}
 }
