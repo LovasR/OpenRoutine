@@ -89,6 +89,7 @@ public class ATBroadcastReceiver extends android.content.BroadcastReceiver {
         notificationIntent.putExtra("dayItemID", dayItem.ID.toString());
         notificationIntent.putExtra("dayItemTypeName", dayItem.type.name);
         notificationIntent.putExtra("dayItemStart", dayItem.start.getTime());
+        notificationIntent.putExtra("dayItemEnd", dayItem.end.getTime());
         notificationIntent.putExtra("requestID", DayInit.notificationRequestID);
 
         DayInit.increaseNotificationRequestID();

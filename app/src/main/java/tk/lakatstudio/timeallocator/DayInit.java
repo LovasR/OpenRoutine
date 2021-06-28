@@ -179,7 +179,8 @@ public class DayInit {
 
             for(DayItem.NotificationTime timeOffset : dayItem.notificationTimes.values()){
                 notificationIntent.putExtra("requestID", timeOffset.requestID);
-                notificationIntent.putExtra("dayItemStart", dayItem.start.getTime());
+        notificationIntent.putExtra("dayItemStart", dayItem.start.getTime());
+        notificationIntent.putExtra("dayItemEnd", dayItem.end.getTime());
                 notificationIntent.putExtra("notificationOffset", timeOffset.offset);
                 notificationIntent.putExtra("notificationOffsetR", timeOffset.fromEnd);
 
@@ -248,6 +249,7 @@ public class DayInit {
         String outJson = "";
 
         //save modified days
+        Log.v("day_save", daysHashMap.toString());
         for(Day day : daysHashMap.values()){
             if(!day.isSaved){
                 //remove dayItems added by the regimes to make regimes usable

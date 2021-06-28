@@ -38,7 +38,6 @@ public class RegimeActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.regime_add);
 
-        todoFragment = new RegimeTodoFragment();
 
         final FrameLayout regimeFrame = findViewById(R.id.regimeFrame);
         regimeViewPager = findViewById(R.id.regimeViewPager);
@@ -51,6 +50,8 @@ public class RegimeActivity extends AppCompatActivity {
             regime = new Regime(getResources().getStringArray(R.array.days_of_week));
             Regime.addRegime(regime);
         }
+
+        todoFragment = new RegimeTodoFragment();
         todoFragment.dayIndex = regimeViewPager.getCurrentItem();
         todoFragment.regime = regime;
         todoFragment.day = regime.days[regimeViewPager.getCurrentItem()];
@@ -104,7 +105,7 @@ public class RegimeActivity extends AppCompatActivity {
                         break;
                     case R.id.regime_menu_2:
                         Intent intent2 = new Intent(RegimeActivity.this, TodoItemActivity.class);
-                        intent2.putExtra("regimeIndex", regimeIndex);
+                        intent2.putExtra("regimeIndex", regime.ID.toString());
                         intent2.putExtra("regimeDayIndex", regimeViewPager.getCurrentItem());
                         regime.isSaved = false;
                         startActivity(intent2);

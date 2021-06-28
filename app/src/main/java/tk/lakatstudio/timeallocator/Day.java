@@ -338,6 +338,7 @@ public class Day {
     void notificationSetAlarm(Context context, Intent notificationIntent, AlarmManager alarmManager, DayItem dayItem, DayItem.NotificationTime timeOffset){
         notificationIntent.putExtra("requestID", timeOffset.requestID);
         notificationIntent.putExtra("dayItemStart", dayItem.start.getTime());
+        notificationIntent.putExtra("dayItemEnd", dayItem.end.getTime());
         notificationIntent.putExtra("notificationOffset", timeOffset.offset);
         notificationIntent.putExtra("notificationOffsetR", timeOffset.fromEnd);
 
@@ -408,6 +409,7 @@ public class Day {
         notificationIntent.putExtra("dayItemID", dayItem.ID.toString());
         notificationIntent.putExtra("dayItemTypeName", dayItem.type.name);
         notificationIntent.putExtra("dayItemStart", dayItem.start.getTime());
+        notificationIntent.putExtra("dayItemEnd", dayItem.end.getTime());
         notificationIntent.putExtra("requestID", DayInit.notificationRequestID);
 
         DayInit.increaseNotificationRequestID();

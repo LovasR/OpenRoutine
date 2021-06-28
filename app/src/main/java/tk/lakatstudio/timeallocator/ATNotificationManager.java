@@ -82,6 +82,7 @@ public class ATNotificationManager {
         UUID dayItemID = UUID.fromString(extras.getString("dayItemID"));
         String typeName = extras.getString("dayItemTypeName");
         long start = extras.getLong("dayItemStart", -1);
+        long end = extras.getLong("dayItemEnd", -1);
         int requestID = extras.getInt("requestID", -1);
         int offset = extras.getInt("notificationOffset", -1);
         boolean fromEnd = extras.getBoolean("notificationOffsetR", false);
@@ -99,19 +100,23 @@ public class ATNotificationManager {
             } else {
                 baseString = context.getString(R.string.notification_show_after_start);
             }
+            contentText = String.format(baseString, typeName,
+                    new SimpleDateFormat(DayInit.getHourFormat(context), Locale.getDefault()).format(start),
+                    offsetFormat(context, offset));
         } else {
-            if(offset < 0){
+            long dayItemLength = (end - start) / 1000;
+            if(offset < dayItemLength){
                 baseString = context.getString(R.string.notification_show_before_end);
-            } else if (offset == 0){
+            } else if (offset == dayItemLength){
                 baseString = context.getString(R.string.notification_show_at_end);
             } else {
                 baseString = context.getString(R.string.notification_show_after_end);
             }
+            contentText = String.format(baseString, typeName,
+                    new SimpleDateFormat(DayInit.getHourFormat(context), Locale.getDefault()).format(start),
+                    offsetFormat(context, (int) (offset - dayItemLength)));
         }
 
-        contentText = String.format(baseString, typeName,
-                new SimpleDateFormat(DayInit.getHourFormat(context), Locale.getDefault()).format(start),
-                offsetFormat(context, offset));
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context, CHANNEL_ID)
                 .setSmallIcon(R.drawable.ic_launcher_foreground)

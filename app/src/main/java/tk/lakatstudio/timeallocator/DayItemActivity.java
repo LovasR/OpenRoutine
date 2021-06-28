@@ -156,7 +156,7 @@ public class DayItemActivity extends FragmentActivity {
             activityButton.setBackground(drawable);
 
             notificationTimes = new ArrayList<>(dayItem.notificationTimes.values());
-            dayItemLength = (int) (dayItem.start.getTime() - dayItem.end.getTime());
+            dayItemLength = (int) (dayItem.end.getTime() - dayItem.start.getTime()) / 1000;
         } else {
 
             Calendar calendar = Calendar.getInstance();
@@ -522,7 +522,6 @@ public class DayItemActivity extends FragmentActivity {
                             notificationSetAlarm(context, notificationIntent, am, dayItem, timeOffset);
                         }
                     }
-                    //TODO set notifications for regimes
                 }
             }
         }
@@ -540,6 +539,7 @@ public class DayItemActivity extends FragmentActivity {
     void notificationSetAlarm(Context context, Intent notificationIntent, AlarmManager alarmManager, DayItem dayItem, NotificationTime timeOffset){
         notificationIntent.putExtra("requestID", timeOffset.requestID);
         notificationIntent.putExtra("dayItemStart", dayItem.start.getTime());
+        notificationIntent.putExtra("dayItemEnd", dayItem.end.getTime());
         notificationIntent.putExtra("notificationOffset", timeOffset.offset);
         notificationIntent.putExtra("notificationOffsetR", timeOffset.fromEnd);
 
@@ -606,6 +606,7 @@ public class DayItemActivity extends FragmentActivity {
                 }
                 //notificationTimes.set(i, notificationTimes.get(i) + (newLength - oldLength));
             }
+            Log.v("notificationTime_length", "length after: " + notificationTime.offset + " oldlength: " + oldLength + " newLength: " + newLength);
             //add to to-be reset list
             if(!changedNotificationTimes.contains((notificationTime))) {
                 changedNotificationTimes.add(notificationTime);
@@ -679,26 +680,12 @@ public class DayItemActivity extends FragmentActivity {
     }
 
     void resetNotification(NotificationTime notificationTime){
-        //re-sets notification time
-        if(focusedDay.dayIndex == MainFragment1.todayIndex && dayItem != null){
-            //re-set alarm with updated time
-            DayInit.cancelAlarm(DayItemActivity.this, notificationTime.requestID);
-            Log.v("notification_refresh", "requestID before: " + notificationTime.requestID + " dayInit ID: " + DayInit.notificationRequestID);
+        boolean isRMS = focusedDay.start.getTime() + (24 * 60 * 60 * 1000) < dayItem.start.getTime() + (notificationTime.offset * 1000)
+                || focusedDay.start.getTime() > dayItem.start.getTime() + (notificationTime.offset * 1000);
 
-            //increase reguestID so that broadcasts don't collide
-            notificationTime.requestID = DayInit.notificationRequestID;
-            DayInit.increaseNotificationRequestID();
-            Log.v("notification_refresh", "requestID after: " + notificationTime.requestID + " dayInit ID: " + DayInit.notificationRequestID);
-
-            AlarmManager am = (AlarmManager) DayItemActivity.this.getSystemService(Context.ALARM_SERVICE);
-
-            Intent notificationIntent = new Intent(DayItemActivity.this, NotificationReceiver.class);
-
-            notificationIntent.setPackage(DayItemActivity.this.getPackageName());
-            notificationIntent.setAction("Notification.Create");
-            notificationIntent.putExtra("dayItemID", dayItem.ID.toString());
-            notificationIntent.putExtra("dayItemTypeName", dayItem.type.name);
-            notificationSetAlarm(DayItemActivity.this, notificationIntent, am, dayItem, notificationTime);
+        //re-sets notification time by first canceling and then setting with the appropriate information
+        if(focusedDay.dayIndex == MainFragment1.todayIndex && dayItem != null && !isRMS){
+            resetNotificationIntent(notificationTime);
         } else if (regime != null && dayItem != null && regime.isActive){
             Calendar calendar = Calendar.getInstance();
             int dayOfWeekToday = calendar.get(Calendar.DAY_OF_WEEK);
@@ -706,22 +693,40 @@ public class DayItemActivity extends FragmentActivity {
 
             //focusedDay.dayIndex == MainFragment1.todayIndex;
             if(calendar.get(Calendar.DAY_OF_WEEK) == dayOfWeekToday){
-                DayInit.cancelAlarm(DayItemActivity.this, notificationTime.requestID);
-
-                AlarmManager am = (AlarmManager) DayItemActivity.this.getSystemService(Context.ALARM_SERVICE);
-
-                DayInit.increaseNotificationRequestID();
-                notificationTime.requestID = DayInit.notificationRequestID;
-
-                Intent notificationIntent = new Intent(DayItemActivity.this, NotificationReceiver.class);
-
-                notificationIntent.setPackage(DayItemActivity.this.getPackageName());
-                notificationIntent.setAction("Notification.Create");
-                notificationIntent.putExtra("dayItemID", dayItem.ID.toString());
-                notificationIntent.putExtra("dayItemTypeName", dayItem.type.name);
-                notificationSetAlarm(DayItemActivity.this, notificationIntent, am, dayItem, notificationTime);
+                resetNotificationIntent(notificationTime);
             }
+        } else if(isRMS){
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTimeInMillis(dayItem.start.getTime());
+            Calendar dayItemStart = (Calendar) calendar.clone();
+            dayItemStart.add(Calendar.SECOND, notificationTime.offset);
+            Date offsetDate = dayItemStart.getTime();
+            Log.v("notificationSet", "remote offsetDAte: " + new SimpleDateFormat("d. HH:mm").format(offsetDate));
+            Log.v("notificationSet", "notification time: " + new SimpleDateFormat("M.d. HH:mm").format(new Date(dayItem.start.getTime() + notificationTime.offset * 1000)));
+            if(dayItemStart.get(Calendar.YEAR) * 366 + dayItemStart.get(Calendar.DAY_OF_YEAR) == MainFragment1.todayIndex){
+                resetNotificationIntent(notificationTime);
+            }
+            Day targetDay = Day.getDay(DayItemActivity.this, offsetDate);
+            //in this instance addRSN will overwrite as it uses the same notificationID
+            targetDay.addRemoteScheduledNotification(dayItem, notificationTime.offset, dayItemStart.get(Calendar.YEAR) * 366 + dayItemStart.get(Calendar.DAY_OF_YEAR), notificationTime.ID);
         }
+    }
+
+    void resetNotificationIntent(NotificationTime notificationTime){
+        DayInit.cancelAlarm(DayItemActivity.this, notificationTime.requestID);
+
+        AlarmManager am = (AlarmManager) DayItemActivity.this.getSystemService(Context.ALARM_SERVICE);
+
+        notificationTime.requestID = DayInit.notificationRequestID;
+        DayInit.increaseNotificationRequestID();
+
+        Intent notificationIntent = new Intent(DayItemActivity.this, NotificationReceiver.class);
+
+        notificationIntent.setPackage(DayItemActivity.this.getPackageName());
+        notificationIntent.setAction("Notification.Create");
+        notificationIntent.putExtra("dayItemID", dayItem.ID.toString());
+        notificationIntent.putExtra("dayItemTypeName", dayItem.type.name);
+        notificationSetAlarm(DayItemActivity.this, notificationIntent, am, dayItem, notificationTime);
     }
 
     int dayItemLengthCalc(int startHour, int endHour, int startMinute, int endMinute){
@@ -1038,9 +1043,6 @@ class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapter.ViewH
             }
             notificationText += " " + context.getString(R.string.notification_end) + ": " + offsetFormat(notificationTime.offset - dayItemLength);
         }
-        /*else if(notificationTime == dayItemLength){
-            notificationText = context.getString(R.string.notification_at_end);
-        }*/
         notificationView.setText(notificationText);
     }
 
