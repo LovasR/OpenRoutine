@@ -108,7 +108,7 @@ public class RegimeTodoFragment extends Fragment {
                         Intent editIntent = new Intent(fragment.getContext(), TodoItemActivity.class);
                         editIntent.putExtra("regimeIndex", regime.ID.toString());
                         editIntent.putExtra("regimeDayIndex", dayIndex);
-                        editIntent.putExtra("regimeTodoIndex", position);
+                        editIntent.putExtra("regimeTodoIndex", getItem(position).ID.toString());
                         startActivity(editIntent);
                     }
                 });

@@ -55,17 +55,16 @@ public class TodoItemActivity extends FragmentActivity {
             String rawRegimeIndex = getIntent().getExtras().getString("regimeIndex", "");
             Log.v("regime_intent_debug", "" + getIntent().getExtras().getInt("regimeIndex", -1));
             int regimeDayIndex = getIntent().getExtras().getInt("regimeDayIndex", -1);
-            int regimeTodoIndex = getIntent().getExtras().getInt("regimeTodoIndex", -1);
+            String regimeTodoIndexRaw = getIntent().getExtras().getString("regimeTodoIndex", "");
             if(rawRegimeIndex.length() > 0) {
                 UUID regimeIndex = UUID.fromString(rawRegimeIndex);
                 regime = Regime.allRegimes.get(regimeIndex);
                 day = regime.days[regimeDayIndex];
                 isRegimeDay = true;
-                if(regimeTodoIndex != -1){
-                    todoItem = day.todoItems.get(regimeTodoIndex);
+                if(regimeTodoIndexRaw.length() > 0){
+                    todoItem = day.todoItems.get(UUID.fromString(regimeTodoIndexRaw));
                 }
             }
-            Log.e("TODO_INTENT", "INTENT_ERROR");
         }
         /*try{
             Log.v("intent_debug", "" + getIntent().getExtras().getInt("index"));
@@ -85,7 +84,6 @@ public class TodoItemActivity extends FragmentActivity {
                     itemNameParent.setBoxStrokeColor(getResources().getColor(R.color.color_box_default));
                 }
             }
-
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
 
