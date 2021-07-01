@@ -245,64 +245,79 @@ public class DayInit {
         return sharedPreferences.getString("date_format", context.getString(R.string.default_date_format));
     }
 
-    static void saveAll(Context context){
-        String outJson = "";
+    static void saveAll(final Context context){
 
         //save modified days
         Log.v("day_save", daysHashMap.toString());
-        for(Day day : daysHashMap.values()){
-            if(!day.isSaved){
-                //remove dayItems added by the regimes to make regimes usable
-                if(day.start.getTime() > System.currentTimeMillis()){
-                    Regime.removeRegimeDays(context, day);
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                String outJson = "";
+                for(Day day : daysHashMap.values()){
+                    if(!day.isSaved){
+                        //remove dayItems added by the regimes to make regimes usable
+                        if(day.start.getTime() > System.currentTimeMillis()){
+                            Regime.removeRegimeDays(context, day);
+                        }
+                        outJson = "";
+                        outJson += gson.toJson(day);
+                        outJson += "\n";
+                        Log.v("day_save", "day_" + new SimpleDateFormat("y.M.d", Locale.getDefault()).format(day.start.getTime()));
+                        writeToFile(context, outJson, "day_" + new SimpleDateFormat("y.M.d", Locale.getDefault()).format(day.start.getTime()));
+                        day.isSaved = true;
+                    }
                 }
-                outJson = "";
-                outJson += gson.toJson(day);
-                outJson += "\n";
-                Log.v("day_save", "day_" + new SimpleDateFormat("y.M.d", Locale.getDefault()).format(day.start.getTime()));
-                writeToFile(context, outJson, "day_" + new SimpleDateFormat("y.M.d", Locale.getDefault()).format(day.start.getTime()));
-                day.isSaved = true;
             }
-        }
+        }).start();
 
         Log.v("day_debug", "day_" + new SimpleDateFormat("y.M.d", Locale.getDefault()).format(Calendar.getInstance().getTime()));
 
-        outJson = "";
-        for(int i = 0; i < ActivityType.allActivityTypes.size(); i++){
-            ActivityType activityType = ActivityType.allActivityTypes.get(i);
-            Log.v("save_debug", "test");
-            //if(!activityType.isSaved){
-                activityType.isSaved = true;
-                outJson += gson.toJson(activityType);
-                outJson += "\n";
-                Log.v("save_debug", "save activity");
-            /*} else{
-                Log.v("save_debug", "no save activity "/* + ActivityType.allActivityTypes.get(2).isSaved);
-            }*/
-        }
-        Log.v("Out_Json activities", outJson);
-        if(outJson.length() > 0){
-            writeToFile(context, outJson, "activities");
-        }
-        ArrayList<String> testRead = readFromFile(context, "activities");
-        if(testRead != null) {
-            for (int i = 0; i < testRead.size(); i++) {
-                Log.e("testreads", testRead.get(i));
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                String outJson = "";
+                for(int i = 0; i < ActivityType.allActivityTypes.size(); i++){
+                    ActivityType activityType = ActivityType.allActivityTypes.get(i);
+                    Log.v("save_debug", "test");
+                    //if(!activityType.isSaved){
+                        activityType.isSaved = true;
+                        outJson += gson.toJson(activityType);
+                        outJson += "\n";
+                        Log.v("save_debug", "save activity");
+                    /*} else{
+                        Log.v("save_debug", "no save activity "/* + ActivityType.allActivityTypes.get(2).isSaved);
+                    }*/
+                }
+                Log.v("Out_Json activities", outJson);
+                if(outJson.length() > 0){
+                    writeToFile(context, outJson, "activities");
+                }
+                ArrayList<String> testRead = readFromFile(context, "activities");
+                if(testRead != null) {
+                    for (int i = 0; i < testRead.size(); i++) {
+                        Log.e("testreads", testRead.get(i));
+                    }
+                }
             }
-        }
+        }).start();
 
-        outJson = "";
-        for(Regime regime : Regime.allRegimes.values()){
-            if(!regime.toDelete) {
-                regime.isSaved = true;
-                outJson += gson.toJson(regime);
-                outJson += "\n";
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                String outJson = "";
+                for(Regime regime : Regime.allRegimes.values()){
+                    if(!regime.toDelete) {
+                        regime.isSaved = true;
+                        outJson += gson.toJson(regime);
+                        outJson += "\n";
+                    }
+                }
+                Log.v("save_debug", "regimes: " + outJson);
+                if(outJson.length() > 0){
+                    writeToFile(context, outJson, "regimes");
+                }
             }
-        }
-        Log.v("save_debug", "regimes: " + outJson);
-        if(outJson.length() > 0){
-            writeToFile(context, outJson, "regimes");
-        }
+        }).start();
 
 
         sharedPreferences.edit().putInt("requestID", notificationRequestID).apply();
