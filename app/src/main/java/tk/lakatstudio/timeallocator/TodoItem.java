@@ -1,7 +1,5 @@
 package tk.lakatstudio.timeallocator;
 
-import android.util.Log;
-
 import java.util.ArrayList;
 import java.util.UUID;
 
@@ -27,11 +25,10 @@ public class TodoItem {
     }
 
     static void addItem(TodoItem item){
-        allTodoItems.add(item);
-        if(item.dayItem != null) {
-            item.dayItemHash = item.dayItem.hashCode();
-            Log.v("hash_debug", item.dayItemHash + "");
+        if(item.dayItem == null && item.dayItemID != null){
+            item.dayItem = DayInit.currentDayItems.get(item.dayItemID);
         }
+        allTodoItems.add(item);
     }
 
     static void removeItem(TodoItem item){

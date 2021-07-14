@@ -117,11 +117,16 @@ public class ATNotificationManager {
                     offsetFormat(context, (int) (offset - dayItemLength)));
         }
 
+        Intent rIntent = new Intent(context, MainActivity.class);
+        rIntent.putExtra("dayItemStart", start);
+        rIntent.putExtra("dayItemID", dayItemID.toString());
+        PendingIntent resultIntent = PendingIntent.getActivity(context, 0, rIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context, CHANNEL_ID)
                 .setSmallIcon(R.drawable.ic_launcher_foreground)
                 .setContentTitle(typeName)
                 .setContentText(contentText)
+                .setContentIntent(resultIntent)
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT);
 
         NotificationManagerCompat notificationManager = NotificationManagerCompat.from(context);

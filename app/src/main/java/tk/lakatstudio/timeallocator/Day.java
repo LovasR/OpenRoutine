@@ -39,7 +39,7 @@ public class Day {
     @Exclude
     HashMap<UUID, TodoItem> regimeTodoItems = new HashMap<>();
     @Exclude
-    HashMap<UUID, Regime> setRegimes = new HashMap<>();
+    ArrayList<UUID> setRegimes = new ArrayList<>();
 
     HashMap<UUID, RemoteScheduledNotification> remoteScheduledNotifications = new HashMap<>();
 
@@ -59,9 +59,19 @@ public class Day {
     boolean isSaved;
     //for when regime`s dayItems are set
     boolean isRegimeSet = false;
+    ArrayList<UUID> regimesSet;
+    boolean isRegimesSet(){
+        for(Regime regime : Regime.allRegimes.values()){
+            if(regime.isActive(start.getTime()) && !regimesSet.contains(regime)){
+                return false;
+            }
+        }
+        return true;
+    }
 
     Day(){};
 
+    //constructor for regimes
     Day(boolean isRegimeDay, int dayOfWeek){
         Calendar calendar = Calendar.getInstance();
         calendar.clear();
@@ -134,6 +144,7 @@ public class Day {
             calendar.setTimeInMillis(this.start.getTime());
             dayIndex = calendar.get(Calendar.YEAR) * 366 + calendar.get(Calendar.DAY_OF_YEAR);
         }
+
     }
 
     void addRegimeDays(Context context, Regime regime){
@@ -201,7 +212,6 @@ public class Day {
                 Log.v("regime_RMS_add_", "alarmTime2 : " + alarmTime);
                 alarmTime += startCalendar.get(Calendar.ZONE_OFFSET);
                 Log.v("set_RMS", "alarmTime3 : " + alarmTime + " timezone: " + Calendar.getInstance().get(Calendar.ZONE_OFFSET));
-                Log.v("regime_RMS_add_", "day : " + new SimpleDateFormat("HH:mm").format(new Date(alarmTime)));
 
                 if (alarmTime > nowMili) {
                     Log.v("regime_RMS_add_", "set.");

@@ -5,6 +5,9 @@ import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.UUID;
 
@@ -20,7 +23,6 @@ public class Regime {
     int index;
     UUID ID;
 
-    boolean isActive;
     boolean isSaved;
     boolean toDelete;       //when regime is removed it isn`t going to be saved
 
@@ -37,8 +39,26 @@ public class Regime {
     ArrayList<DayItem>[] dayItemsChange;
     @Exclude
     ArrayList<Integer>[] changeCodeList;
+    //scheduleItems hold the planned on/off states of the regime
+    class ScheduleItem{
 
-
+        //Regime IS applied on start day and end day
+        //if start is 0, it means until end
+        Date start;
+        //if end is 0, it means regime is active forever
+        Date end;
+        boolean isActive;
+        UUID ID;
+        ScheduleItem (Date start, Date end, boolean isActive){
+            ID = UUID.randomUUID();
+            this.start = start;
+            this.end = end;
+            this.isActive = isActive;
+        }
+    }
+    ArrayList<ScheduleItem> schedule;
+    @Exclude
+    ScheduleItem lastAdded;
 
     /*@Exclude
     ArrayList<DayItem> dayItemsAdd = new ArrayList<>();*/
@@ -54,7 +74,6 @@ public class Regime {
     private final static int CODE_ADD = 1;
     private final static int CODE_CHANGE = 2;
     private final static int CODE_REMOVE = 3;
-
     Regime (String[] dayNames){
         this.ID = UUID.randomUUID();
         this.dayNames = dayNames;
@@ -62,13 +81,18 @@ public class Regime {
         for(int i = 0; i < DEFAULT_DAYS_IN_WEEK; i++){
             this.days[i] = new Day(true, i);
         }
+        this.schedule = new ArrayList<>();
+        //default scheduleItem, on forever
+        this.schedule.add(new ScheduleItem(new Date(System.currentTimeMillis()), new Date(0), true));
+        Log.v("scheduleItem_debug", "" + schedule.toString());
+
         this.dayItemsChange = new ArrayList[DEFAULT_DAYS_IN_WEEK];
         this.changeCodeList = new ArrayList[DEFAULT_DAYS_IN_WEEK];
         for(int i = 0; i < DEFAULT_DAYS_IN_WEEK; i++){
             this.dayItemsChange[i] = new ArrayList<>();
             this.changeCodeList[i] = new ArrayList<>();
         }
-        this.isActive = false;
+        //this.isActive = false;
         this.toDelete = false;
     }
 
@@ -91,9 +115,24 @@ public class Regime {
         Log.v("regime_null", "added regime: " + Regime.allRegimes.toString());
     }
 
-    //there are by default 7 lists in a changes list for changes by day
+    //boolean isActive;
+    boolean isActive(long date){
+        //checks schedule
+        //default is false, gets the forever item of schedule
+        boolean foreverStatus = false;
+        for(ScheduleItem scheduleItem : schedule){
+            if(date >= scheduleItem.start.getTime() && date <= scheduleItem.end.getTime()){
+                return scheduleItem.isActive;
+            } else if(scheduleItem.end.getTime() == 0){
+                foreverStatus = scheduleItem.isActive;
+            }
+        }
+        return foreverStatus;
+    }
 
+    //there are by default 7 lists in a changes list for changes by day
     //adds an add request
+
     void addDayItem(DayItem dayItem, int dayOfWeek){
         int index;
         if((index = dayItemsChange[dayOfWeek].indexOf(dayItem)) >= 0){
@@ -103,8 +142,8 @@ public class Regime {
             changeCodeList[dayOfWeek].add(CODE_ADD);
         }
     }
-
     //adds a change request
+
     void changeDayItem(DayItem dayItem, int dayOfWeek){
         int index;
         if((index = dayItemsChange[dayOfWeek].indexOf(dayItem)) >= 0){
@@ -114,8 +153,8 @@ public class Regime {
             changeCodeList[dayOfWeek].add(CODE_CHANGE);
         }
     }
-
     //removes add request if there is one, and adds a remove request
+
     void removeDayItem(DayItem dayItem, int dayOfWeek){
         int index;
         if((index = dayItemsChange[dayOfWeek].indexOf(dayItem)) >= 0){
@@ -135,11 +174,15 @@ public class Regime {
         if(appliedDays == null){
             appliedDays = new HashMap<>();
         }
+        if(schedule == null){
+            schedule = new ArrayList<>();
+            schedule.add(new ScheduleItem(new Date(System.currentTimeMillis()), new Date(0), true));
+        }
     }
-
     //TODO multi-thread
+
     void refreshDays(Context context){
-        Log.v("set_RMS_pre", "first day: " + (appliedDays.values().size() > 0 ? ((Day)appliedDays.values().toArray()[0]).dayIndex : "null"));
+        //Log.v("set_RMS_pre", "first day: " + (appliedDays.values().size() > 0 ? ((Day)appliedDays.values().toArray()[0]).dayIndex : "null"));
         Calendar calendar = Calendar.getInstance();
         calendar.setFirstDayOfWeek(Calendar.MONDAY);
         for(Day day : appliedDays.values()){
@@ -212,15 +255,42 @@ public class Regime {
         }
     }
 
+    void refreshRegimesDays(Context context, ScheduleItem scheduleItem){
+        for(Day day : appliedDays.values()){
+            if(day.start.getTime() >= scheduleItem.start.getTime() && day.start.getTime() <= scheduleItem.end.getTime()){
+                //simple scheduleItem
+                refreshRegimeDaysRefresh(context, day, scheduleItem);
+            } else if(scheduleItem.end.getTime() == 0) {
+                //if default status is changed
+                boolean isPlanned = false;
+                //check if day is in the schedule
+                for(ScheduleItem scheduleItemI : schedule){
+                    if(day.start.getTime() >= scheduleItemI.start.getTime() && day.start.getTime() <= scheduleItemI.end.getTime()){
+                        isPlanned = true;
+                    }
+                }
+                //if it isn't then it falls under the default status, apply
+                if(!isPlanned){
+                    refreshRegimeDaysRefresh(context, day, scheduleItem);
+                }
+            }
+        }
+    }
+    void refreshRegimeDaysRefresh(Context context, Day day, ScheduleItem scheduleItem){
+        if(scheduleItem.isActive && !day.setRegimes.contains(ID)){
+            day.addRegimeDays(context, this);
+        } else if(!scheduleItem.isActive && day.setRegimes.contains(ID)) {
+            removeRegimeItems(context, day);
+            day.setRegimes.remove(ID);
+        }
+    }
+
     //checks all active regimes to add all dayItems from regime
     static void setAllActiveRegimesDays(Context context, Day day){
-        Log.v("regime_null", "setAllActiveRegimesDays");
         for (Regime regime : Regime.allRegimes.values()) {
-            Log.v("regime_null", "regime.isActive: " + regime.isActive);
-            //TODO calculate if its on schedule here
-            if(regime.isActive && (day.setRegimes.get(regime.ID) == null)) {
+            if(regime.isActive(day.start.getTime()) && !day.setRegimes.contains(regime.ID)) {
                 day.addRegimeDays(context, regime);
-                day.setRegimes.put(regime.ID, regime);
+                day.setRegimes.add(regime.ID);
                 regime.appliedDays.put(day.dayIndex, day);
             }
         }
@@ -229,8 +299,9 @@ public class Regime {
     static void removeRegimeDays(Context context, Day day){
         //TODO optimize
         for (Regime regime : Regime.allRegimes.values()) {
-            if(!regime.isSaved || !regime.isActive){
+            if(!regime.isSaved || !regime.isActive(day.start.getTime())){
                 removeRegimeItems(context, day);
+                day.setRegimes.remove(regime.ID);
             }
         }
     }
@@ -251,6 +322,181 @@ public class Regime {
         for (TodoItem todoItem : day.regimeTodoItems.values()) {
             day.todoItems.remove(todoItem.ID);
             day.regimeTodoItems.remove(todoItem.ID);
+        }
+    }
+
+    ScheduleItem addScheduleItem(Date start, Date end, boolean isActive){
+        ScheduleItem newScheduleItem = new ScheduleItem(start, end, isActive);
+        schedule.add(newScheduleItem);
+        defaultTimeSortSchedule(schedule);
+        lastAdded = newScheduleItem;
+        return newScheduleItem;
+    }
+
+    static ArrayList<ScheduleItem> defaultTimeSortSchedule(ArrayList<ScheduleItem> schedule){
+        Collections.sort(schedule, new Comparator<ScheduleItem>() {
+            @Override
+            public int compare(ScheduleItem item1, ScheduleItem item2) {
+                return Long.compare(item1.start.getTime(), item2.start.getTime());
+            }
+        });
+        return schedule;
+    }
+
+    ArrayList<ScheduleItem> checkOverlap(long start, long end){
+        //returns list with scheduleItems whose end time conflict
+        ArrayList<ScheduleItem> outSchedule = new ArrayList<>();
+        ScheduleItem lastItem = null;
+        Log.v("scheduleItem_debug_chck", "schedule_size: " + schedule.size());
+        for(ScheduleItem scheduleItem : schedule){
+            if(lastItem == null){
+                lastItem = scheduleItem;
+                continue;
+            }
+            Log.v("scheduleItem_debug_chck", "" + lastItem.end.getTime() + " " + scheduleItem.start.getTime());
+            //check for conflict
+            if(lastItem.end.getTime() > scheduleItem.start.getTime()){
+                outSchedule.add(lastItem);
+            }
+            lastItem = scheduleItem;
+        }
+        if(outSchedule.size() == 0){
+            return null;
+        } else {
+            return outSchedule;
+        }
+    }
+    boolean checkOverlapL(long start, long end){
+        ScheduleItem lastItem = null;
+        for(Regime.ScheduleItem scheduleItem : schedule){
+            if(lastItem == null){
+                if(scheduleItem.start.getTime() < start) {
+                    lastItem = scheduleItem;
+                    continue;
+                }
+                lastItem = scheduleItem;
+                continue;
+            }
+            if(start > lastItem.start.getTime() && start < scheduleItem.start.getTime() && end > scheduleItem.start.getTime()){
+                return true;
+            }
+            if(start > scheduleItem.start.getTime() && start <= scheduleItem.end.getTime()){
+                return true;
+            }
+            lastItem = scheduleItem;
+        }
+        return false;
+    }
+    boolean checkOverlapSI(ScheduleItem scheduleItemIn){
+        ScheduleItem lastItem = null;
+        for(Regime.ScheduleItem scheduleItem : schedule){
+            if(lastItem == null){
+                if(scheduleItem.start.getTime() < scheduleItemIn.start.getTime()) {
+                    lastItem = scheduleItem;
+                    continue;
+                }
+                lastItem = scheduleItem;
+                continue;
+            }
+            if(scheduleItem == scheduleItemIn){
+                lastItem = scheduleItem;
+                continue;
+            }
+            if(scheduleItemIn.start.getTime() > lastItem.start.getTime() && scheduleItemIn.start.getTime() < scheduleItem.start.getTime() && scheduleItemIn.end.getTime() > scheduleItem.start.getTime()){
+                return true;
+            }
+            if(scheduleItemIn.start.getTime() > scheduleItem.start.getTime() && scheduleItemIn.start.getTime() <= scheduleItem.end.getTime()){
+                return true;
+            }
+            lastItem = scheduleItem;
+        }
+        return false;
+    }
+    void resolveConflicts(){
+        if(lastAdded == null){
+            return;
+        }
+        //TODO ohno
+        ScheduleItem lastItem = null;
+        ScheduleItem lastAddedLocal = lastAdded;
+        ArrayList<ScheduleItem> scheduleLocal = (ArrayList<ScheduleItem>) schedule.clone();
+        for(ScheduleItem scheduleItem : scheduleLocal){
+            if(lastItem == null){
+                lastItem = scheduleItem;
+                continue;
+            }
+            //if(scheduleItem == lastAdded) continue;
+            /*if(lastAddedLocal.start.getTime() >= scheduleItem.start.getTime() &&
+                    (lastAddedLocal.end.getTime() <= scheduleItem.end.getTime() || scheduleItem.end.getTime() == 0)){
+                //handles new scheduleItem in the middle of existing scheduleItem
+                if(scheduleItem.start.before(lastAddedLocal.start)){
+                    //make new scheduleItem and cut the later one down to size
+                    addScheduleItem(scheduleItem.start, lastAddedLocal.start, scheduleItem.isActive);
+                    scheduleItem.start = lastAddedLocal.end;
+                } else if(scheduleItem.start.equals(lastAddedLocal.start)){
+                    scheduleItem.start = lastAddedLocal.end;
+                } else if(scheduleItem.end.equals(lastAddedLocal.end) && !scheduleItem.start.equals(lastAddedLocal.start)){
+
+                }
+            }*/
+/*
+            if(lastAddedLocal.start.getTime() >= scheduleItem.start.getTime() &&
+                    (lastAddedLocal.end.getTime() <= scheduleItem.end.getTime() || scheduleItem.end.getTime() == 0)){
+                if(lastAddedLocal.start.getTime() == scheduleItem.start.getTime()){
+                    if(lastAddedLocal.end.getTime() < scheduleItem.end.getTime()){
+                        //see 1.1
+                        scheduleItem.start = (Date) lastAddedLocal.end.clone();
+                    } else if(lastAddedLocal.end.getTime() >= scheduleItem.end.getTime()){
+                        //TODO figure out how to remove from schedule multiple times
+                        //schedule.remove(scheduleLocal.indexOf(scheduleItem));
+                        //see 1.2, 1.3
+                    }
+                } else if(lastAddedLocal.start.getTime() < scheduleItem.start.getTime()){
+                    if(lastAddedLocal.end.getTime() < scheduleItem.end.getTime()){
+                        //see 2.1
+                        scheduleItem.start = (Date) lastAddedLocal.end.clone();
+                    } else if(lastAddedLocal.end.getTime() == scheduleItem.end.getTime()){
+                        //see 2.2
+                    }
+                }
+            }*/
+
+            if(lastItem.end.getTime() >= scheduleItem.start.getTime()){
+                Log.v("schedule_overlap_corr", "overlap");
+                if(lastItem.isActive == scheduleItem.isActive){
+                    //merge
+                    scheduleItem.start.setTime(lastItem.start.getTime());
+                    schedule.remove(lastItem);
+                    continue;
+                }
+                Log.v("schedule_overlap_corr", "start_cut");
+                if(lastItem.end.getTime() >= scheduleItem.end.getTime()){
+                    //remove this
+                    schedule.remove(scheduleItem);
+                    Log.v("schedule_overlap_corr", "remove");
+                } else if(lastItem.end.getTime() == scheduleItem.start.getTime()) {
+                    //if only one day is the overlap than add a day
+                    scheduleItem.start.setTime(scheduleItem.start.getTime() + (24 * 60 * 60 * 1000));
+                    lastItem = scheduleItem;
+                    Log.v("schedule_overlap_corr", "start_plus_day");
+                } else {
+                    scheduleItem.start.setTime(lastItem.end.getTime() + (24 * 60 * 60 * 1000));
+                    lastItem = scheduleItem;
+                }
+            } else if (lastItem.start.getTime() == scheduleItem.start.getTime()){
+                Log.v("schedule_overlap_corr", "same_start");
+                if(lastItem.end.getTime() > scheduleItem.end.getTime()){
+                    lastItem.start.setTime(scheduleItem.end.getTime() + (24 * 60 * 60 * 1000));
+                } else if(lastItem.end.getTime() == scheduleItem.end.getTime()){
+                    schedule.remove(scheduleItem);
+                } else {
+                    scheduleItem.start.setTime(lastItem.end.getTime() + (24 * 60 * 60 * 1000));
+                }
+                lastItem = scheduleItem;
+            } else {
+                Log.v("schedule_overlap_corr", "no_correction");
+                lastItem = scheduleItem;
+            }
         }
     }
 }

@@ -18,16 +18,25 @@
             android:layout_height="wrap_content"
             android:id="@+id/regimeItemName"
             android:textSize="20sp"/>
+        <ImageButton
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:id="@+id/regimeItemScheduleEdit"
+            android:background="@drawable/ic_baseline_playlist_edit_24"
+            android:layout_marginTop="15dp"
+            android:foreground="?android:attr/selectableItemBackground"/>
     </LinearLayout>
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:layout_gravity="end"
+        android:padding="10dp">
         <com.google.android.material.switchmaterial.SwitchMaterial
             android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_gravity="end"
-            android:id="@+id/regimeItemActive"/>
+            android:layout_height="wrap_content"
+            android:layout_gravity="end|top"
+            android:id="@+id/regimeItemActive" />
     </LinearLayout>
 
 

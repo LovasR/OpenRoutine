@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout android:layout_width="match_parent"
+<LinearLayout
+    android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
     xmlns:android="http://schemas.android.com/apk/res/android">
@@ -27,6 +28,37 @@
             android:layout_height="wrap_content"
             android:id="@+id/addRegimeEditName"/>
     </com.google.android.material.textfield.TextInputLayout>
+
+
+    <View
+        android:layout_width="wrap_content"
+        android:layout_height="2dp"
+        android:background="@android:color/darker_gray"
+        android:layout_marginTop="10dp"
+        android:layout_marginHorizontal="6dp"/>
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/regime_dialog_schedule"
+        android:textSize="28sp"
+        android:layout_margin="10dp"
+        android:textStyle="bold"/>
+
+    <ImageButton
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/addScheduleItem"
+        android:background="@drawable/spinner_background"
+        android:src="@drawable/ic_baseline_add_24"
+        android:padding="5dp"
+        android:layout_margin="5dp"/>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/add_regime_dialog_schedule_list"
+        android:layout_marginHorizontal="10dp"
+        android:layout_marginTop="10dp"/>
 
     <Button
         android:layout_width="wrap_content"

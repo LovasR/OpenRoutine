@@ -24,6 +24,7 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Locale;
 import java.util.TimeZone;
+import java.util.UUID;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -104,7 +105,7 @@ public class MainActivity extends AppCompatActivity {
                         startActivity(intent2);
                         break;
                     case R.id.main_menu_3:
-                        fragment3.regimeDialog();
+                        fragment3.regimeDialog(null);
                         /*Intent intent3 = new Intent(MainActivity.this, RegimeActivity.class);
                         intent3.putExtra("regimeIndex", -1);
                         startActivity(intent3);*/
@@ -159,6 +160,21 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        //if launched from notification check intent
+        if(getIntent().getExtras() != null){
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    final Bundle extras = getIntent().getExtras();
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            fragment1.highlightDayItem(extras.getLong("dayItemStart"), UUID.fromString(extras.getString("dayItemID")));
+                        }
+                    });
+                }
+            }).start();
+        }
     }
 
     void registerDAyItemActivity(){

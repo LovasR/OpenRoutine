@@ -16,7 +16,9 @@ import androidx.viewpager2.widget.ViewPager2;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.Locale;
+import java.util.UUID;
 
 public class MainFragment1 extends Fragment {
 
@@ -212,10 +214,18 @@ public class MainFragment1 extends Fragment {
         }
         dayFragments[index].fragmentIndex = newIndex;
         dayFragments[index].fragmentDay.nullCheck();
-        if(!dayFragments[index].fragmentDay.isRegimeSet){
-            Regime.setAllActiveRegimesDays(getContext(), dayFragments[index].fragmentDay);
-        }
+        Regime.setAllActiveRegimesDays(getContext(), dayFragments[index].fragmentDay);
+
         //dayFragments[index].fragmentIndex = dayFragments[index].fragmentDay.dayIndex;
+    }
+
+    void highlightDayItem(long dayItemStart, UUID dayItemID){
+        Day day = Day.getDay(getContext(), new Date(dayItemStart));
+        fragmentIndex = day.dayIndex;
+        refreshAllFragments(getContext(), SCROLL_FORWARD);
+        DayItem dayItem = day.dayItems.get(dayItemID);
+        Log.v("highlight", dayItem.ID.toString());
+        //TODO highlight dayItem
     }
 
     static DayFragment getFragment(int index){

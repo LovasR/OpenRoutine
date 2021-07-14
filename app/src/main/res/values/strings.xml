@@ -160,7 +160,22 @@
 
     <string name="regime_dialog_title">Set-up routine</string>
 
+    <string name="regime_dialog_schedule">Schedule</string>
+
     <string name="regime_name_hint">Name the routine</string>
+
+    <string name="regime_dialog_schedule_on">On</string>
+    <string name="regime_dialog_schedule_off">Off</string>
+    <string name="regime_dialog_schedule_default">by default</string>
+    <string name="regime_dialog_schedule_from">from:</string>
+    <string name="regime_dialog_schedule_to">to:</string>
+    <string name="regime_dialog_schedule_forever">forever</string>
+
+    <string name="schedule_item_dialog_title">Add to schedule</string>
+    <string name="schedule_item_dialog_range">Range:</string>
+    <string name="schedule_item_dialog_status">Status:</string>
+
+    <string name="schedule_item_dialog_overlap_warning">Warning: schedule overlaps</string>
 
     <!--Activity strings-->
     <string name="activity_title">Activities</string>

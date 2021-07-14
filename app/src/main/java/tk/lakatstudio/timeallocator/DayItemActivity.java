@@ -513,11 +513,11 @@ public class DayItemActivity extends FragmentActivity {
 
                         boolean isToday = ((dayIndex == Calendar.SUNDAY ? 6 : dayIndex - 2) == regimeDayIndex);
 
-                        Log.v("notificationSet_r", "(add) booleans: " + isToday + " " + regime.isActive + ";" + (dayIndex == Calendar.SUNDAY ? 6 : dayIndex - 2) + " " + regimeDayIndex);
+                        Log.v("notificationSet_r", "(add) booleans: " + isToday + " " + regime.isActive(focusedDay.start.getTime()) + ";" + (dayIndex == Calendar.SUNDAY ? 6 : dayIndex - 2) + " " + regimeDayIndex);
 
                         //checks if the day edited in this activity is today
                         //TODO replace regime.isActive with isActive check after schedule is implemented
-                        if(isToday && regime.isActive){
+                        if(isToday && regime.isActive(focusedDay.start.getTime())){
                             Log.v("notificationSet_r", "set alarm ");
                             notificationSetAlarm(context, notificationIntent, am, dayItem, timeOffset);
                         }
@@ -666,11 +666,11 @@ public class DayItemActivity extends FragmentActivity {
 
                     boolean isToday = (dayIndex == MainFragment1.todayIndex);
 
-                    Log.v("notificationSet_r", "(remove) booleans: " + isToday + " " + regime.isActive);
+                    Log.v("notificationSet_r", "(remove) booleans: " + isToday + " " + regime.isActive(focusedDay.start.getTime()));
 
                     //checks if the day edited in this activity is today
                     //TODO replace regime.isActive with isActive check after schedule is implemented
-                    if(isToday && regime.isActive){
+                    if(isToday && regime.isActive(focusedDay.start.getTime())){
                         DayInit.cancelAlarm(context, notificationTime.requestID);
                     }
                 }
@@ -686,7 +686,7 @@ public class DayItemActivity extends FragmentActivity {
         //re-sets notification time by first canceling and then setting with the appropriate information
         if(focusedDay.dayIndex == MainFragment1.todayIndex && dayItem != null && !isRMS){
             resetNotificationIntent(notificationTime);
-        } else if (regime != null && dayItem != null && regime.isActive){
+        } else if (regime != null && dayItem != null && regime.isActive(focusedDay.start.getTime())){
             Calendar calendar = Calendar.getInstance();
             int dayOfWeekToday = calendar.get(Calendar.DAY_OF_WEEK);
             calendar.setTimeInMillis(focusedDay.start.getTime());
@@ -984,11 +984,6 @@ class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapter.ViewH
         this.context = context;
         this.dayItemLength = dayItemLength;
         //this.dayItemStart = dayItemStart;
-    }
-
-    void refreshContents(ArrayList<Integer> newDayItems){
-        //dayItemLength = newDayItems;
-        notifyDataSetChanged();
     }
 
     String offsetFormat(int offset){
