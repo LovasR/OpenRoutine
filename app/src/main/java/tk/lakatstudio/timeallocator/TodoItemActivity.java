@@ -205,7 +205,6 @@ public class TodoItemActivity extends FragmentActivity {
             @Override
             public void onClick(View view) {
                 String name = itemName.getText().toString();
-                Log.v("debug_", name.length() + " ");
                 if(name.length() != 0) {
                     if(todoItem != null){
                         todoItem.name = name;

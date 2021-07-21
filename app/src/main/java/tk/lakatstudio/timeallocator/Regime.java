@@ -83,7 +83,7 @@ public class Regime {
         }
         this.schedule = new ArrayList<>();
         //default scheduleItem, on forever
-        this.schedule.add(new ScheduleItem(new Date(System.currentTimeMillis()), new Date(0), true));
+        this.schedule.add(new ScheduleItem(new Date(0), new Date(0), true));
         Log.v("scheduleItem_debug", "" + schedule.toString());
 
         this.dayItemsChange = new ArrayList[DEFAULT_DAYS_IN_WEEK];

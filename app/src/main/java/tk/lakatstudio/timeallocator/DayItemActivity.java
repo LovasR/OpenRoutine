@@ -751,6 +751,7 @@ public class DayItemActivity extends FragmentActivity {
             spinner2 = dialogView.findViewById(R.id.addNotificationRelativeSpinner);
         }
 
+
         final Spinner relativeSpinner = spinner1;
         final Spinner relativeSpinnerPre = spinner2;
 

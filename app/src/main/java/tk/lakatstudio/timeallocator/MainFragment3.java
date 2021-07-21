@@ -208,9 +208,13 @@ public class MainFragment3 extends Fragment {
                 };
 
                 AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-                builder.setMessage(getString(R.string.remove_activity,
-                        getString(R.string.day_item_singular))).setPositiveButton(getString(R.string.yes),
-                        dialogClickListener).setNegativeButton(getString(R.string.no), dialogClickListener).show();
+                if(scheduleAdapter.getItem(position).end.getTime() == 0){
+                    builder.setMessage(R.string.schedule_item_default_info).show();
+                } else {
+                    builder.setMessage(getString(R.string.remove_activity,
+                            getString(R.string.day_item_singular))).setPositiveButton(getString(R.string.yes),
+                            dialogClickListener).setNegativeButton(getString(R.string.no), dialogClickListener).show();
+                }
             }
         });
 

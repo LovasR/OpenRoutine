@@ -166,7 +166,7 @@
 
     <string name="regime_dialog_schedule_on">On</string>
     <string name="regime_dialog_schedule_off">Off</string>
-    <string name="regime_dialog_schedule_default">by default</string>
+    <string name="regime_dialog_schedule_default">by <b>default</b></string>
     <string name="regime_dialog_schedule_from">from:</string>
     <string name="regime_dialog_schedule_to">to:</string>
     <string name="regime_dialog_schedule_forever">forever</string>
@@ -176,6 +176,8 @@
     <string name="schedule_item_dialog_status">Status:</string>
 
     <string name="schedule_item_dialog_overlap_warning">Warning: schedule overlaps</string>
+
+    <string name="schedule_item_default_info">You can\'t remove this item</string>
 
     <!--Activity strings-->
     <string name="activity_title">Activities</string>

@@ -57,13 +57,14 @@ public class RegimeDayFragment extends DayFragment {
         fragmentDay = regime.days[fragmentIndex];
 
 
-        dayPlanner.setLayoutManager(new LinearLayoutManager(getContext()));
+        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext());
+        dayPlanner.setLayoutManager(layoutManager);
         DividerItemDecoration itemDecor = new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL);
         itemDecor.setDrawable(getResources().getDrawable(R.drawable.divider_nothing));
         dayPlanner.addItemDecoration(itemDecor);
         final HashMap<UUID, DayItem> dayItems = fragmentDay.dayItems;
 
-        adapter = new DayItemAdapter(getContext(), dayItems.values(), this);
+        adapter = new DayItemAdapter(getContext(), dayItems.values(), this, layoutManager);
         adapter.setClickListener(new DayItemAdapter.ItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {

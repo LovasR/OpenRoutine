@@ -121,7 +121,8 @@ public class MainFragment2 extends Fragment {
             noTodoText.setVisibility(View.GONE);
             todoList.setVisibility(View.VISIBLE);
         }
-        final ArrayAdapter<TodoItem> arrayAdapter = new ArrayAdapter<TodoItem>(fragment.getContext(), R.layout.todo_item, new ArrayList<>(day.todoItems.values())) {
+        final ArrayList<TodoItem> todoItems = new ArrayList<>(day.todoItems.values());
+        final ArrayAdapter<TodoItem> arrayAdapter = new ArrayAdapter<TodoItem>(fragment.getContext(), R.layout.todo_item, todoItems) {
             @NonNull
             @Override
             public View getView(final int position, @Nullable View convertView, @NonNull ViewGroup parent) {
@@ -129,6 +130,7 @@ public class MainFragment2 extends Fragment {
                     convertView = getLayoutInflater().inflate(R.layout.todo_item, null);
                 }
 
+                Log.v("todo_debug", getItem(position).ID.toString());
                 final TodoItem todo = day.todoItems.get(getItem(position).ID);
 
                 TextView itemName = convertView.findViewById(R.id.todoItem);
@@ -162,15 +164,14 @@ public class MainFragment2 extends Fragment {
                 convertView.setOnLongClickListener(new View.OnLongClickListener() {
                     @Override
                     public boolean onLongClick(View view) {
-                        //TodoItem.removeItem(todo);
-                        //day.removeTodoItem(todo);
-
                         DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 switch (which){
                                     case DialogInterface.BUTTON_POSITIVE:
                                         day.removeTodoItem(todo);
+                                        todoItems.remove(todo);
+                                        Log.v("todo_debug", "" + todoItems.size());
                                         notifyDataSetChanged();
                                         break;
                                     case DialogInterface.BUTTON_NEGATIVE:
@@ -195,6 +196,7 @@ public class MainFragment2 extends Fragment {
                         Log.v("__debug", "check clicked");
                         TodoItem.removeItem(todo);
                         day.removeTodoItem(todo);
+                        todoItems.remove(todo);
                         notifyDataSetChanged();
                     }
                 });

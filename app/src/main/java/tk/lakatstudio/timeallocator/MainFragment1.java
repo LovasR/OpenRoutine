@@ -226,6 +226,7 @@ public class MainFragment1 extends Fragment {
         DayItem dayItem = day.dayItems.get(dayItemID);
         Log.v("highlight", dayItem.ID.toString());
         //TODO highlight dayItem
+        dayFragments[1].highlightDayItem(dayItem);
     }
 
     static DayFragment getFragment(int index){

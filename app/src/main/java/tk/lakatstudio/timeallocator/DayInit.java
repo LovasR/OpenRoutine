@@ -275,28 +275,22 @@ public class DayInit {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                String outJson = "";
+                StringBuilder outJson = new StringBuilder();
+                int lastID = -1;
                 for(int i = 0; i < ActivityType.allActivityTypes.size(); i++){
                     ActivityType activityType = ActivityType.allActivityTypes.get(i);
                     Log.v("save_debug", "test");
-                    //if(!activityType.isSaved){
+                    if(activityType.ID > lastID){
                         activityType.isSaved = true;
-                        outJson += gson.toJson(activityType);
-                        outJson += "\n";
+                        outJson.append(gson.toJson(activityType));
+                        outJson.append("\n");
                         Log.v("save_debug", "save activity");
-                    /*} else{
-                        Log.v("save_debug", "no save activity "/* + ActivityType.allActivityTypes.get(2).isSaved);
-                    }*/
-                }
-                Log.v("Out_Json activities", outJson);
-                if(outJson.length() > 0){
-                    writeToFile(context, outJson, "activities");
-                }
-                ArrayList<String> testRead = readFromFile(context, "activities");
-                if(testRead != null) {
-                    for (int i = 0; i < testRead.size(); i++) {
-                        Log.e("testreads", testRead.get(i));
+                        lastID = activityType.ID;
                     }
+                }
+                Log.v("Out_Json activities", outJson.toString());
+                if(outJson.length() > 0){
+                    writeToFile(context, outJson.toString(), "activities");
                 }
             }
         }).start();
@@ -394,7 +388,7 @@ public class DayInit {
 
     static ArrayList<String> readFromFile(Context context, String fileName){
         if(context == null)
-            Log.v("context_null", "2 YIL");
+            Log.v("save_debug_load", "context_null");
         File dir = new File(context.getFilesDir(), "saves");
         if(!dir.exists()){
             Log.v("save_debug_load", "directory !exist");

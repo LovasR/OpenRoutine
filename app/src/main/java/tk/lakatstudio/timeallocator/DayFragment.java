@@ -111,14 +111,14 @@ public class DayFragment extends Fragment {
         });
 
 
-
-        rDayPlanner.setLayoutManager(new LinearLayoutManager(getContext()));
+        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext());
+        rDayPlanner.setLayoutManager(layoutManager);
         DividerItemDecoration itemDecor = new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL);
         itemDecor.setDrawable(getResources().getDrawable(R.drawable.divider_nothing));
-        rDayPlanner.addItemDecoration(itemDecor);
+        //rDayPlanner.addItemDecoration(itemDecor);
 
         if(fragmentDay == null){
-            adapter = new DayItemAdapter(getContext(), new ArrayList<DayItem>(), this);
+            adapter = new DayItemAdapter(getContext(), new ArrayList<DayItem>(), this, layoutManager);
             new Thread(new Runnable() {
                 @Override
                 public void run() {
@@ -134,7 +134,7 @@ public class DayFragment extends Fragment {
                 }
             });
         } else {
-            adapter = new DayItemAdapter(getContext(), fragmentDay.dayItems.values(), this);
+            adapter = new DayItemAdapter(getContext(), fragmentDay.dayItems.values(), this, layoutManager);
         }
 
         adapter.setClickListener(new DayItemAdapter.ItemClickListener() {
@@ -242,6 +242,27 @@ public class DayFragment extends Fragment {
             out += minutes + " " + getString(R.string.minute_short);
         }
         return out;
+    }
+
+    void highlightDayItem(final DayItem dayItem){
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                while (adapter == null) {
+                    try {
+                        Thread.sleep(100);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+                getActivity().runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        adapter.highlightItem(dayItem);
+                    }
+                });
+            }
+        }).start();
     }
 
     /*void refreshDayPlanner(Arr){

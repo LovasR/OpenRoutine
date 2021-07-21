@@ -3,10 +3,14 @@ package tk.lakatstudio.timeallocator;
 import android.content.Context;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
+import android.graphics.drawable.TransitionDrawable;
+import android.os.Handler;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -21,6 +25,8 @@ import java.util.Locale;
 public class DayItemAdapter extends RecyclerView.Adapter<DayItemAdapter.ViewHolder> {
 
     ArrayList<DayItem> dayItems;
+
+    RecyclerView.LayoutManager layoutManager;
     LayoutInflater inflater;
     ItemClickListener clickListener;
     ItemLongClickListener longClickListener;
@@ -28,7 +34,7 @@ public class DayItemAdapter extends RecyclerView.Adapter<DayItemAdapter.ViewHold
 
     DayFragment dayFragment;
 
-    DayItemAdapter(Context context, Collection<DayItem> dayItems, DayFragment dayFragment) {
+    DayItemAdapter(Context context, Collection<DayItem> dayItems, DayFragment dayFragment, RecyclerView.LayoutManager layoutManager) {
         this.inflater = LayoutInflater.from(context);
 
         this.dayItems = new ArrayList<>();
@@ -38,6 +44,7 @@ public class DayItemAdapter extends RecyclerView.Adapter<DayItemAdapter.ViewHold
         Log.v("recyclerView_test", dayItems.size() + "");
         this.context = context;
         this.dayFragment = dayFragment;
+        this.layoutManager = layoutManager;
     }
 
     void refreshContents(Collection<DayItem> newDayItems){
@@ -47,9 +54,20 @@ public class DayItemAdapter extends RecyclerView.Adapter<DayItemAdapter.ViewHold
         notifyDataSetChanged();
     }
 
-    void removedDayItem(int position){
-        dayItems.remove(position);
-        notifyItemRemoved(position);
+    void removedDayItem(final int position){
+        Animation animation = AnimationUtils.loadAnimation(context, android.R.anim.slide_out_right);
+        animation.setDuration(300);
+        final View itemView = layoutManager.findViewByPosition(position);
+        itemView.startAnimation(animation);
+
+        new Handler().postDelayed(new Runnable() {
+            public void run() {
+                itemView.setVisibility(View.INVISIBLE);
+                dayItems.remove(position);
+                notifyItemRemoved(position);
+            }
+
+        }, animation.getDuration() - 100);
     }
 
     @NonNull
@@ -91,6 +109,31 @@ public class DayItemAdapter extends RecyclerView.Adapter<DayItemAdapter.ViewHold
         return dayItems.size();
     }
 
+    public void highlightItem(DayItem dayItem){
+        //TODO make work
+        int position = dayItems.indexOf(dayItem);
+        if(position >= 0) {
+            View rootView = layoutManager.findViewByPosition(position);
+            final TransitionDrawable transitionDrawable = (TransitionDrawable) context.getDrawable(R.drawable.highlight_transition);
+            rootView.setBackground(transitionDrawable);
+            highlightLoop(transitionDrawable);
+        }
+    }
+    void highlightLoop(final TransitionDrawable transitionDrawable){
+
+        transitionDrawable.resetTransition();
+        for(int i = 0; i < 3; i++) {
+            Handler handler = new Handler();
+            handler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    transitionDrawable.startTransition(500);
+                    transitionDrawable.reverseTransition(500);
+                }
+            }, 1000 * i);
+        }
+    }
+
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener {
 
         ViewHolder(View itemView) {
@@ -118,6 +161,7 @@ public class DayItemAdapter extends RecyclerView.Adapter<DayItemAdapter.ViewHold
     public DayItem getItem(int position) {
         return dayItems.get(position);
     }
+
     // allows clicks events to be caught
     void setClickListener(ItemClickListener itemClickListener) {
         this.clickListener = itemClickListener;

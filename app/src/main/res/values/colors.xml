@@ -12,6 +12,7 @@
 
     <color name="color_error">#FF0000</color>
     <color name="color_warning">#DDCC11</color>
+    <color name="color_highlight">#3cace6</color>
 
     <color name="color_box_default">#D1D1D1</color>
 
