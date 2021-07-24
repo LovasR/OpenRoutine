@@ -44,10 +44,7 @@ public class RegimeDayFragment extends DayFragment {
         //fragmentIndex = getArguments().getInt("test", -1);
         Log.e("UI_test", "oncreateview fragment " + fragmentIndex);
 
-        /*int regimeIndex = getArguments().getInt("regimeIndex", -1);
-        if(regimeIndex != -1){
-            regime = Regime.allRegimes.get(regimeIndex);
-        }*/
+        noDayItemText = view.findViewById(R.id.dayNoItems);
 
         daySelect = view.findViewById(R.id.daySelect);
         daySelect.setVisibility(View.GONE);
@@ -91,7 +88,7 @@ public class RegimeDayFragment extends DayFragment {
                                 calendar.setTimeInMillis(fragmentDay.start.getTime());
                                 Log.v("regime_refresh", "original size: " + fragmentDay.dayItems.size());
                                 regime.removeDayItem(adapter.getItem(position), (calendar.get(Calendar.DAY_OF_WEEK) == Calendar.SUNDAY ? 6 : calendar.get(Calendar.DAY_OF_WEEK) - 2));
-                                adapter.removedDayItem(position);
+                                adapter.removedDayItem(position, noDayItemText, rDayPlanner);
                                 Log.v("regime_refresh", "original size: " + fragmentDay.dayItems.size() + " " + fragmentDay.dayItems.toString());
                                 break;
                             case DialogInterface.BUTTON_NEGATIVE:
@@ -126,11 +123,11 @@ public class RegimeDayFragment extends DayFragment {
         if(fragmentDay.dayItems.size() == 0){
             Log.v("fragment_preload", fragmentIndex + " b ");
             dayPlanner.setVisibility(View.GONE);
-            //noDayItemText.setVisibility(View.VISIBLE);
+            noDayItemText.setVisibility(View.VISIBLE);
             return;
         } else {
             dayPlanner.setVisibility(View.VISIBLE);
-            //noDayItemText.setVisibility(View.GONE);
+            noDayItemText.setVisibility(View.GONE);
         }
 
         adapter.refreshContents(fragmentDay.dayItems.values());

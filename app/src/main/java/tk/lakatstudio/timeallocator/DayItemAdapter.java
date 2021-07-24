@@ -54,7 +54,7 @@ public class DayItemAdapter extends RecyclerView.Adapter<DayItemAdapter.ViewHold
         notifyDataSetChanged();
     }
 
-    void removedDayItem(final int position){
+    void removedDayItem(final int position, final TextView replacementText, final RecyclerView recyclerView){
         Animation animation = AnimationUtils.loadAnimation(context, android.R.anim.slide_out_right);
         animation.setDuration(300);
         final View itemView = layoutManager.findViewByPosition(position);
@@ -65,8 +65,11 @@ public class DayItemAdapter extends RecyclerView.Adapter<DayItemAdapter.ViewHold
                 itemView.setVisibility(View.INVISIBLE);
                 dayItems.remove(position);
                 notifyItemRemoved(position);
+                if(dayItems.size() == 0){
+                    recyclerView.setVisibility(View.GONE);
+                    replacementText.setVisibility(View.VISIBLE);
+                }
             }
-
         }, animation.getDuration() - 100);
     }
 

@@ -155,11 +155,7 @@ public class DayFragment extends Fragment {
                         switch (which){
                             case DialogInterface.BUTTON_POSITIVE:
                                 fragmentDay.removeDayItem(getContext(), adapter.getItem(position).ID, false);
-                                adapter.removedDayItem(position);
-                                if(adapter.getItemCount() == 0){
-                                    rDayPlanner.setVisibility(View.GONE);
-                                    noDayItemText.setVisibility(View.VISIBLE);
-                                }
+                                adapter.removedDayItem(position, noDayItemText, rDayPlanner);
                                 break;
                             case DialogInterface.BUTTON_NEGATIVE:
                                 break;

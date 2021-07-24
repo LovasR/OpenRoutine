@@ -353,8 +353,7 @@ public class DayInit {
                     DayItem.allDayItemHashes.put(dayItem.ID, dayItem);
                 }
                 currentDay.isRegimeSet = false;
-                //Log.v("save_debug_load", "load day: " + currentDay.dayItems.size() + " " + (currentDay.dayItems.size() > 0 ? currentDay.dayItems.g.type.name : "null"));
-            }
+             }
         }
 
         ArrayList<String> activityList = readFromFile(context, "activities");
@@ -365,8 +364,6 @@ public class DayInit {
                 Log.v("save_debug_load", "load activity: \t" + activityJson);
             }
         }
-
-
         return true;
     }
 
