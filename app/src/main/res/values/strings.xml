@@ -213,4 +213,6 @@
         <item>24-hour format</item>
     </string-array>
 
+    <string name="data_export_setting_title">Export data</string>
+
 </resources>

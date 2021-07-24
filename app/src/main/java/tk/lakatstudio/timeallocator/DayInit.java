@@ -5,6 +5,7 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.Environment;
 import android.text.format.DateFormat;
 import android.util.Log;
 
@@ -19,8 +20,11 @@ import com.google.gson.GsonBuilder;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
+import java.io.IOException;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -30,8 +34,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 public class DayInit {
 
@@ -410,6 +417,73 @@ public class DayInit {
             return null;
         }
         return out;
+    }
+
+    public static void exportData(Context context){
+        String sourceFolder = context.getFilesDir() + "/saves";
+        List<String> fileList = new ArrayList<>();
+        generateFileList(new File(sourceFolder), fileList, sourceFolder);
+        String outputPath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS) + "/OpenRoutineData.zip";
+        zipIt(outputPath, fileList, sourceFolder);
+    }
+
+    public static void zipIt(String zipFile, List<String> fileList, String sourceFolder) {
+        byte[] buffer = new byte[1024];
+        String source = new File(sourceFolder).getName();
+        FileOutputStream fos = null;
+        ZipOutputStream zos = null;
+        try {
+            fos = new FileOutputStream(zipFile);
+            zos = new ZipOutputStream(fos);
+
+            System.out.println("Output to Zip : " + zipFile);
+            FileInputStream in = null;
+
+            for (String file: fileList) {
+                System.out.println("File Added : " + file);
+                ZipEntry ze = new ZipEntry(source + File.separator + file);
+                zos.putNextEntry(ze);
+                try {
+                    in = new FileInputStream(sourceFolder + File.separator + file);
+                    int len;
+                    while ((len = in .read(buffer)) > 0) {
+                        zos.write(buffer, 0, len);
+                    }
+                } finally {
+                    in.close();
+                }
+            }
+
+            zos.closeEntry();
+            System.out.println("Folder successfully compressed");
+
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        } finally {
+            try {
+                zos.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public static void generateFileList(File node, List<String> fileList, String sourceFolder) {
+        // add file only
+        if (node.isFile()) {
+            fileList.add(generateZipEntry(node.toString(), sourceFolder));
+        }
+
+        if (node.isDirectory()) {
+            String[] subNote = node.list();
+            for (String filename: subNote) {
+                generateFileList(new File(node, filename), fileList, sourceFolder);
+            }
+        }
+    }
+
+    private static String generateZipEntry(String file, String sourceFolder) {
+        return file.substring(sourceFolder.length() + 1, file.length());
     }
 
     @Retention(RetentionPolicy.RUNTIME)

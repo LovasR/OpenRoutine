@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<PreferenceScreen
-    xmlns:android="http://schemas.android.com/apk/res/android">
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
     <PreferenceCategory
         android:title="@string/format_settings_title">
         <EditTextPreference
@@ -24,9 +24,13 @@
             android:summary="@string/hour_format_setting_summary"/>
     </PreferenceCategory>
     <PreferenceCategory
-        android:title="">
+        android:title="Data">
+        <Preference
+            android:key="export_data"
+            app:title="@string/data_export_setting_title"/>
         <Preference
             android:key="color_picker">
         </Preference>
+
     </PreferenceCategory>
 </PreferenceScreen>
