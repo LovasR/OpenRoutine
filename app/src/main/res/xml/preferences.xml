@@ -29,6 +29,9 @@
             android:key="export_data"
             app:title="@string/data_export_setting_title"/>
         <Preference
+            android:key="import_data"
+            app:title="@string/data_import_setting_title"/>
+        <Preference
             android:key="color_picker">
         </Preference>
 

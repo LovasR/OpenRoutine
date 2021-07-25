@@ -8,6 +8,7 @@ import android.content.SharedPreferences;
 import android.net.Uri;
 import android.text.format.DateFormat;
 import android.util.Log;
+import android.widget.Toast;
 
 import androidx.core.app.AlarmManagerCompat;
 import androidx.preference.PreferenceManager;
@@ -18,6 +19,7 @@ import com.google.gson.FieldAttributes;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
+import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -38,6 +40,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
 import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 
 public class DayInit {
@@ -422,6 +425,8 @@ public class DayInit {
         return out;
     }
 
+    String finalOutputPath;
+
     public static void exportData(Context context, Uri outputPath){
         if(outputPath == null){
             return;
@@ -430,6 +435,7 @@ public class DayInit {
         List<String> fileList = new ArrayList<>();
         generateFileList(new File(sourceFolder), fileList, sourceFolder);
         makeZip(context, outputPath, fileList, sourceFolder);
+        Toast.makeText(context, R.string.data_export_success, Toast.LENGTH_SHORT);
     }
 
     public static void makeZip(Context context, Uri zipFile, List<String> fileList, String sourceFolder) {
@@ -484,6 +490,72 @@ public class DayInit {
 
     private static String generateZipEntry(String file, String sourceFolder) {
         return file.substring(sourceFolder.length() + 1, file.length());
+    }
+
+    public static void importData(Context context, Uri uri){
+        deleteData(context);
+        //could be optional to merge the saves folder
+        unzip(context, context.getFilesDir().getPath() + "/", uri);
+        refreshAppData(context);
+        Toast.makeText(context, R.string.data_import_success, Toast.LENGTH_SHORT);
+    }
+
+    static void deleteData(Context context){
+        String savesPath = context.getFilesDir().getPath() + "/saves";
+        File savesDir = new File(savesPath);
+        String[] entries = savesDir.list();
+        for(String s : entries){
+            File currentFile = new File(savesDir.getPath(),s);
+            currentFile.delete();
+        }
+        Log.v("import_data", savesDir.list().length + " ");
+    }
+    static void refreshAppData(Context context){
+        Regime.allRegimes.clear();
+        daysHashMap.clear();
+        ActivityType.allActivityTypes.clear();
+        DayInit.currentDayItems.clear();
+        DayItem.allDayItemHashes.clear();
+
+        loadAll(context);
+        MainFragment1.staticClass.refreshAllFragments(context, -1);
+    }
+    public static void unzip(Context context, String path, Uri zipFile) {
+        try  {
+            FileInputStream fin = (FileInputStream) context.getContentResolver().openInputStream(zipFile);
+            ZipInputStream zin = new ZipInputStream(fin);
+            ZipEntry ze = null;
+
+            while ((ze = zin.getNextEntry()) != null) {
+
+                if(ze.isDirectory()) {
+                    if(!ze.getName().equals("saves")){
+                        Toast.makeText(context, R.string.data_import_format_error, Toast.LENGTH_LONG);
+                        return;
+                    }
+                    File f = new File(path + ze.getName());
+
+                    if(!f.isDirectory()) {
+                        f.mkdirs();
+                    }
+                } else {
+                    FileOutputStream fout = new FileOutputStream(path + ze.getName());
+                    BufferedOutputStream bufout = new BufferedOutputStream(fout);
+                    byte[] buffer = new byte[1024];
+                    int read = 0;
+                    while ((read = zin.read(buffer)) != -1) {
+                        bufout.write(buffer, 0, read);
+                    }
+                    bufout.close();
+                    zin.closeEntry();
+                    fout.close();
+                }
+
+            }
+            zin.close();
+        } catch(Exception e) {
+            Log.v("import_data", e.toString());
+        }
     }
 
     @Retention(RetentionPolicy.RUNTIME)

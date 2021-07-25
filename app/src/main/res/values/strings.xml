@@ -214,5 +214,10 @@
     </string-array>
 
     <string name="data_export_setting_title">Export data</string>
+    <string name="data_import_setting_title">Import data</string>
+
+    <string name="data_import_format_error">Error in the format of the zip file. Import failed</string>
+    <string name="data_import_success">Successful import</string>
+    <string name="data_export_success">Successful export</string>
 
 </resources>

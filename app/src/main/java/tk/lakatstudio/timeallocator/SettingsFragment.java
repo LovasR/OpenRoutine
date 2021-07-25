@@ -27,6 +27,9 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Activi
 
     ActivityResultLauncher<String> requestPermissionLauncher;
     ActivityResultLauncher<String> getExportPath;
+    ActivityResultLauncher<String[]> getImportPath;
+
+    boolean isPermissionForExport = true;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -43,14 +46,22 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Activi
         requestPermissionLauncher = registerForActivityResult(new ActivityResultContracts.RequestPermission(), new ActivityResultCallback<Boolean>() {
             @Override
             public void onActivityResult(Boolean isGranted) {
-                if (isGranted) {
-                    //DayInit.exportData(requireContext(), getOutputPath());
+                if (isPermissionForExport) {
+                    if (isGranted) {
+                        getOutputPath();
+                    } else {
+                        // Explain to the user that the feature is unavailable because the
+                        // features requires a permission that the user has denied. At the
+                        // same time, respect the user's decision. Don't link to system
+                        // settings in an effort to convince the user to change their
+                        // decision.
+                    }
                 } else {
-                    // Explain to the user that the feature is unavailable because the
-                    // features requires a permission that the user has denied. At the
-                    // same time, respect the user's decision. Don't link to system
-                    // settings in an effort to convince the user to change their
-                    // decision.
+                    if (isGranted) {
+                        getImportPath.launch(new String[]{"*/*"});
+                    } else {
+                        //not granted for import
+                    }
                 }
             }
         });
@@ -67,8 +78,20 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Activi
                         DayInit.exportData(requireContext(), uri);
                     }
                 });
+        getImportPath = registerForActivityResult(new ActivityResultContracts.OpenDocument(), new ActivityResultCallback<Uri>() {
+            @Override
+            public void onActivityResult(Uri uri) {
+                try {
+                    Log.v("export_data", uri.toString());
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                DayInit.importData(requireContext(), uri);
+            }
+        });
         return super.onCreateView(inflater, container, savedInstanceState);
     }
+
     @Override
     public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
         setPreferencesFromResource(R.xml.preferences, rootKey);
@@ -113,10 +136,24 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Activi
             public boolean onPreferenceClick(Preference preference) {
 
                 if(ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_DENIED){
+                    isPermissionForExport = true;
                     requestPermissionLauncher.launch(Manifest.permission.WRITE_EXTERNAL_STORAGE);
                 } else {
                     getOutputPath();
-                    //DayInit.exportData(requireContext(), getOutputPath());
+                }
+                return false;
+            }
+        });
+        Preference importPreference = findPreference("import_data");
+        importPreference.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener(){
+            @Override
+            public boolean onPreferenceClick(Preference preference) {
+
+                if(ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_DENIED){
+                    isPermissionForExport = false;
+                    requestPermissionLauncher.launch(Manifest.permission.READ_EXTERNAL_STORAGE);
+                } else {
+                    getImportPath.launch(new String[]{"*/*"});
                 }
                 return false;
             }
