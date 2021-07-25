@@ -1,10 +1,13 @@
 package tk.lakatstudio.timeallocator;
 
 import android.Manifest;
+import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.text.InputFilter;
 import android.text.Spanned;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,6 +25,9 @@ import androidx.preference.PreferenceFragmentCompat;
 
 public class SettingsFragment extends PreferenceFragmentCompat implements ActivityResultCallback {
 
+    ActivityResultLauncher<String> requestPermissionLauncher;
+    ActivityResultLauncher<String> getExportPath;
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
@@ -38,7 +44,7 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Activi
             @Override
             public void onActivityResult(Boolean isGranted) {
                 if (isGranted) {
-                    DayInit.exportData(requireContext());
+                    //DayInit.exportData(requireContext(), getOutputPath());
                 } else {
                     // Explain to the user that the feature is unavailable because the
                     // features requires a permission that the user has denied. At the
@@ -48,9 +54,21 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Activi
                 }
             }
         });
+
+        getExportPath = registerForActivityResult(new ActivityResultContracts.CreateDocument(),
+                new ActivityResultCallback<Uri>() {
+                    @Override
+                    public void onActivityResult(Uri uri) {
+                        try {
+                            Log.v("export_data", uri.toString());
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                        DayInit.exportData(requireContext(), uri);
+                    }
+                });
         return super.onCreateView(inflater, container, savedInstanceState);
     }
-
     @Override
     public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
         setPreferencesFromResource(R.xml.preferences, rootKey);
@@ -97,15 +115,25 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Activi
                 if(ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_DENIED){
                     requestPermissionLauncher.launch(Manifest.permission.WRITE_EXTERNAL_STORAGE);
                 } else {
-                    DayInit.exportData(requireContext());
+                    getOutputPath();
+                    //DayInit.exportData(requireContext(), getOutputPath());
                 }
                 return false;
             }
         });
     }
-    ActivityResultLauncher<String> requestPermissionLauncher;
     @Override
     public void onActivityResult(Object result) {
 
+    }
+    String getOutputPath() {
+        Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT);
+        intent.addCategory(Intent.CATEGORY_OPENABLE);
+        intent.setType("application/zip");
+
+        getExportPath.launch("OpenRoutine_Backup.zip");
+
+
+        return null;
     }
 }

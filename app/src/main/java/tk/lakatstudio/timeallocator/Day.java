@@ -23,9 +23,7 @@ import tk.lakatstudio.timeallocator.DayInit.Exclude;
 
 public class Day {
     Date start;         //Start of day to serve as base line for cycles
-
     int dayIndex;
-
 
     HashMap<UUID, DayItem> dayItems = new HashMap<>();
     //dayItems must be sorted when used in list

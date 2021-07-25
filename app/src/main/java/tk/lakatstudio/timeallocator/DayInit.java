@@ -5,7 +5,7 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.os.Environment;
+import android.net.Uri;
 import android.text.format.DateFormat;
 import android.util.Log;
 
@@ -403,6 +403,9 @@ public class DayInit {
 
         try {
             File file = new File(dir, fileName);
+            if(!file.exists()){
+                return null;
+            }
             BufferedReader reader = new BufferedReader(new FileReader(file));
             String object;
             while ((object = reader.readLine()) != null){
@@ -419,44 +422,42 @@ public class DayInit {
         return out;
     }
 
-    public static void exportData(Context context){
+    public static void exportData(Context context, Uri outputPath){
+        if(outputPath == null){
+            return;
+        }
         String sourceFolder = context.getFilesDir() + "/saves";
         List<String> fileList = new ArrayList<>();
         generateFileList(new File(sourceFolder), fileList, sourceFolder);
-        String outputPath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS) + "/OpenRoutineData.zip";
-        zipIt(outputPath, fileList, sourceFolder);
+        makeZip(context, outputPath, fileList, sourceFolder);
     }
 
-    public static void zipIt(String zipFile, List<String> fileList, String sourceFolder) {
+    public static void makeZip(Context context, Uri zipFile, List<String> fileList, String sourceFolder) {
         byte[] buffer = new byte[1024];
         String source = new File(sourceFolder).getName();
         FileOutputStream fos = null;
         ZipOutputStream zos = null;
         try {
-            fos = new FileOutputStream(zipFile);
+            fos = (FileOutputStream) context.getContentResolver().openOutputStream(zipFile, "rw");
             zos = new ZipOutputStream(fos);
 
-            System.out.println("Output to Zip : " + zipFile);
+            Log.v("export_data", "Output to Zip : " + zipFile);
             FileInputStream in = null;
 
             for (String file: fileList) {
-                System.out.println("File Added : " + file);
                 ZipEntry ze = new ZipEntry(source + File.separator + file);
                 zos.putNextEntry(ze);
                 try {
                     in = new FileInputStream(sourceFolder + File.separator + file);
-                    int len;
-                    while ((len = in .read(buffer)) > 0) {
-                        zos.write(buffer, 0, len);
+                    int length;
+                    while ((length = in.read(buffer)) > 0) {
+                        zos.write(buffer, 0, length);
                     }
                 } finally {
                     in.close();
                 }
             }
-
             zos.closeEntry();
-            System.out.println("Folder successfully compressed");
-
         } catch (IOException ex) {
             ex.printStackTrace();
         } finally {
@@ -469,7 +470,6 @@ public class DayInit {
     }
 
     public static void generateFileList(File node, List<String> fileList, String sourceFolder) {
-        // add file only
         if (node.isFile()) {
             fileList.add(generateZipEntry(node.toString(), sourceFolder));
         }
