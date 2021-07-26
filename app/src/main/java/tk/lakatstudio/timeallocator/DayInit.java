@@ -377,7 +377,7 @@ public class DayInit {
         return true;
     }
 
-    static void loadRegimes(Context context){
+    static void  loadRegimes(Context context){
         Regime.allRegimes = new HashMap<>();
         Log.v("regime_null", "loadRegimes");
         ArrayList<String> regimeList = readFromFile(context, "regimes");
@@ -504,11 +504,13 @@ public class DayInit {
         String savesPath = context.getFilesDir().getPath() + "/saves";
         File savesDir = new File(savesPath);
         String[] entries = savesDir.list();
-        for(String s : entries){
-            File currentFile = new File(savesDir.getPath(),s);
-            currentFile.delete();
+        if(entries != null) {
+            for (String s : entries) {
+                File currentFile = new File(savesDir.getPath(), s);
+                currentFile.delete();
+            }
+            Log.v("import_data", savesDir.list().length + " ");
         }
-        Log.v("import_data", savesDir.list().length + " ");
     }
     static void refreshAppData(Context context){
         Regime.allRegimes.clear();

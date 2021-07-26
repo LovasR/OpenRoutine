@@ -358,6 +358,7 @@ public class Day {
     }
 
     static void setAllNotifications(Context context){
+        DayInit.initGson();
         Day currentDay = getDay(context, Calendar.getInstance().getTime());
 
         System.out.println("tk.lakatstudio setAllNotifications ");
@@ -366,7 +367,6 @@ public class Day {
             return;
         }
 
-        DayInit.initGson();
         DayInit.loadRegimes(context);
 
         //TODO calculate remoteschedulednotification in routines
