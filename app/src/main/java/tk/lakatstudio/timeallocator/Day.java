@@ -148,11 +148,12 @@ public class Day {
     void addRegimeDays(Context context, Regime regime){
         //TODO make it compatible custom length regime
         Calendar startCalendar = Calendar.getInstance();
+        int todayIndex = startCalendar.get(Calendar.YEAR) * 366 + startCalendar.get(Calendar.DAY_OF_YEAR);
         startCalendar.setTime(start);
         //corrects for java weeks sunday
         int dayOfWeek = startCalendar.get(Calendar.DAY_OF_WEEK) == Calendar.SUNDAY ? 6 : startCalendar.get(Calendar.DAY_OF_WEEK) - 2;
 
-        boolean isToday = (dayIndex == MainFragment1.todayIndex);
+        boolean isToday = (dayIndex == todayIndex);
 
         Log.v("set_RMS_add", "dayIndex: " + dayIndex + " todayIndex: " + MainFragment1.todayIndex);
 
@@ -361,7 +362,6 @@ public class Day {
         DayInit.initGson();
         Day currentDay = getDay(context, Calendar.getInstance().getTime());
 
-        System.out.println("tk.lakatstudio setAllNotifications ");
 
         if(currentDay == null){
             return;
@@ -369,7 +369,6 @@ public class Day {
 
         DayInit.loadRegimes(context);
 
-        //TODO calculate remoteschedulednotification in routines
         Regime.setAllActiveRegimesDays(context, currentDay);
 
         DayInit.sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
@@ -439,7 +438,14 @@ public class Day {
         ArrayList<String> days = DayInit.readFromFile(context, "day_" + new SimpleDateFormat("y.M.d", Locale.getDefault()).format(date));
 
         if(days == null){
-            return new Day();
+            out = new Day();
+            out.dayIndex = calendar.get(Calendar.DAY_OF_YEAR) + calendar.get(Calendar.YEAR) * 366;
+
+            calendar.clear(Calendar.SECOND);
+            calendar.clear(Calendar.MINUTE);
+            calendar.clear(Calendar.HOUR_OF_DAY);
+            out.start = calendar.getTime();
+            return out;
         }
 
         out = DayInit.gson.fromJson(days.get(0), Day.class);

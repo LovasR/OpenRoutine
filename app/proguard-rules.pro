@@ -21,3 +21,7 @@
 #-renamesourcefileattribute SourceFile
 
 -keepattributes LineNumberTable,SourceFile
+
+-printmapping obfuscation/mapping.txt
+
+-printseeds obfuscation/seeds.txt

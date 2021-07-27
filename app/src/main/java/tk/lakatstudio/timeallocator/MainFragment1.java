@@ -174,9 +174,9 @@ public class MainFragment1 extends Fragment {
         //Log.v("fragment_preload", "newindex: " + newIndex + " index: " + index + " fragmentIndex: " + fragmentIndex);
 
         Calendar calendar = Calendar.getInstance();
-        calendar.set(Calendar.SECOND, 0);
-        calendar.set(Calendar.MINUTE, 0);
-        calendar.set(Calendar.HOUR_OF_DAY, 0);
+        calendar.clear(Calendar.SECOND);
+        calendar.clear(Calendar.MINUTE);
+        calendar.clear(Calendar.HOUR_OF_DAY);
         //TODO check with leap years
         calendar.set(Calendar.DAY_OF_YEAR, newIndex - (calendar.get(Calendar.YEAR) * 366));
 

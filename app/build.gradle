@@ -7,15 +7,15 @@ android {
         applicationId "tk.lakatstudio.timeallocator"
         minSdkVersion 21
         targetSdkVersion 29
-        versionCode 15
-        versionName "a5s3"
+        versionCode 16
+        versionName "a5s4"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
     buildTypes {
         release {
-            minifyEnabled false
+            minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }

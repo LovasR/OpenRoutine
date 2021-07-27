@@ -425,8 +425,6 @@ public class DayInit {
         return out;
     }
 
-    String finalOutputPath;
-
     public static void exportData(Context context, Uri outputPath){
         if(outputPath == null){
             return;
@@ -482,7 +480,7 @@ public class DayInit {
 
         if (node.isDirectory()) {
             String[] subNote = node.list();
-            for (String filename: subNote) {
+            for (String filename : subNote) {
                 generateFileList(new File(node, filename), fileList, sourceFolder);
             }
         }
