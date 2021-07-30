@@ -29,8 +29,6 @@ public class Regime {
 
     static HashMap<UUID, Regime> allRegimes = new HashMap<>();
 
-    //TODO try to refresh days from regime
-
     @Exclude
     HashMap<Integer, Day> appliedDays = new HashMap<>();
 

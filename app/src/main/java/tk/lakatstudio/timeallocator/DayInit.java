@@ -2,6 +2,8 @@ package tk.lakatstudio.timeallocator;
 
 import android.app.AlarmManager;
 import android.app.PendingIntent;
+import android.appwidget.AppWidgetManager;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -231,6 +233,14 @@ public class DayInit {
         }
     }
 
+    static void refreshWidget(Context context){
+        AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
+        int appWidgetIds[] = appWidgetManager.getAppWidgetIds(new ComponentName(context, LineupWidgetProvider.class));
+        if(appWidgetIds.length > 0) {
+            appWidgetManager.notifyAppWidgetViewDataChanged(appWidgetIds, R.id.lineupWidgetListView);
+        }
+    }
+
     static int getMaterialTimeFormat(Context context){
         //same as hour format just for material time pickers
         String setting = sharedPreferences.getString("hour_format", context.getResources().getStringArray(R.array.hour_format_setting_entries)[0]);
@@ -251,7 +261,6 @@ public class DayInit {
 
     static String getDateFormat(Context context){
         //get dateformat from string
-        Log.v("pref_test", sharedPreferences.getString("date_format", "null"));
         return sharedPreferences.getString("date_format", context.getString(R.string.default_date_format));
     }
 

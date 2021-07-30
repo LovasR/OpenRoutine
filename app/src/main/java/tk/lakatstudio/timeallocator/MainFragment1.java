@@ -177,7 +177,6 @@ public class MainFragment1 extends Fragment {
         calendar.clear(Calendar.SECOND);
         calendar.clear(Calendar.MINUTE);
         calendar.clear(Calendar.HOUR_OF_DAY);
-        //TODO check with leap years
         calendar.set(Calendar.DAY_OF_YEAR, newIndex - (calendar.get(Calendar.YEAR) * 366));
 
         SimpleDateFormat dateFormat = new SimpleDateFormat("y.M.d");
@@ -224,8 +223,6 @@ public class MainFragment1 extends Fragment {
         fragmentIndex = day.dayIndex;
         refreshAllFragments(getContext(), SCROLL_FORWARD);
         DayItem dayItem = day.dayItems.get(dayItemID);
-        Log.v("highlight", dayItem.ID.toString());
-        //TODO highlight dayItem
         dayFragments[1].highlightDayItem(dayItem);
     }
 

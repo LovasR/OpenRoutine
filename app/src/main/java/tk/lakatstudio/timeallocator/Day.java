@@ -31,7 +31,6 @@ public class Day {
     HashMap<UUID, TodoItem> todoItems = new HashMap<>();
 
     //used to identify dayItems from regimes
-    //TODO make the regime added dayItems savable as hashes
     @Exclude
     HashMap<UUID, DayItem> regimeDayItems = new HashMap<>();
     @Exclude
@@ -146,7 +145,6 @@ public class Day {
     }
 
     void addRegimeDays(Context context, Regime regime){
-        //TODO make it compatible custom length regime
         Calendar startCalendar = Calendar.getInstance();
         int todayIndex = startCalendar.get(Calendar.YEAR) * 366 + startCalendar.get(Calendar.DAY_OF_YEAR);
         startCalendar.setTime(start);

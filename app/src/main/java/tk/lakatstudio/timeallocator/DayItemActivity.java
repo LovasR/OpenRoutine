@@ -170,7 +170,6 @@ public class DayItemActivity extends FragmentActivity {
             calendar.set(Calendar.MINUTE, startMinute);
             startTimeButton.setText(new SimpleDateFormat(DayInit.getHourFormat(getBaseContext()), Locale.getDefault()).format(calendar.getTime()));
 
-            //TODO set end time to the preferred length of the activityType
             int preferredHours = (selectedActivity.preferredLength > 0 ? selectedActivity.preferredLength / 60 : 1);
             endHour = startHour + preferredHours;
             int preferredMinutes = (selectedActivity.preferredLength > 0 ? selectedActivity.preferredLength % 60 : 0);
@@ -441,6 +440,8 @@ public class DayItemActivity extends FragmentActivity {
                 regime.addDayItem(dayItem, (calendar.get(Calendar.DAY_OF_WEEK) == Calendar.SUNDAY ? 6 : calendar.get(Calendar.DAY_OF_WEEK) - 2));
             }
         }
+
+        DayInit.refreshWidget(getApplicationContext());
 
         final DayFragment dayFragment;
         if((dayFragment = MainFragment1.getFragment(focusedFragment)) != null){

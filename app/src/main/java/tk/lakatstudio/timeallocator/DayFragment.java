@@ -156,6 +156,7 @@ public class DayFragment extends Fragment {
                             case DialogInterface.BUTTON_POSITIVE:
                                 fragmentDay.removeDayItem(getContext(), adapter.getItem(position).ID, false);
                                 adapter.removedDayItem(position, noDayItemText, rDayPlanner);
+                                DayInit.refreshWidget(getContext());
                                 break;
                             case DialogInterface.BUTTON_NEGATIVE:
                                 break;
