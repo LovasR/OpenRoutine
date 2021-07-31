@@ -79,6 +79,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:id="@+id/addDayItemActivity"
+                android:textColor="@color/color_text_day_only"
                 android:background="@drawable/spinner_background"
                 android:padding="15dp"/>
         </LinearLayout>
@@ -107,6 +108,7 @@
                 android:id="@+id/addDayItemNotification"
                 android:background="@drawable/spinner_background"
                 android:src="@drawable/ic_baseline_add_24"
+                android:tint="@android:color/black"
                 android:padding="5dp"/>
             <androidx.recyclerview.widget.RecyclerView
                 android:layout_width="match_parent"

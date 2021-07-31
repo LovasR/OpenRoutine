@@ -4,6 +4,7 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
+import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.text.Editable;
@@ -95,7 +96,8 @@ public class MainFragment4 extends Fragment {
                 };
 
                 AlertDialog.Builder builder = new AlertDialog.Builder(fragment.getContext());
-                builder.setMessage(getString(R.string.remove_activity, getString(R.string.activity_singular))).setPositiveButton(getString(R.string.yes), dialogClickListener).setNegativeButton(getString(R.string.no), dialogClickListener).show();
+                builder.setMessage(getString(R.string.remove_activity, getString(R.string.activity_singular))).setPositiveButton(getString(R.string.yes), dialogClickListener)
+                        .setNegativeButton(getString(R.string.no), dialogClickListener).show().getWindow().setBackgroundDrawableResource(R.drawable.alert_dialog_background);
                 return true;
             }
         });
@@ -108,7 +110,10 @@ public class MainFragment4 extends Fragment {
         View dialogView = getLayoutInflater().inflate(R.layout.activity_edit_dialog, null);
         builder.setView(dialogView);
         final AlertDialog alertDialog = builder.create();
-        final EditText editText = dialogView.findViewById(R.id.activityEditName);
+
+        alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+
+        final EditText nameEditText = dialogView.findViewById(R.id.activityEditName);
         final EditText editTimeText = dialogView.findViewById(R.id.activityEditTime);
         final Button colorPicker = dialogView.findViewById(R.id.activityEditColor);
         Button done = dialogView.findViewById(R.id.activityEditDone);
@@ -117,14 +122,13 @@ public class MainFragment4 extends Fragment {
         final ActivityType activityType;
         if(index != -1) {
             activityType = ActivityType.allActivityTypes.get(index);
-            editText.setText(activityType.name);
+            nameEditText.setText(activityType.name);
             if(activityType.preferredLength > 0) {
                 editTimeText.setText(String.valueOf(activityType.preferredLength));
             }
             selectedColor = activityType.color;
         } else {
             activityType = ActivityType.addActivityType("", 0);
-            editText.setHint(getString(R.string.activity_name));
             selectedColor = getResources().getIntArray(R.array.default_colors)[Math.abs(new Random().nextInt()) % getResources().getIntArray(R.array.default_colors).length];
         }
 
@@ -141,7 +145,7 @@ public class MainFragment4 extends Fragment {
         done.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                activityType.name = editText.getText().toString();
+                activityType.name = nameEditText.getText().toString();
                 Log.v("selectedColor", "will be: " + selectedColor);
                 activityType.color = selectedColor;
                 //editText.setText(activityType.name);
@@ -177,7 +181,10 @@ public class MainFragment4 extends Fragment {
         final ImageView customCircle = dialogView.findViewById(R.id.colorPickerCustomCircle);
         Button done = dialogView.findViewById(R.id.colorPickerDone);
         builder.setView(dialogView);
+
         final AlertDialog alertDialog = builder.create();
+
+        alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
 
         colorSheet.setLayoutManager(new GridLayoutManager(fragment.getContext(), 3));
         ArrayList<Integer> colorList = new ArrayList<Integer>();

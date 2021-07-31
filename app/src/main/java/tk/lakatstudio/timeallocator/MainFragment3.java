@@ -4,6 +4,8 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -41,6 +43,7 @@ import java.util.Locale;
 public class MainFragment3 extends Fragment {
 
     ListView regimeList;
+    TextView noRegimeText;
 
     @Nullable
     @Override
@@ -48,6 +51,7 @@ public class MainFragment3 extends Fragment {
         View view = inflater.inflate(R.layout.main_fragment_3, container, false);
 
         regimeList = view.findViewById(R.id.regimeListview);
+        noRegimeText = view.findViewById(R.id.regimeNoRegime);
 
         return view;
     }
@@ -61,9 +65,14 @@ public class MainFragment3 extends Fragment {
     void regimeListInit(final Fragment fragment){
 
         Log.e("regime_test", "regime list init " + Regime.allRegimes.size());
+
         if(Regime.allRegimes.size() == 0){
-            Log.e("regime_test", "regime size 0");
+            noRegimeText.setVisibility(View.VISIBLE);
+            regimeList.setVisibility(View.GONE);
             return;
+        } else {
+            noRegimeText.setVisibility(View.GONE);
+            regimeList.setVisibility(View.VISIBLE);
         }
         ArrayList<Regime> regimeArrayList = new ArrayList<>(Regime.allRegimes.values());
         for(Regime regime : regimeArrayList){
@@ -142,7 +151,7 @@ public class MainFragment3 extends Fragment {
                         AlertDialog.Builder builder = new AlertDialog.Builder(fragment.getContext());
                         builder.setMessage(getString(R.string.remove_activity,
                                 getString(R.string.regime_singular))).setPositiveButton(getString(R.string.yes),
-                                dialogClickListener).setNegativeButton(getString(R.string.no), dialogClickListener).show();
+                                dialogClickListener).setNegativeButton(getString(R.string.no), dialogClickListener).show().getWindow().setBackgroundDrawableResource(R.drawable.alert_dialog_background);
                         return true;
                     }
                 });
@@ -164,6 +173,8 @@ public class MainFragment3 extends Fragment {
 
         builder.setView(dialogView);
         final AlertDialog alertDialog = builder.create();
+
+        alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
 
         final boolean wasRegimeNull;
         if(regime == null) {
@@ -213,7 +224,7 @@ public class MainFragment3 extends Fragment {
                 } else {
                     builder.setMessage(getString(R.string.remove_activity,
                             getString(R.string.day_item_singular))).setPositiveButton(getString(R.string.yes),
-                            dialogClickListener).setNegativeButton(getString(R.string.no), dialogClickListener).show();
+                            dialogClickListener).setNegativeButton(getString(R.string.no), dialogClickListener).show().getWindow().setBackgroundDrawableResource(R.drawable.alert_dialog_background);
                 }
             }
         });
@@ -256,6 +267,8 @@ public class MainFragment3 extends Fragment {
 
         builder.setView(dialogView);
         final AlertDialog alertDialog = builder.create();
+
+        alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
 
         Calendar calendar = Calendar.getInstance();
         calendar.clear(Calendar.MILLISECOND);

@@ -105,9 +105,9 @@
     <!--Todo_ strings-->
 
     <string name="todo_singular">to-do</string>
-    <string name="todo_hint">Todo`s text</string>
+    <string name="todo_hint">Todo\'s text</string>
     <string name="todo_add_time">Add time</string>
-    <string name="todo_set_text_error">Text can`t be empty!</string>
+    <string name="todo_set_text_error">Text can\'t be empty!</string>
     <string name="todo_no_todo">Nothing to do on this day!</string>
 
     <!--DayItem activity-->
@@ -154,6 +154,8 @@
     <!--Regime strings-->
     <string name="regime_title">Routines</string>
     <string name="regime_singular">routine</string>
+    
+    <string name="regime_no_regime">No routines, yet!</string>
 
     <string name="regime_menu_1_title">Days</string>
     <string name="regime_menu_2_title">To-Dos</string>
@@ -199,7 +201,7 @@
     <string name="format_settings_title">Formats</string>
 
     <string name="date_format_setting_title">Set date format</string>
-    <string name="date_format_setting_summary"><b>Advanced feature:</b> Set date format based on Java`s SimpleDateFormat.</string>
+    <string name="date_format_setting_summary"><b>Advanced feature:</b> Set date format based on Java\'s SimpleDateFormat.</string>
 
     <string name="date_format_setting_info_title">Info about the date format</string>
     <string name="date_format_setting_info_data">https://docs.oracle.com/javase/8/docs/api/java/text/SimpleDateFormat.html</string>
@@ -211,6 +213,20 @@
         <item>@string/setting_system_default</item>
         <item>12-hour format</item>
         <item>24-hour format</item>
+    </string-array>
+
+    <string name="dark_mode_setting_title">Set dark mode</string>
+    <string name="dark_mode_setting_summary">Select dark mode</string>
+    <string-array name="dark_mode_setting_entries">
+        <item>@string/setting_system_default</item>
+        <item>Dark mode</item>
+        <item>Light mode</item>
+    </string-array>
+
+    <string-array name="setting_entries">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
     </string-array>
 
     <string name="data_export_setting_title">Export data</string>

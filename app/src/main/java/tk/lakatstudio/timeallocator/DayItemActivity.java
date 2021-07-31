@@ -6,7 +6,9 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
 import android.graphics.PorterDuff;
+import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.Log;
@@ -274,6 +276,8 @@ public class DayItemActivity extends FragmentActivity {
                 builder.setView(dialogView);
                 final AlertDialog alertDialog = builder.create();
 
+                alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+
                 ArrayAdapter<ActivityType> adapter = new ArrayAdapter<ActivityType>(getBaseContext(), R.layout.activity_item, ActivityType.allActivityTypes){
                     @NonNull
                     @Override
@@ -373,7 +377,7 @@ public class DayItemActivity extends FragmentActivity {
                 AlertDialog.Builder builder = new AlertDialog.Builder(DayItemActivity.this);
                 builder.setMessage(getString(R.string.remove_activity,
                         getString(R.string.day_item_singular))).setPositiveButton(getString(R.string.yes),
-                        dialogClickListener).setNegativeButton(getString(R.string.no), dialogClickListener).show();
+                        dialogClickListener).setNegativeButton(getString(R.string.no), dialogClickListener).show().getWindow().setBackgroundDrawableResource(R.drawable.alert_dialog_background);
             }
         });
         notificationList.setAdapter(notificationAdapter);
@@ -752,7 +756,6 @@ public class DayItemActivity extends FragmentActivity {
             spinner2 = dialogView.findViewById(R.id.addNotificationRelativeSpinner);
         }
 
-
         final Spinner relativeSpinner = spinner1;
         final Spinner relativeSpinnerPre = spinner2;
 
@@ -765,6 +768,8 @@ public class DayItemActivity extends FragmentActivity {
         Button done = dialogView.findViewById(R.id.addNotificationDone);
 
         final AlertDialog alertDialog = builder.create();
+
+        alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
 
         //localization
 

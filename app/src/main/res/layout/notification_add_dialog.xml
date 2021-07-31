@@ -4,15 +4,17 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:background="@drawable/alert_dialog_background">
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/add_notification"
         android:textStyle="bold"
-        android:textSize="22sp"
+        android:textSize="26sp"
         android:layout_marginHorizontal="10dp"
-        android:layout_marginTop="10dp"/>
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="6dp"/>
     <View
         android:layout_width="match_parent"
         android:layout_height="2dp"
@@ -115,14 +117,14 @@
         </com.google.android.material.textfield.TextInputLayout>
     </LinearLayout>
 
-    <Button
+    <com.google.android.material.button.MaterialButton
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:padding="15dp"
         android:background="@drawable/spinner_background"
         android:id="@+id/addNotificationDone"
         android:layout_gravity="end"
         android:text="@string/buttonDone"
+        android:textColor="@color/color_text_day_only"
         android:layout_margin="10dp"/>
 
 </LinearLayout>

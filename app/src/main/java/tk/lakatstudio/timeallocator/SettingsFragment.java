@@ -99,7 +99,6 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Activi
         Preference colorPreference = findPreference("color");
         EditTextPreference editTextPreference = findPreference("date_format");
 
-
         editTextPreference.setOnBindEditTextListener(new EditTextPreference.OnBindEditTextListener() {
             @Override
             public void onBindEditText(@NonNull EditText editText) {
@@ -127,6 +126,15 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Activi
                 };
                 InputFilter[] filters = new InputFilter[]{inputFilter};
                 editText.setFilters(filters);
+            }
+        });
+
+        Preference darkPreference = findPreference("dark_mode");
+        darkPreference.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+            @Override
+            public boolean onPreferenceChange(Preference preference, Object newValue) {
+                DayInit.setSelectedTheme(newValue);
+                return true;
             }
         });
 

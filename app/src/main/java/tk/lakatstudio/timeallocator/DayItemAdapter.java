@@ -76,7 +76,7 @@ public class DayItemAdapter extends RecyclerView.Adapter<DayItemAdapter.ViewHold
     @NonNull
     @Override
     public DayItemAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = inflater.inflate(R.layout.dayplanner_item, parent, false);
+        View view = inflater.inflate(R.layout.dayitem_item, parent, false);
         return new ViewHolder(view);
     }
 
@@ -130,7 +130,13 @@ public class DayItemAdapter extends RecyclerView.Adapter<DayItemAdapter.ViewHold
             handler.postDelayed(new Runnable() {
                 @Override
                 public void run() {
+                    transitionDrawable.resetTransition();
                     transitionDrawable.startTransition(500);
+                    try {
+                        Thread.sleep(500);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
                     transitionDrawable.reverseTransition(500);
                 }
             }, 1000 * i);

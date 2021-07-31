@@ -17,6 +17,17 @@
         android:layout_height="2dp"
         android:layout_marginHorizontal="6dp"
         android:background="@android:color/darker_gray"/-->
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/regime_no_regime"
+        android:id="@+id/regimeNoRegime"
+        android:textStyle="bold"
+        android:textSize="20sp"
+        android:layout_marginTop="30dp"
+        android:visibility="gone"
+        android:gravity="center"/>
     <ListView
         android:layout_width="match_parent"
         android:layout_height="match_parent"

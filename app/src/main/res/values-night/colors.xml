@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="outline_background_color">@android:color/black</color>
+    <color name="color_box_default">#E1E1E1</color>
+    <color name="color_text_default">@android:color/white</color>
+    <color name="color_day_and_night">@android:color/black</color>
+</resources>

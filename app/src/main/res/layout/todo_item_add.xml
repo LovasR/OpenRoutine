@@ -15,8 +15,6 @@
             android:id="@+id/addTodoEditNameLayout"
             android:hint="@string/todo_hint"
             app:hintTextColor="@android:color/black"
-
-            app:boxStrokeColor="@color/color_box_default"
             style="@style/TAOutlinedEditText"
             android:layout_margin="10dp"
 

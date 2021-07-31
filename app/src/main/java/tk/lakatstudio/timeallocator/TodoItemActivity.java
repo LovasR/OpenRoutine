@@ -1,7 +1,9 @@
 package tk.lakatstudio.timeallocator;
 
 import android.app.AlertDialog;
+import android.graphics.Color;
 import android.graphics.PorterDuff;
+import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.text.Editable;
@@ -114,12 +116,14 @@ public class TodoItemActivity extends FragmentActivity {
                 builder.setView(dialogView);
                 final AlertDialog alertDialog = builder.create();
 
-                final ArrayAdapter<DayItem> adapter = new ArrayAdapter<DayItem>(getBaseContext(), R.layout.dayplanner_item, new ArrayList<>(day.dayItems.values())) {
+                alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+
+                final ArrayAdapter<DayItem> adapter = new ArrayAdapter<DayItem>(getBaseContext(), R.layout.dayitem_item, new ArrayList<>(day.dayItems.values())) {
                     @NonNull
                     @Override
                     public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
                         if (convertView == null) {
-                            convertView = getLayoutInflater().inflate(R.layout.dayplanner_item, null);
+                            convertView = getLayoutInflater().inflate(R.layout.dayitem_item, null);
                         }
                         final DayItem dayItem = day.dayItems.get(getItem(position).ID);
                         Log.v("save_debug_load", "a" + dayItem.type.name);

@@ -100,7 +100,7 @@ public class RegimeDayFragment extends DayFragment {
                 AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
                 builder.setMessage(getString(R.string.remove_activity,
                         getString(R.string.day_item_singular))).setPositiveButton(getString(R.string.yes),
-                        dialogClickListener).setNegativeButton(getString(R.string.no), dialogClickListener).show();
+                        dialogClickListener).setNegativeButton(getString(R.string.no), dialogClickListener).show().getWindow().setBackgroundDrawableResource(R.drawable.alert_dialog_background);
             }
         });
         dayPlanner.setAdapter(adapter);

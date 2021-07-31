@@ -63,7 +63,7 @@ public class DayFragment extends Fragment {
             dayDateText.setText(dateText);
             Drawable drawable = getResources().getDrawable(R.drawable.selected_background);
             assert drawable != null;
-            drawable.setColorFilter(getResources().getColor(R.color.colorAccent), PorterDuff.Mode.SRC);
+            drawable.setColorFilter(getResources().getColor(R.color.colorPrimary), PorterDuff.Mode.SRC);
             daySelect.setBackground(drawable);
         }
 
@@ -167,7 +167,7 @@ public class DayFragment extends Fragment {
                 AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
                 builder.setMessage(getString(R.string.remove_activity,
                         getString(R.string.day_item_singular))).setPositiveButton(getString(R.string.yes),
-                        dialogClickListener).setNegativeButton(getString(R.string.no), dialogClickListener).show();
+                        dialogClickListener).setNegativeButton(getString(R.string.no), dialogClickListener).show().getWindow().setBackgroundDrawableResource(R.drawable.alert_dialog_background);
             }
         });
         rDayPlanner.setAdapter(adapter);
@@ -200,7 +200,7 @@ public class DayFragment extends Fragment {
 
             Drawable drawable = context.getResources().getDrawable(R.drawable.selected_background);
             assert drawable != null;
-            drawable.setColorFilter(context.getResources().getColor(R.color.colorAccent), PorterDuff.Mode.SRC);
+            drawable.setColorFilter(context.getResources().getColor(R.color.colorPrimary), PorterDuff.Mode.SRC);
             try{
                 daySelect.setBackground(drawable);
             } catch (NullPointerException np){

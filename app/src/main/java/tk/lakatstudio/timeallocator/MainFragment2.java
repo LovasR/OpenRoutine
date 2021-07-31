@@ -76,7 +76,7 @@ public class MainFragment2 extends Fragment {
 
             Drawable drawable = context.getResources().getDrawable(R.drawable.selected_background);
             assert drawable != null;
-            drawable.setColorFilter(context.getResources().getColor(R.color.colorAccent), PorterDuff.Mode.SRC);
+            drawable.setColorFilter(context.getResources().getColor(R.color.colorPrimary), PorterDuff.Mode.SRC);
             try{
                 daySelect.setBackground(drawable);
             } catch (NullPointerException np){
@@ -183,7 +183,7 @@ public class MainFragment2 extends Fragment {
                         AlertDialog.Builder builder = new AlertDialog.Builder(fragment.getContext());
                         builder.setMessage(getString(R.string.remove_activity,
                                 getString(R.string.todo_singular))).setPositiveButton(getString(R.string.yes),
-                                dialogClickListener).setNegativeButton(getString(R.string.no), dialogClickListener).show();
+                                dialogClickListener).setNegativeButton(getString(R.string.no), dialogClickListener).show().getWindow().setBackgroundDrawableResource(R.drawable.alert_dialog_background);
                         return false;
                     }
                 });

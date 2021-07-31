@@ -5,6 +5,8 @@ import android.app.AlertDialog;
 import android.app.NotificationManager;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.ArrayAdapter;
@@ -37,7 +39,8 @@ public class SilenceDialog extends Activity {
             }
         });
         builder.create();
-        AlertDialog dialog = builder.show();
+        AlertDialog alertDialog = builder.show();
+        alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
     }
 
 

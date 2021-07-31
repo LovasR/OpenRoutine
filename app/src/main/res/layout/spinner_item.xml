@@ -3,7 +3,7 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:textColor="@android:color/black"
+    android:textColor="@color/color_text_default"
 
     android:textSize="16sp"
     android:ellipsize="marquee"

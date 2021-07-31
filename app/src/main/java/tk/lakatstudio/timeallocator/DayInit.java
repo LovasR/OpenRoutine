@@ -12,6 +12,7 @@ import android.text.format.DateFormat;
 import android.util.Log;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AppCompatDelegate;
 import androidx.core.app.AlarmManagerCompat;
 import androidx.preference.PreferenceManager;
 
@@ -93,6 +94,7 @@ public class DayInit {
 
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
 
+        setSelectedTheme(null);
 
         //Other less-important initialization
         new Thread(new Runnable() {
@@ -243,8 +245,7 @@ public class DayInit {
 
     static int getMaterialTimeFormat(Context context){
         //same as hour format just for material time pickers
-        String setting = sharedPreferences.getString("hour_format", context.getResources().getStringArray(R.array.hour_format_setting_entries)[0]);
-        int options = Arrays.asList(context.getResources().getStringArray(R.array.hour_format_setting_entries)).indexOf(setting);
+       int options = Integer.parseInt(sharedPreferences.getString("hour_format", "0"));
         switch (options){
             default:
             case 0:
@@ -256,6 +257,22 @@ public class DayInit {
                 return TimeFormat.CLOCK_12H;
             case 2:
                 return TimeFormat.CLOCK_24H;
+        }
+    }
+
+    static void setSelectedTheme(Object newValue){
+        int options = Integer.parseInt(newValue == null ? sharedPreferences.getString("dark_mode", "0") : (String) newValue);
+        switch (options){
+            default:
+            case 0:
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM);
+                break;
+            case 1:
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+                break;
+            case 2:
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+                break;
         }
     }
 
