@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto">
@@ -14,14 +15,12 @@
             android:layout_height="wrap_content"
             android:id="@+id/addTodoEditNameLayout"
             android:hint="@string/todo_hint"
-            app:hintTextColor="@android:color/black"
             style="@style/TAOutlinedEditText"
             android:layout_margin="10dp"
 
             app:errorEnabled="true"
-            app:helperTextEnabled="true"
-            app:helperTextTextColor="@color/color_error"
-            >
+            app:boxStrokeErrorColor="@color/color_error"
+            app:errorTextColor="@color/color_error">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:layout_width="match_parent"
@@ -45,7 +44,8 @@
                 android:id="@+id/addTodoDayItem"
                 android:background="@drawable/spinner_background"
                 android:paddingHorizontal="15dp"
-                android:text="@string/todo_add_time"/>
+                android:text="@string/todo_add_time"
+                android:textColor="@color/color_text_day_only"/>
             <ImageButton
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
@@ -62,15 +62,19 @@
                 android:id="@+id/addTodoDayItemTime"
                 android:gravity="end|center"
                 android:paddingEnd="10dp"
+                android:paddingStart="10dp"
                 android:visibility="gone"/>
         </LinearLayout>
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/addTodoDone"
-            android:background="@drawable/spinner_background"
-            android:layout_margin="10dp"
-            android:text="@string/buttonDone"/>
-
     </LinearLayout>
-</androidx.constraintlayout.widget.ConstraintLayout>
+
+    <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+        android:id="@+id/addTodoDone"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="20dp"
+        android:layout_gravity="bottom|end"
+        android:contentDescription="@string/buttonDone"
+        android:text="@string/buttonDone"
+        app:icon="@drawable/ic_baseline_check_24"
+        app:backgroundTint="@color/colorPrimary"/>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

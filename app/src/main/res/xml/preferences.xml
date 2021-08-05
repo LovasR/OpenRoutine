@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
     <PreferenceCategory
         android:title="@string/format_settings_title">
         <EditTextPreference
@@ -34,10 +33,12 @@
         android:title="Data">
         <Preference
             android:key="export_data"
-            app:title="@string/data_export_setting_title"/>
+            android:title="@string/data_export_setting_title"
+            android:summary="@string/data_export_setting_summary"/>
         <Preference
             android:key="import_data"
-            app:title="@string/data_import_setting_title"/>
+            android:title="@string/data_import_setting_title"
+            android:summary="@string/data_import_setting_summary"/>
 
     </PreferenceCategory>
 </PreferenceScreen>

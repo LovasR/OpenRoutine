@@ -39,6 +39,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
@@ -395,10 +396,15 @@ public class DayInit {
         ArrayList<String> activityList = readFromFile(context, "activities");
         if(activityList != null) {
             Log.v("save_debug_load", "load activities: " + activityList.size());
+            ActivityType.allActivityTypes.clear();
+            LinkedHashSet<ActivityType> temporaryActivityTypes = new LinkedHashSet<>();
             for (String activityJson : activityList) {
-                ActivityType.addActivityType(gson.fromJson(activityJson, ActivityType.class));
+                ActivityType activityType = gson.fromJson(activityJson, ActivityType.class);
+                temporaryActivityTypes.add(activityType);
                 Log.v("save_debug_load", "load activity: \t" + activityJson);
             }
+            Log.v("save_debug_load", temporaryActivityTypes.toString());
+            ActivityType.allActivityTypes.addAll(temporaryActivityTypes);
         }
         return true;
     }
@@ -459,7 +465,7 @@ public class DayInit {
         List<String> fileList = new ArrayList<>();
         generateFileList(new File(sourceFolder), fileList, sourceFolder);
         makeZip(context, outputPath, fileList, sourceFolder);
-        Toast.makeText(context, R.string.data_export_success, Toast.LENGTH_SHORT);
+        Toast.makeText(context, R.string.data_export_success, Toast.LENGTH_SHORT).show();
     }
 
     public static void makeZip(Context context, Uri zipFile, List<String> fileList, String sourceFolder) {
@@ -521,7 +527,7 @@ public class DayInit {
         //could be optional to merge the saves folder
         unzip(context, context.getFilesDir().getPath() + "/", uri);
         refreshAppData(context);
-        Toast.makeText(context, R.string.data_import_success, Toast.LENGTH_SHORT);
+        Toast.makeText(context, R.string.data_import_success, Toast.LENGTH_SHORT).show();
     }
 
     static void deleteData(Context context){
@@ -556,7 +562,7 @@ public class DayInit {
 
                 if(ze.isDirectory()) {
                     if(!ze.getName().equals("saves")){
-                        Toast.makeText(context, R.string.data_import_format_error, Toast.LENGTH_LONG);
+                        Toast.makeText(context, R.string.data_import_format_error, Toast.LENGTH_LONG).show();
                         return;
                     }
                     File f = new File(path + ze.getName());

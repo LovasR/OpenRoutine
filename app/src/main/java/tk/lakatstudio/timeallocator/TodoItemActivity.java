@@ -81,9 +81,8 @@ public class TodoItemActivity extends FragmentActivity {
 
             @Override
             public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                if(i2 != 0 && itemNameParent.getHelperText() != null){
-                    itemNameParent.setHelperText(null);
-                    itemNameParent.setBoxStrokeColor(getResources().getColor(R.color.color_box_default));
+                if(i2 != 0 && itemNameParent.getError() != null){
+                    itemNameParent.setError(null);
                 }
             }
             @Override
@@ -226,9 +225,7 @@ public class TodoItemActivity extends FragmentActivity {
                     }
                     finish();
                 } else {
-                    //itemName.setError();
-                    itemNameParent.setHelperText(getString(R.string.todo_set_text_error));
-                    itemNameParent.setBoxStrokeColor(getResources().getColor(R.color.color_error));
+                    itemNameParent.setError(getString(R.string.todo_set_text_error));
                 }
             }
         });

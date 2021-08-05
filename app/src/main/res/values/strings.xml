@@ -49,8 +49,6 @@
     </string-array>
 
     <!-- Settings -->
-    <string name="cycle_setting">Set the intervals of notifications:</string>
-
 
     <string-array name="default_activities">
         <item>Studying</item>
@@ -230,10 +228,27 @@
     </string-array>
 
     <string name="data_export_setting_title">Export data</string>
+    <string name="data_export_setting_summary">Export data to a .zip at the selected location</string>
     <string name="data_import_setting_title">Import data</string>
+    <string name="data_import_setting_summary">Import data from a .zip, the zip must contain a saves folder</string>
 
     <string name="data_import_format_error">Error in the format of the zip file. Import failed</string>
     <string name="data_import_success">Successful import</string>
     <string name="data_export_success">Successful export</string>
+
+    <string name="see_code">Code</string>
+    <string name="donate">Donate</string>
+
+    <string name="donation_dialog_title">Support us!</string>
+    <string name="donation_monero">Monero:</string>
+    <string name="donation_bitcoin">Bitcoin:</string>
+    <string name="donation_kofi">Ko-fi:</string>
+    <string name="donation_copy">Copy</string>
+    <string name="donation_view">View</string>
+    <string name="bitcoin_copied">Successfully copied Bitcoin address to keyboard</string>
+    <string name="monero_copied">Successfully copied Monero address to keyboard</string>
+    <string name="monero_address">44z1NzFE4Lz6enNV688ALHRbEA4CZSFBH9tQBWYqzRp59VC1cZW1P3dDmMuTCqj1rUPiaxas5egEK1k1wr9fzDXMPS6KHnd</string>
+    <string name="bitcoin_address">bc1qthk4e3pjw6fe9gt55erg4a36tl8cnp2l0rnjqu</string>
+    <string name="kofi_link">https://www.ko-fi.com/lovasr</string>
 
 </resources>

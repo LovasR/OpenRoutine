@@ -31,6 +31,8 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.material.textfield.TextInputLayout;
+
 import java.util.ArrayList;
 import java.util.Random;
 
@@ -113,6 +115,7 @@ public class MainFragment4 extends Fragment {
 
         alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
 
+        final TextInputLayout nameEditTextParent = dialogView.findViewById(R.id.activityEditNameField);
         final EditText nameEditText = dialogView.findViewById(R.id.activityEditName);
         final EditText editTimeText = dialogView.findViewById(R.id.activityEditTime);
         final Button colorPicker = dialogView.findViewById(R.id.activityEditColor);
@@ -132,6 +135,24 @@ public class MainFragment4 extends Fragment {
             selectedColor = getResources().getIntArray(R.array.default_colors)[Math.abs(new Random().nextInt()) % getResources().getIntArray(R.array.default_colors).length];
         }
 
+        nameEditText.addTextChangedListener(new TextWatcher() {
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                if(i2 != 0 && nameEditTextParent.getError() != null){
+                    nameEditTextParent.setError(null);
+                }
+            }
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+            @Override
+            public void afterTextChanged(Editable editable) {
+
+            }
+        });
+
         Drawable drawable = ContextCompat.getDrawable(fragment.getContext(), R.drawable.spinner_background);
         drawable.setColorFilter(selectedColor, PorterDuff.Mode.SRC);
         colorPicker.setBackground(drawable);
@@ -145,17 +166,19 @@ public class MainFragment4 extends Fragment {
         done.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                activityType.name = nameEditText.getText().toString();
-                Log.v("selectedColor", "will be: " + selectedColor);
-                activityType.color = selectedColor;
-                //editText.setText(activityType.name);
-                if(editTimeText.getText().length() > 0) {
-                    activityType.preferredLength = Integer.parseInt(editTimeText.getText().toString());
+                if(nameEditText.getText().length() > 0) {
+                    activityType.name = nameEditText.getText().toString();
+                    activityType.color = selectedColor;
+                    if (editTimeText.getText().length() > 0) {
+                        activityType.preferredLength = Integer.parseInt(editTimeText.getText().toString());
+                    } else {
+                        activityType.preferredLength = -1;
+                    }
+                    alertDialog.cancel();
+                    pickerAdapter.notifyDataSetChanged();
                 } else {
-                    activityType.preferredLength = -1;
+                    nameEditTextParent.setError(getString(R.string.todo_set_text_error));
                 }
-                alertDialog.cancel();
-                pickerAdapter.notifyDataSetChanged();
             }
         });
 

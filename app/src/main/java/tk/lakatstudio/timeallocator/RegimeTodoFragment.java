@@ -6,10 +6,13 @@ import android.content.Intent;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.ArrayAdapter;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
@@ -64,6 +67,8 @@ public class RegimeTodoFragment extends Fragment {
         todoListInit(this);
     }
 
+    ArrayAdapter<TodoItem> arrayAdapter;
+
     void todoListInit(final Fragment fragment){
 
         if(day.todoItems.size() == 0){
@@ -74,7 +79,8 @@ public class RegimeTodoFragment extends Fragment {
             noTodoText.setVisibility(View.GONE);
         }
 
-        final ArrayAdapter<TodoItem> arrayAdapter = new ArrayAdapter<TodoItem>(fragment.getContext(), R.layout.todo_item, new ArrayList<>(day.todoItems.values())) {
+        final ArrayList<TodoItem> todoItems = new ArrayList<>(day.todoItems.values());
+        arrayAdapter = new ArrayAdapter<TodoItem>(fragment.getContext(), R.layout.todo_item, todoItems) {
             @NonNull
             @Override
             public View getView(final int position, @Nullable View convertView, @NonNull ViewGroup parent) {
@@ -121,10 +127,7 @@ public class RegimeTodoFragment extends Fragment {
                             public void onClick(DialogInterface dialog, int which) {
                                 switch (which){
                                     case DialogInterface.BUTTON_POSITIVE:
-                                        regime.todoItemsRemove.add(todo.ID);
-                                        day.removeTodoItem(todo);
-                                        remove(todo);
-                                        notifyDataSetChanged();
+                                        removeTodoItem(view, todo, todoItems);
                                         break;
                                     case DialogInterface.BUTTON_NEGATIVE:
                                         break;
@@ -148,5 +151,25 @@ public class RegimeTodoFragment extends Fragment {
             }
         };
         todoList.setAdapter(arrayAdapter);
+    }
+
+    void removeTodoItem(final View itemView, TodoItem todoItem, ArrayList<TodoItem> todoItems){
+        Animation animation = AnimationUtils.loadAnimation(requireContext(), android.R.anim.slide_out_right);
+        animation.setDuration(300);
+        itemView.startAnimation(animation);
+
+        new Handler().postDelayed(new Runnable() {
+            public void run() {
+                itemView.setVisibility(View.INVISIBLE);
+                todoItems.remove(todoItem);
+                regime.todoItemsRemove.add(todoItem.ID);
+                day.removeTodoItem(todoItem);
+                arrayAdapter.notifyDataSetChanged();
+                if(day.todoItems.size() == 0){
+                    noTodoText.setVisibility(View.VISIBLE);
+                    todoList.setVisibility(View.GONE);
+                }
+            }
+        }, animation.getDuration());
     }
 }

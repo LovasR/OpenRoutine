@@ -7,12 +7,15 @@ import android.content.Intent;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.os.Handler;
 import android.text.SpannableString;
 import android.text.style.UnderlineSpan;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.ArrayAdapter;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
@@ -111,6 +114,8 @@ public class MainFragment2 extends Fragment {
         todoListInit(this);
     }
 
+    ArrayAdapter<TodoItem> arrayAdapter;
+
     void todoListInit(final Fragment fragment){
 
         if(day.todoItems.size() == 0){
@@ -122,7 +127,7 @@ public class MainFragment2 extends Fragment {
             todoList.setVisibility(View.VISIBLE);
         }
         final ArrayList<TodoItem> todoItems = new ArrayList<>(day.todoItems.values());
-        final ArrayAdapter<TodoItem> arrayAdapter = new ArrayAdapter<TodoItem>(fragment.getContext(), R.layout.todo_item, todoItems) {
+        arrayAdapter = new ArrayAdapter<TodoItem>(fragment.getContext(), R.layout.todo_item, todoItems) {
             @NonNull
             @Override
             public View getView(final int position, @Nullable View convertView, @NonNull ViewGroup parent) {
@@ -164,15 +169,19 @@ public class MainFragment2 extends Fragment {
                 convertView.setOnLongClickListener(new View.OnLongClickListener() {
                     @Override
                     public boolean onLongClick(View view) {
+
                         DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 switch (which){
                                     case DialogInterface.BUTTON_POSITIVE:
-                                        day.removeTodoItem(todo);
-                                        todoItems.remove(todo);
                                         Log.v("todo_debug", "" + todoItems.size());
-                                        notifyDataSetChanged();
+                                        /*notifyDataSetChanged();
+                                        if(day.todoItems.size() == 0){
+                                            noTodoText.setVisibility(View.VISIBLE);
+                                            todoList.setVisibility(View.GONE);
+                                        }*/
+                                        removeTodoItem(view, todo, todoItems);
                                         break;
                                     case DialogInterface.BUTTON_NEGATIVE:
                                         break;
@@ -190,14 +199,11 @@ public class MainFragment2 extends Fragment {
 
 
                 ImageButton itemCheck = convertView.findViewById(R.id.todoItemCheck);
+                View finalConvertView = convertView;
                 itemCheck.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        Log.v("__debug", "check clicked");
-                        TodoItem.removeItem(todo);
-                        day.removeTodoItem(todo);
-                        todoItems.remove(todo);
-                        notifyDataSetChanged();
+                        removeTodoItem(finalConvertView, todo, todoItems);
                     }
                 });
 
@@ -205,5 +211,24 @@ public class MainFragment2 extends Fragment {
             }
         };
         todoList.setAdapter(arrayAdapter);
+    }
+
+    void removeTodoItem(final View itemView, TodoItem todoItem, ArrayList<TodoItem> todoItems){
+        Animation animation = AnimationUtils.loadAnimation(requireContext(), android.R.anim.slide_out_right);
+        animation.setDuration(300);
+        itemView.startAnimation(animation);
+
+        new Handler().postDelayed(new Runnable() {
+            public void run() {
+                itemView.setVisibility(View.INVISIBLE);
+                todoItems.remove(todoItem);
+                day.removeTodoItem(todoItem);
+                arrayAdapter.notifyDataSetChanged();
+                if(day.todoItems.size() == 0){
+                    noTodoText.setVisibility(View.VISIBLE);
+                    todoList.setVisibility(View.GONE);
+                }
+            }
+        }, animation.getDuration());
     }
 }

@@ -11,12 +11,16 @@
         android:orientation="vertical">
 
         <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/outlineActivityTextField"
+            android:id="@+id/activityEditNameField"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="@string/activity_name"
             style="@style/TAOutlinedEditText"
-            android:layout_margin="10dp">
+            android:layout_margin="10dp"
+
+            app:errorEnabled="true"
+            app:boxStrokeErrorColor="@color/color_error"
+            app:errorTextColor="@color/color_error">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:layout_width="match_parent"

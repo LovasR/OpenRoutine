@@ -5,7 +5,6 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
-import android.widget.Toast;
 
 import androidx.core.app.AlarmManagerCompat;
 import androidx.preference.PreferenceManager;
@@ -22,9 +21,6 @@ public class ATBroadcastReceiver extends android.content.BroadcastReceiver {
 
     @Override
     public void onReceive(final Context context, final Intent intent) {
-        Log.v("notification", "onReceive ATBroadcastReceiver " + intent.getAction());
-        System.out.println("tk.lakatstudio onReceive ATBroadcastReceiver " + intent.getAction());
-        Toast.makeText(context, "Boot TA", Toast.LENGTH_SHORT).show();
         final PendingResult result = goAsync();
         Thread thread = new Thread() {
             public void run() {
@@ -36,9 +32,6 @@ public class ATBroadcastReceiver extends android.content.BroadcastReceiver {
                         intent1.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                         intent1.putExtra("notificationID", intent.getIntExtra("notificationID", 0));
                         context.startActivity(intent1);
-                        break;
-                    case ATNotificationManager.CREATE_NOTIFICATION:
-                        //ATNotificationManager.dayItemNotification(context, intent.getStringExtra("dayItemID"));
                         break;
                     case Intent.ACTION_BOOT_COMPLETED:
                         Day.setAllNotifications(context);

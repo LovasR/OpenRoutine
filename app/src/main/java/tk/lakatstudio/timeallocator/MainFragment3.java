@@ -7,6 +7,8 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -33,6 +35,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.google.android.material.datepicker.MaterialDatePicker;
 import com.google.android.material.datepicker.MaterialPickerOnPositiveButtonClickListener;
 import com.google.android.material.switchmaterial.SwitchMaterial;
+import com.google.android.material.textfield.TextInputLayout;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -166,6 +169,7 @@ public class MainFragment3 extends Fragment {
     void regimeDialog(Regime regime){
         final AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
         View dialogView = getLayoutInflater().inflate(R.layout.regime_add_dialog, null);
+        final TextInputLayout nameEditTextParent = dialogView.findViewById(R.id.addRegimeEditNameField);
         final EditText nameEditText = dialogView.findViewById(R.id.addRegimeEditName);
         ImageButton addScheduleItem = dialogView.findViewById(R.id.addScheduleItem);
         RecyclerView scheduleList = dialogView.findViewById(R.id.add_regime_dialog_schedule_list);
@@ -185,6 +189,23 @@ public class MainFragment3 extends Fragment {
             nameEditText.setText(regime.name);
         }
 
+        nameEditText.addTextChangedListener(new TextWatcher() {
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                if(i2 != 0 && nameEditTextParent.getError() != null){
+                    nameEditTextParent.setError(null);
+                }
+            }
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+            @Override
+            public void afterTextChanged(Editable editable) {
+
+            }
+        });
 
         scheduleList.setLayoutManager(new LinearLayoutManager(getContext()));
         final ScheduleAdapter scheduleAdapter = new ScheduleAdapter(getContext(), regime.schedule);
@@ -246,6 +267,8 @@ public class MainFragment3 extends Fragment {
                     finalRegime.name = nameEditText.getText().toString();
                     regimeListInit(MainFragment3.this);
                     alertDialog.cancel();
+                } else {
+                    nameEditTextParent.setError(getString(R.string.todo_set_text_error));
                 }
             }
         });
