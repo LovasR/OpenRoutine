@@ -17,7 +17,7 @@ import java.text.SimpleDateFormat;
 import java.util.Locale;
 import java.util.UUID;
 
-public class ATNotificationManager {
+public class TANotificationManager {
     public static final String ACTION_ACTION = "Notification.Action";
     public static final String ACTION_OTHER_ACTIVITY = "Notification.OtherActivity";
     public static final String CREATE_NOTIFICATION = "Notification.Create";

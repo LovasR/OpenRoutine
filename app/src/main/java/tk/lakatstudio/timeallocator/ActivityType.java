@@ -1,46 +1,34 @@
 package tk.lakatstudio.timeallocator;
 
-import android.util.Log;
-
-import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.UUID;
 
 public class ActivityType {
     String name;
-    int ID;
+    UUID ID;
     int color;
     boolean isColorCustom;
     int preferredLength;
 
     boolean isSaved;
 
-    public static ArrayList<ActivityType> allActivityTypes = new ArrayList<>();
-    static int currentID;
-
-    static ArrayList<ActivityType> userActivityTypes = new ArrayList<ActivityType>();
-
-    ActivityType(String n, int id, int c){
-        name = n;
-        ID = id;
-        color = c;
-    }
+    public static LinkedHashMap<UUID, ActivityType> allActivityTypes = new LinkedHashMap<>();
 
     ActivityType(){ }
 
     static ActivityType addActivityType(String name, int color){
-        int ID = ++currentID;
         ActivityType at = new ActivityType();
         at.name = name;
-        at.ID = ID;
+        at.ID = UUID.randomUUID();
         at.color = color;
         at.isSaved = false;
         at.isColorCustom = false;
         //at.preferredLength = -1;
-        allActivityTypes.add(at);
-        Log.e("AT_test", name + "\t" + String.valueOf(color) + "\t" + allActivityTypes.get(allActivityTypes.size() - 1).name);
+        allActivityTypes.put(at.ID, at);
         return at;
     }
 
     static void addActivityType(ActivityType at){
-        allActivityTypes.add(at);
+        //allActivityTypes.add(at);
     }
 }

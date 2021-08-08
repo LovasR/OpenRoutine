@@ -161,7 +161,7 @@ public class MainFragment2 extends Fragment {
                     public void onClick(View view) {
                         Intent editIntent = new Intent(fragment.getContext(), TodoItemActivity.class);
                         editIntent.putExtra("fragmentIndex", MainFragment1.fragmentIndex);
-                        editIntent.putExtra("index", position);
+                        editIntent.putExtra("ID", getItem(position).ID.toString());
                         startActivity(editIntent);
                     }
                 });

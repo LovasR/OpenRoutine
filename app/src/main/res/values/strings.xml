@@ -55,7 +55,7 @@
         <item>Work</item>
         <item>Sports</item>
         <item>Leisure</item>
-        <item>Doomscrolling</item>
+        <item>Chores</item>
     </string-array>
 
     <!--General strings-->
@@ -107,12 +107,13 @@
     <string name="todo_add_time">Add time</string>
     <string name="todo_set_text_error">Text can\'t be empty!</string>
     <string name="todo_no_todo">Nothing to do on this day!</string>
+    <string name="todo_no_day_item">No plans to add to</string>
 
     <!--DayItem activity-->
 
     <string name="day_item_singular">item</string>
     <string name="buttonDone">Done</string>
-    <string name="day_item_name_hint">Name of the activity</string>
+    <string name="day_item_name_hint">Title</string>
     <string name="set_day_name_start">Set start</string>
     <string name="set_day_name_end">Set end</string>
 
@@ -196,7 +197,7 @@
 
     <string name="setting_system_default">System default</string>
 
-    <string name="format_settings_title">Formats</string>
+    <string name="format_settings_title">Look and feel</string>
 
     <string name="date_format_setting_title">Set date format</string>
     <string name="date_format_setting_summary"><b>Advanced feature:</b> Set date format based on Java\'s SimpleDateFormat.</string>

@@ -111,7 +111,7 @@ public class MainActivity extends AppCompatActivity {
                         startActivity(intent3);*/
                         break;
                     case R.id.main_menu_4:
-                        fragment4.activityTypeAdd(-1, fragment4);
+                        fragment4.activityTypeAdd(null, fragment4);
                         break;
                 }
 

@@ -92,10 +92,9 @@ public class DayItemActivity extends FragmentActivity {
             int defaultColor = getResources().getIntArray(R.array.default_colors)[0];
             String name = getResources().getStringArray(R.array.default_activities)[0];
             ActivityType.addActivityType(name, defaultColor);
-            selectedActivity = ActivityType.allActivityTypes.get(ActivityType.allActivityTypes.size() - 1);
-        } else {
-            selectedActivity = ActivityType.allActivityTypes.get(0);
         }
+
+        selectedActivity = ActivityType.allActivityTypes.values().iterator().next();
 
         final EditText itemName = findViewById(R.id.addDayItemEditName);
 
@@ -278,14 +277,15 @@ public class DayItemActivity extends FragmentActivity {
 
                 alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
 
-                ArrayAdapter<ActivityType> adapter = new ArrayAdapter<ActivityType>(getBaseContext(), R.layout.activity_item, ActivityType.allActivityTypes){
+                ArrayList<ActivityType> activityTypes = new ArrayList<>(ActivityType.allActivityTypes.values());
+                ArrayAdapter<ActivityType> adapter = new ArrayAdapter<ActivityType>(getBaseContext(), R.layout.activity_item, activityTypes){
                     @NonNull
                     @Override
                     public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
                         if(convertView==null){
                             convertView = getLayoutInflater().inflate(R.layout.activity_item, null);
                         }
-                        ActivityType activityType = ActivityType.allActivityTypes.get(position);
+                        ActivityType activityType = activityTypes.get(position);
 
                         TextView textView = (TextView) convertView;
                         textView.setText(activityType.name);
@@ -300,7 +300,7 @@ public class DayItemActivity extends FragmentActivity {
                 pickerList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                     @Override
                     public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                        selectedActivity = ActivityType.allActivityTypes.get(i);
+                        selectedActivity = activityTypes.get(i);
 
                         //set activityindicator to newly selected type
                         activityButton.setText(selectedActivity.name);
@@ -479,7 +479,7 @@ public class DayItemActivity extends FragmentActivity {
             calendar.setTimeInMillis(dayItem.start.getTime());
 
             for(DayItem.NotificationTime timeOffset : notificationTimesAdded.values()){
-                Log.v("notificationSet", "offset format: " + ATNotificationManager.offsetFormat(context, timeOffset.offset));
+                Log.v("notificationSet", "offset format: " + TANotificationManager.offsetFormat(context, timeOffset.offset));
                 if(focusedDay.start.getTime() + (24 * 60 * 60 * 1000) < dayItem.start.getTime() + (timeOffset.offset * 1000)
                         || focusedDay.start.getTime() > dayItem.start.getTime() + (timeOffset.offset * 1000)){
                     if(!isRegimeDay) {

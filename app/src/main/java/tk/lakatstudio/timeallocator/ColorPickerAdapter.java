@@ -36,7 +36,7 @@ public class ColorPickerAdapter extends RecyclerView.Adapter<ColorPickerAdapter.
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        Drawable drawable = ContextCompat.getDrawable(context, R.drawable.circle_24 );
+        Drawable drawable = ContextCompat.getDrawable(context, R.drawable.circle_24);
         drawable.setColorFilter(colors.get(position), PorterDuff.Mode.SRC);
         holder.imageView.setImageDrawable(drawable);
     }

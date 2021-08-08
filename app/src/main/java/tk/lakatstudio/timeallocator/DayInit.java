@@ -13,7 +13,6 @@ import android.util.Log;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatDelegate;
-import androidx.core.app.AlarmManagerCompat;
 import androidx.preference.PreferenceManager;
 
 import com.google.android.material.timepicker.TimeFormat;
@@ -89,10 +88,6 @@ public class DayInit {
             //mainActivity.fragment1.dayPlannerInit(mainActivity.fragment1);
         }
 
-        if(ActivityType.allActivityTypes.size() > 0) {
-            ActivityType.currentID = ActivityType.allActivityTypes.get(ActivityType.allActivityTypes.size() - 1).ID;
-        }
-
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
 
         setSelectedTheme(null);
@@ -102,8 +97,7 @@ public class DayInit {
             @Override
             public void run() {
                 notificationRequestID = sharedPreferences.getInt("requestID", 0);
-                ATNotificationManager.createNotificationChannel(context);
-                //am = (AlarmManager) context.getApplicationContext().getSystemService(Context.ALARM_SERVICE);
+                TANotificationManager.createNotificationChannel(context);
                 pendingIntentCleanup(context);
             }
         }).start();
@@ -141,69 +135,13 @@ public class DayInit {
     }
 
     static void pendingIntentCleanup(Context context){
-        Intent alarmIntent = new Intent(context, ATBroadcastReceiver.class);
+        Intent alarmIntent = new Intent(context, GeneralBroadcastReceiver.class);
         alarmIntent.setAction("Notification.Create");
         alarmIntent.putExtra("dayItemID", "");
         final PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 0, alarmIntent,PendingIntent.FLAG_NO_CREATE);
         if (pendingIntent != null) {
             Log.v("notification", "pendingIntent existed ");
             pendingIntent.cancel();
-        }
-    }
-
-    //static AlarmManager am;
-    static void setAlarm(Context context, String dayItemID, long alarmTime){
-        AlarmManager am = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-
-        Intent intent = new Intent(context, NotificationReceiver.class);
-        intent.setPackage(context.getPackageName());
-        intent.setAction("Notification.Create");
-        intent.putExtra("dayItemID", dayItemID);
-        //(int) ((alarmTime / 1000) & 0xFFFFFF)
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 0, intent, 0);
-
-        Log.v("notification", "setting alarm: " + alarmTime + " " + dayItemID + " " + (int) ((alarmTime / 1000) & 0xFFFFFF));
-        Log.v("notification", "pendingIntent: " + intent.toString() + (pendingIntent != null ? " !null" : " null"));
-
-        AlarmManagerCompat.setExactAndAllowWhileIdle(am, AlarmManager.RTC_WAKEUP, alarmTime, pendingIntent);
-
-        if(am.getNextAlarmClock() != null)
-            Log.v("notification", "alarm: " + am.getNextAlarmClock().toString());
-        /*if(am.getNextAlarmClock() != null) {
-            Log.v("notification", "NextAlarmClock is not null");
-            if (am.getNextAlarmClock().getShowIntent().equals(pendingIntent)) {
-                Log.v("notification", "same intent: ");
-            }
-        } else {
-            Log.v("notification", "NextAlarmClock is null");
-        }*/
-    }
-
-    static void addAlarm(Context context, DayItem dayItem){
-        if(dayItem.notificationTimes.size() > 0){
-            DayItem dayItem_ = currentDayItems.get(UUID.fromString(dayItem.ID.toString()));
-            Log.v("notifications", (dayItem_ == null ? "dayItem_ is null " : "dayItem_ is !!!null "));
-            AlarmManager am = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-
-            Intent notificationIntent = new Intent(context, NotificationReceiver.class);
-
-            notificationIntent.setPackage(context.getPackageName());
-            notificationIntent.setAction("Notification.Create");
-            notificationIntent.putExtra("dayItemID", dayItem.ID.toString());
-            notificationIntent.putExtra("dayItemTypeName", dayItem.type.name);
-
-            for(DayItem.NotificationTime timeOffset : dayItem.notificationTimes.values()){
-                notificationIntent.putExtra("requestID", timeOffset.requestID);
-        notificationIntent.putExtra("dayItemStart", dayItem.start.getTime());
-        notificationIntent.putExtra("dayItemEnd", dayItem.end.getTime());
-                notificationIntent.putExtra("notificationOffset", timeOffset.offset);
-                notificationIntent.putExtra("notificationOffsetR", timeOffset.fromEnd);
-
-                PendingIntent pendingIntent = PendingIntent.getBroadcast(context, timeOffset.requestID, notificationIntent, 0);
-
-                AlarmManagerCompat.setExactAndAllowWhileIdle(am, AlarmManager.RTC_WAKEUP, dayItem.start.getTime() + (timeOffset.offset * 1000), pendingIntent);
-
-            }
         }
     }
 
@@ -285,7 +223,6 @@ public class DayInit {
     static void saveAll(final Context context){
 
         //save modified days
-        Log.v("day_save", daysHashMap.toString());
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -299,7 +236,6 @@ public class DayInit {
                         outJson = "";
                         outJson += gson.toJson(day);
                         outJson += "\n";
-                        Log.v("day_save", "day_" + new SimpleDateFormat("y.M.d", Locale.getDefault()).format(day.start.getTime()));
                         writeToFile(context, outJson, "day_" + new SimpleDateFormat("y.M.d", Locale.getDefault()).format(day.start.getTime()));
                         day.isSaved = true;
                     }
@@ -314,18 +250,12 @@ public class DayInit {
             public void run() {
                 StringBuilder outJson = new StringBuilder();
                 int lastID = -1;
-                for(int i = 0; i < ActivityType.allActivityTypes.size(); i++){
-                    ActivityType activityType = ActivityType.allActivityTypes.get(i);
-                    Log.v("save_debug", "test");
-                    if(activityType.ID > lastID){
-                        activityType.isSaved = true;
-                        outJson.append(gson.toJson(activityType));
-                        outJson.append("\n");
-                        Log.v("save_debug", "save activity");
-                        lastID = activityType.ID;
-                    }
+                for(ActivityType activityType : ActivityType.allActivityTypes.values()){
+                    activityType.isSaved = true;
+                    outJson.append(gson.toJson(activityType));
+                    outJson.append("\n");
+                    Log.v("save_debug", "save activity");
                 }
-                Log.v("Out_Json activities", outJson.toString());
                 if(outJson.length() > 0){
                     writeToFile(context, outJson.toString(), "activities");
                 }
@@ -343,7 +273,6 @@ public class DayInit {
                         outJson += "\n";
                     }
                 }
-                Log.v("save_debug", "regimes: " + outJson);
                 if(outJson.length() > 0){
                     writeToFile(context, outJson, "regimes");
                 }
@@ -366,15 +295,17 @@ public class DayInit {
             writer.append(json);
             writer.flush();
             writer.close();
-            Log.v("save_debug", "successful file write: " + json.length() + " @: " + file.getAbsolutePath());
         } catch (Exception e){
             //e.printStackTrace();
-            Log.v("save_debug", "file writing exception");
+            Log.e("save_debug", "file writing exception");
         }
     }
 
     static boolean loadAll(Context context){
-        loadRegimes(context);
+        if(!loadRegimes(context)){
+            return false;
+        }
+
 
         ArrayList<String> days = readFromFile(context, "day_" + new SimpleDateFormat("y.M.d", Locale.getDefault()).format(Calendar.getInstance().getTime()));
 
@@ -404,12 +335,14 @@ public class DayInit {
                 Log.v("save_debug_load", "load activity: \t" + activityJson);
             }
             Log.v("save_debug_load", temporaryActivityTypes.toString());
-            ActivityType.allActivityTypes.addAll(temporaryActivityTypes);
+            for(ActivityType activityType : temporaryActivityTypes){
+                ActivityType.allActivityTypes.put(activityType.ID, activityType);
+            }
         }
         return true;
     }
 
-    static void  loadRegimes(Context context){
+    static boolean loadRegimes(Context context){
         Regime.allRegimes = new HashMap<>();
         Log.v("regime_null", "loadRegimes");
         ArrayList<String> regimeList = readFromFile(context, "regimes");
@@ -420,8 +353,10 @@ public class DayInit {
                 regime.nullCheck();
                 Regime.addRegime(regime);
             }
+            return true;
         } else {
             Log.v("save_Debug_load", "regime file null");
+            return false;
         }
     }
 

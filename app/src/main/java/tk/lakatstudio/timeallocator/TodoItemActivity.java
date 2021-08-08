@@ -18,6 +18,7 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -49,9 +50,9 @@ public class TodoItemActivity extends FragmentActivity {
         final int dayIndex = getIntent().getExtras().getInt("fragmentIndex", -1);
         if(dayIndex != -1){
             day = DayInit.daysHashMap.get(dayIndex);
-            int todoIndex = getIntent().getExtras().getInt("index", -1);
-            if(todoIndex != -1) {
-                todoItem = day.todoItems.get(todoIndex);
+            String todoIDRaw = getIntent().getExtras().getString("ID", "");
+            if(todoIDRaw.length() != 0) {
+                todoItem = day.todoItems.get(UUID.fromString(todoIDRaw));
             }
         } else {
             String rawRegimeIndex = getIntent().getExtras().getString("regimeIndex", "");
@@ -105,7 +106,7 @@ public class TodoItemActivity extends FragmentActivity {
             @Override
             public void onClick(View view) {
                 if(day.dayItems.size() == 0){
-                    //TODO relay lack of item to associate to user
+                    Toast.makeText(TodoItemActivity.this, R.string.todo_no_day_item, Toast.LENGTH_SHORT).show();
                     return;
                 }
 
@@ -129,9 +130,6 @@ public class TodoItemActivity extends FragmentActivity {
 
                         TextView itemStart = convertView.findViewById(R.id.dayPlannerItemStart);
                         itemStart.setText(new SimpleDateFormat("HH:mm", Locale.getDefault()).format(dayItem.start.getTime()));
-
-                        TextView itemLength = convertView.findViewById(R.id.dayPlannerItemLength);
-                        //itemLength.setText(lengthAdapter(dayItem.start, dayItem.end));
 
                         TextView itemName = convertView.findViewById(R.id.dayPlannerItem);
                         if (dayItem.name.length() != 0) {
@@ -158,7 +156,7 @@ public class TodoItemActivity extends FragmentActivity {
 
                         if(assoc != null) {
                             selectDayItem.setText(assoc.type.name);
-                            Drawable drawable = getDrawable(R.drawable.spinner_background);
+                            Drawable drawable = AppCompatResources.getDrawable(TodoItemActivity.this, R.drawable.spinner_background);
                             drawable.setColorFilter(assoc.type.color, PorterDuff.Mode.SRC);
                             selectDayItem.setBackground(drawable);
 
@@ -180,7 +178,7 @@ public class TodoItemActivity extends FragmentActivity {
             if(todoItem.dayItem != null){
                 assoc = todoItem.dayItem;
                 selectDayItem.setText(assoc.type.name);
-                Drawable drawable = getDrawable(R.drawable.spinner_background);
+                Drawable drawable = AppCompatResources.getDrawable(TodoItemActivity.this, R.drawable.spinner_background);
                 drawable.setColorFilter(assoc.type.color, PorterDuff.Mode.SRC);
                 selectDayItem.setBackground(drawable);
 
@@ -196,7 +194,7 @@ public class TodoItemActivity extends FragmentActivity {
             public void onClick(View view) {
                 removeDayItem.setVisibility(View.GONE);
                 selectDayItem.setText(R.string.todo_add_time);
-                selectDayItem.setBackground(getDrawable(R.drawable.spinner_background));
+                selectDayItem.setBackground(AppCompatResources.getDrawable(TodoItemActivity.this, R.drawable.spinner_background));
                 dayItemTime.setVisibility(View.GONE);
                 assoc = null;
             }
@@ -234,7 +232,7 @@ public class TodoItemActivity extends FragmentActivity {
     /*
     private void setDayItemView(DayItem dayItem){
         selectDayItem.setText(assoc.type.name);
-        Drawable drawable = getDrawable(R.drawable.spinner_background);
+        Drawable drawable = AppCompatResources.getDrawable(TodoItemActivity.this, R.drawable.spinner_background);
         drawable.setColorFilter(assoc.type.color, PorterDuff.Mode.SRC);
         selectDayItem.setBackground(drawable);
 

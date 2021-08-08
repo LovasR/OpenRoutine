@@ -35,6 +35,7 @@ import com.google.android.material.textfield.TextInputLayout;
 
 import java.util.ArrayList;
 import java.util.Random;
+import java.util.UUID;
 
 public class MainFragment4 extends Fragment {
 
@@ -55,14 +56,15 @@ public class MainFragment4 extends Fragment {
     }
 
     void activityPickerInit(final Fragment fragment){
-        pickerAdapter = new ArrayAdapter<ActivityType>(fragment.getContext(), R.layout.activity_item, ActivityType.allActivityTypes){
+        ArrayList<ActivityType> activityTypes = new ArrayList<>(ActivityType.allActivityTypes.values());
+        pickerAdapter = new ArrayAdapter<ActivityType>(fragment.getContext(), R.layout.activity_item, activityTypes){
             @NonNull
             @Override
             public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
-                if(convertView==null){
+                if(convertView == null){
                     convertView = getLayoutInflater().inflate(R.layout.activity_item, null);
                 }
-                ActivityType activityType = ActivityType.allActivityTypes.get(position);
+                ActivityType activityType = activityTypes.get(position);
 
                 TextView textView = (TextView) convertView;
                 textView.setText(activityType.name);
@@ -77,7 +79,7 @@ public class MainFragment4 extends Fragment {
         pickerList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                activityTypeAdd(i, fragment);
+                activityTypeAdd(activityTypes.get(i).ID, fragment);
             }
         });
         pickerList.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
@@ -88,7 +90,7 @@ public class MainFragment4 extends Fragment {
                     public void onClick(DialogInterface dialog, int which) {
                         switch (which){
                             case DialogInterface.BUTTON_POSITIVE:
-                                ActivityType.allActivityTypes.remove(ActivityType.allActivityTypes.get(i));
+                                ActivityType.allActivityTypes.remove(activityTypes.get(i).ID);
                                 pickerAdapter.notifyDataSetChanged();
                                 break;
                             case DialogInterface.BUTTON_NEGATIVE:
@@ -107,7 +109,7 @@ public class MainFragment4 extends Fragment {
 
     int selectedColor;
 
-    void activityTypeAdd(int index, final Fragment fragment){
+    void activityTypeAdd(UUID ID, final Fragment fragment){
         final AlertDialog.Builder builder = new AlertDialog.Builder(fragment.getContext());
         View dialogView = getLayoutInflater().inflate(R.layout.activity_edit_dialog, null);
         builder.setView(dialogView);
@@ -123,8 +125,8 @@ public class MainFragment4 extends Fragment {
 
 
         final ActivityType activityType;
-        if(index != -1) {
-            activityType = ActivityType.allActivityTypes.get(index);
+        if(ID != null) {
+            activityType = ActivityType.allActivityTypes.get(ID);
             nameEditText.setText(activityType.name);
             if(activityType.preferredLength > 0) {
                 editTimeText.setText(String.valueOf(activityType.preferredLength));
@@ -186,7 +188,7 @@ public class MainFragment4 extends Fragment {
             @Override
             public void onCancel(DialogInterface dialogInterface) {
                 if(activityType.name.length() == 0){
-                    ActivityType.allActivityTypes.remove(activityType);
+                    ActivityType.allActivityTypes.remove(activityType.ID);
                 }
             }
         });

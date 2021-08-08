@@ -1,5 +1,7 @@
 package tk.lakatstudio.timeallocator;
 
+import static tk.lakatstudio.timeallocator.DayInit.gson;
+
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Context;
@@ -14,9 +16,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Locale;
 
-import static tk.lakatstudio.timeallocator.DayInit.gson;
-
-public class ATBroadcastReceiver extends android.content.BroadcastReceiver {
+public class GeneralBroadcastReceiver extends android.content.BroadcastReceiver {
     int notificationID = 8;
 
     @Override
@@ -27,7 +27,7 @@ public class ATBroadcastReceiver extends android.content.BroadcastReceiver {
                 int i = 0;
 
                 switch(intent.getAction()){
-                    case ATNotificationManager.ACTION_OTHER_ACTIVITY:
+                    case TANotificationManager.ACTION_OTHER_ACTIVITY:
                         Intent intent1 = new Intent(context, SilenceDialog.class);
                         intent1.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                         intent1.putExtra("notificationID", intent.getIntExtra("notificationID", 0));

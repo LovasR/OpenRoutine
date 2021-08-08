@@ -30,7 +30,7 @@ public class SettingsActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(Intent.ACTION_VIEW);
-                intent.setData(Uri.parse("https://www.github.com"));
+                intent.setData(Uri.parse("https://github.com/LovasR/OpenRoutine"));
                 startActivity(intent);
             }
         });
