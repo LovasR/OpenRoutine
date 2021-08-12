@@ -28,6 +28,12 @@
             android:key="dark_mode"
             android:title="@string/dark_mode_setting_title"
             android:summary="@string/dark_mode_setting_summary"/>
+        <ListPreference
+            android:defaultValue="null"
+            android:entries="@array/language_setting_entries"
+            android:entryValues="@array/language_setting_value_entries"
+            android:key="language_select"
+            android:title="@string/language_setting_title"/>
     </PreferenceCategory>
     <PreferenceCategory
         android:title="Data">

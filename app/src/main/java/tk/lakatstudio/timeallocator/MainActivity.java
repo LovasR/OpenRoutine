@@ -3,6 +3,7 @@ package tk.lakatstudio.timeallocator;
 import android.content.BroadcastReceiver;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageButton;
@@ -44,6 +45,13 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        DayInit.defaultLocale = Locale.getDefault();
+
+        DayInit.sharedPreferences = PreferenceManager.getDefaultSharedPreferences(MainActivity.this);
+
+        DayInit.setLocale(getResources(), null);
+
         setContentView(R.layout.activity_main);
 
         DayInit.init(this);

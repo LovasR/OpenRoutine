@@ -30,6 +30,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatDelegate;
 import androidx.core.app.AlarmManagerCompat;
 import androidx.fragment.app.FragmentActivity;
 import androidx.recyclerview.widget.DividerItemDecoration;
@@ -86,6 +87,7 @@ public class DayItemActivity extends FragmentActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        DayInit.setLocale(getResources(), null);
         setContentView(R.layout.activity_day_item_add);
 
         if(ActivityType.allActivityTypes.size() == 0){
@@ -132,6 +134,8 @@ public class DayItemActivity extends FragmentActivity {
         if(dayItemID != null) {
             dayItem = focusedDay.dayItems.get(dayItemID);
         }
+
+        Log.v("theme_debug", AppCompatDelegate.getDefaultNightMode() + "");
 
         //this if/else sets all the UI elements if the activity was started with the intention of editing
         if(dayItem != null){

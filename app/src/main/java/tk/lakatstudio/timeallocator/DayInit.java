@@ -7,6 +7,8 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.Configuration;
+import android.content.res.Resources;
 import android.net.Uri;
 import android.text.format.DateFormat;
 import android.util.Log;
@@ -59,6 +61,8 @@ public class DayInit {
     //main Gson
     static Gson gson;
 
+    static Locale defaultLocale;
+
     static void init(final Context context){
 
         initGson();
@@ -87,8 +91,6 @@ public class DayInit {
             //Log.v("save_debug_load", "Loading finished " + currentDay.dayItems.size());
             //mainActivity.fragment1.dayPlannerInit(mainActivity.fragment1);
         }
-
-        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
 
         setSelectedTheme(null);
 
@@ -215,6 +217,21 @@ public class DayInit {
         }
     }
 
+    public static void setLocale(Resources resources, String languageCode) {
+        Locale locale;
+        if(languageCode == null) {
+            locale = new Locale(sharedPreferences.getString("language_select", "en"));
+        } else if(languageCode.equals("null")){
+            locale = defaultLocale;
+        } else {
+            locale = new Locale(languageCode);
+        }
+        Locale.setDefault(locale);
+        Configuration config = resources.getConfiguration();
+        config.setLocale(locale);
+        resources.updateConfiguration(config, resources.getDisplayMetrics());
+    }
+
     static String getDateFormat(Context context){
         //get dateformat from string
         return sharedPreferences.getString("date_format", context.getString(R.string.default_date_format));
@@ -302,10 +319,25 @@ public class DayInit {
     }
 
     static boolean loadAll(Context context){
-        if(!loadRegimes(context)){
+        ArrayList<String> activityList = readFromFile(context, "activities");
+        if(activityList != null) {
+            Log.v("save_debug_load", "load activities: " + activityList.size());
+            ActivityType.allActivityTypes.clear();
+            LinkedHashSet<ActivityType> temporaryActivityTypes = new LinkedHashSet<>();
+            for (String activityJson : activityList) {
+                ActivityType activityType = gson.fromJson(activityJson, ActivityType.class);
+                temporaryActivityTypes.add(activityType);
+                Log.v("save_debug_load", "load activity: \t" + activityJson);
+            }
+            Log.v("save_debug_load", temporaryActivityTypes.toString());
+            for(ActivityType activityType : temporaryActivityTypes){
+                ActivityType.allActivityTypes.put(activityType.ID, activityType);
+            }
+        } else {
             return false;
         }
 
+        loadRegimes(context);
 
         ArrayList<String> days = readFromFile(context, "day_" + new SimpleDateFormat("y.M.d", Locale.getDefault()).format(Calendar.getInstance().getTime()));
 
@@ -321,28 +353,12 @@ public class DayInit {
                     DayItem.allDayItemHashes.put(dayItem.ID, dayItem);
                 }
                 currentDay.isRegimeSet = false;
-             }
-        }
-
-        ArrayList<String> activityList = readFromFile(context, "activities");
-        if(activityList != null) {
-            Log.v("save_debug_load", "load activities: " + activityList.size());
-            ActivityType.allActivityTypes.clear();
-            LinkedHashSet<ActivityType> temporaryActivityTypes = new LinkedHashSet<>();
-            for (String activityJson : activityList) {
-                ActivityType activityType = gson.fromJson(activityJson, ActivityType.class);
-                temporaryActivityTypes.add(activityType);
-                Log.v("save_debug_load", "load activity: \t" + activityJson);
-            }
-            Log.v("save_debug_load", temporaryActivityTypes.toString());
-            for(ActivityType activityType : temporaryActivityTypes){
-                ActivityType.allActivityTypes.put(activityType.ID, activityType);
             }
         }
         return true;
     }
 
-    static boolean loadRegimes(Context context){
+    static void loadRegimes(Context context){
         Regime.allRegimes = new HashMap<>();
         Log.v("regime_null", "loadRegimes");
         ArrayList<String> regimeList = readFromFile(context, "regimes");
@@ -353,10 +369,6 @@ public class DayInit {
                 regime.nullCheck();
                 Regime.addRegime(regime);
             }
-            return true;
-        } else {
-            Log.v("save_Debug_load", "regime file null");
-            return false;
         }
     }
 

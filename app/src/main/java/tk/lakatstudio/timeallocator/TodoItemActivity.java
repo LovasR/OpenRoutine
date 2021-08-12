@@ -44,6 +44,7 @@ public class TodoItemActivity extends FragmentActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        DayInit.setLocale(getResources(), null);
         setContentView(R.layout.todo_item_add);
 
         //get item for editing

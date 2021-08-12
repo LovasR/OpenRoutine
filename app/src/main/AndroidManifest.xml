@@ -27,8 +27,11 @@
             android:taskAffinity="" android:theme="@style/Theme.AppCompat.Dialog">
         </activity>
 
-        <activity android:name=".DayItemActivity"/>
-        <activity android:name=".TodoItemActivity"/>
+        <activity android:name=".DayItemActivity"
+            android:theme="@style/AppTheme"/>
+        <activity
+            android:name=".TodoItemActivity"
+            android:theme="@style/AppTheme"/>
         <activity android:name=".RegimeActivity"/>
         <activity android:name=".SettingsActivity"/>
         <receiver

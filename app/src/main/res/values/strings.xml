@@ -50,12 +50,17 @@
 
     <!-- Settings -->
 
+    <string name="default_activity_1">Studying</string>
+    <string name="default_activity_2">Work</string>
+    <string name="default_activity_3">Sports</string>
+    <string name="default_activity_4">Leisure</string>
+    <string name="default_activity_5">Chores</string>
     <string-array name="default_activities">
-        <item>Studying</item>
-        <item>Work</item>
-        <item>Sports</item>
-        <item>Leisure</item>
-        <item>Chores</item>
+        <item>@string/default_activity_1</item>
+        <item>@string/default_activity_2</item>
+        <item>@string/default_activity_3</item>
+        <item>@string/default_activity_4</item>
+        <item>@string/default_activity_5</item>
     </string-array>
 
     <!--General strings-->
@@ -121,7 +126,7 @@
 
     <string name="preposition1">From:</string>
     <string name="preposition2">To:</string>
-    <string name="preposition3"></string>
+    <string name="preposition3">" "</string>
 
     <string name="activity_picker_title">Select a type of activity:</string>
 
@@ -159,7 +164,7 @@
     <string name="regime_menu_1_title">Days</string>
     <string name="regime_menu_2_title">To-Dos</string>
 
-    <string name="regime_dialog_title">Set-up routine</string>
+    <string name="regime_dialog_title">Set routine</string>
 
     <string name="regime_dialog_schedule">Schedule</string>
 
@@ -170,6 +175,7 @@
     <string name="regime_dialog_schedule_default">by <b>default</b></string>
     <string name="regime_dialog_schedule_from">from:</string>
     <string name="regime_dialog_schedule_to">to:</string>
+    <string name="regime_dialog_schedule_to_optional">" "</string>
     <string name="regime_dialog_schedule_forever">forever</string>
 
     <string name="schedule_item_dialog_title">Add to schedule</string>
@@ -228,12 +234,32 @@
         <item>2</item>
     </string-array>
 
+
+    <string name="language_setting_title">Select language</string>
+
+    <string name="system_default">System default</string>
+    <string name="english" translatable="false">English</string>
+    <string name="esperanto" translatable="false">Esperanto</string>
+    <string name="hungarian" translatable="false">Magyar</string>
+    <string-array name="language_setting_entries">
+        <item>@string/system_default</item>
+        <item>@string/english</item>
+        <item>@string/esperanto</item>
+        <item>@string/hungarian</item>
+    </string-array>
+    <string-array name="language_setting_value_entries">
+        <item>null</item>
+        <item>en</item>
+        <item>eo</item>
+        <item>hu</item>
+    </string-array>
+
     <string name="data_export_setting_title">Export data</string>
     <string name="data_export_setting_summary">Export data to a .zip at the selected location</string>
     <string name="data_import_setting_title">Import data</string>
     <string name="data_import_setting_summary">Import data from a .zip, the zip must contain a saves folder</string>
 
-    <string name="data_import_format_error">Error in the format of the zip file. Import failed</string>
+    <string name="data_import_format_error">Error in the format of the zip file, import failed</string>
     <string name="data_import_success">Successful import</string>
     <string name="data_export_success">Successful export</string>
 
@@ -241,15 +267,15 @@
     <string name="donate">Donate</string>
 
     <string name="donation_dialog_title">Support us!</string>
-    <string name="donation_monero">Monero:</string>
-    <string name="donation_bitcoin">Bitcoin:</string>
-    <string name="donation_kofi">Ko-fi:</string>
+    <string name="donation_monero" translatable="false">Monero:</string>
+    <string name="donation_bitcoin" translatable="false">Bitcoin:</string>
+    <string name="donation_kofi" translatable="false">Ko-fi:</string>
     <string name="donation_copy">Copy</string>
     <string name="donation_view">View</string>
-    <string name="bitcoin_copied">Successfully copied Bitcoin address to keyboard</string>
-    <string name="monero_copied">Successfully copied Monero address to keyboard</string>
-    <string name="monero_address">44z1NzFE4Lz6enNV688ALHRbEA4CZSFBH9tQBWYqzRp59VC1cZW1P3dDmMuTCqj1rUPiaxas5egEK1k1wr9fzDXMPS6KHnd</string>
-    <string name="bitcoin_address">bc1qthk4e3pjw6fe9gt55erg4a36tl8cnp2l0rnjqu</string>
-    <string name="kofi_link">https://www.ko-fi.com/lovasr</string>
+    <string name="bitcoin_copied">Successfully copied Bitcoin address to clipboard</string>
+    <string name="monero_copied">Successfully copied Monero address to clipboard</string>
+    <string name="monero_address" translatable="false">44z1NzFE4Lz6enNV688ALHRbEA4CZSFBH9tQBWYqzRp59VC1cZW1P3dDmMuTCqj1rUPiaxas5egEK1k1wr9fzDXMPS6KHnd</string>
+    <string name="bitcoin_address" translatable="false">bc1qthk4e3pjw6fe9gt55erg4a36tl8cnp2l0rnjqu</string>
+    <string name="kofi_link" translatable="false">https://www.ko-fi.com/lovasr</string>
 
 </resources>

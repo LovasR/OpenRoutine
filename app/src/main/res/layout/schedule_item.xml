@@ -50,5 +50,6 @@
         android:layout_height="match_parent"
         android:textSize="14sp"
         android:padding="4dp"
-        android:id="@+id/scheduleTextView6"/>
+        android:id="@+id/scheduleTextView6"
+        android:text="@string/regime_dialog_schedule_to_optional"/>
 </LinearLayout>

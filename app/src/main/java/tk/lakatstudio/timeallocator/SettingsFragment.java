@@ -1,8 +1,11 @@
 package tk.lakatstudio.timeallocator;
 
 import android.Manifest;
+import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.content.res.Configuration;
+import android.content.res.Resources;
 import android.net.Uri;
 import android.os.Bundle;
 import android.text.InputFilter;
@@ -22,6 +25,8 @@ import androidx.preference.EditTextPreference;
 import androidx.preference.ListPreference;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
+
+import java.util.Locale;
 
 public class SettingsFragment extends PreferenceFragmentCompat implements ActivityResultCallback {
 
@@ -98,6 +103,7 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Activi
         ListPreference hourFormatP = findPreference("hour_format");
         Preference colorPreference = findPreference("color");
         EditTextPreference editTextPreference = findPreference("date_format");
+        ListPreference languagePreference = findPreference("language_select");
 
         editTextPreference.setOnBindEditTextListener(new EditTextPreference.OnBindEditTextListener() {
             @Override
@@ -134,6 +140,24 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Activi
             @Override
             public boolean onPreferenceChange(Preference preference, Object newValue) {
                 DayInit.setSelectedTheme(newValue);
+                DayInit.sharedPreferences.edit().putString("dark_mode", (String) newValue).apply();
+                Intent i = getActivity().getBaseContext().getPackageManager() .getLaunchIntentForPackage(getActivity().getBaseContext().getPackageName());
+                i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP); i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                startActivity(i);
+                getActivity().finish();
+                return false;
+            }
+        });
+
+        languagePreference.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+            @Override
+            public boolean onPreferenceChange(Preference preference, Object newValue) {
+                DayInit.setLocale(getResources(), (String) newValue);
+                DayInit.sharedPreferences.edit().putString("language_select", (String) newValue).apply();
+                Intent i = getActivity().getBaseContext().getPackageManager() .getLaunchIntentForPackage(getActivity().getBaseContext().getPackageName());
+                i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP); i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                startActivity(i);
+                getActivity().finish();
                 return true;
             }
         });
@@ -171,6 +195,7 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Activi
     public void onActivityResult(Object result) {
 
     }
+
     String getOutputPath() {
         Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT);
         intent.addCategory(Intent.CATEGORY_OPENABLE);

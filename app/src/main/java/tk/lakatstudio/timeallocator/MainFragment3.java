@@ -78,7 +78,7 @@ public class MainFragment3 extends Fragment {
             regimeList.setVisibility(View.VISIBLE);
         }
         ArrayList<Regime> regimeArrayList = new ArrayList<>(Regime.allRegimes.values());
-        for(Regime regime : regimeArrayList){
+        for(Regime regime : new ArrayList<>(regimeArrayList)){
             if(regime.toDelete){
                 regimeArrayList.remove(regime);
             }
@@ -167,7 +167,7 @@ public class MainFragment3 extends Fragment {
 
 
     void regimeDialog(Regime regime){
-        final AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+        final AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
         View dialogView = getLayoutInflater().inflate(R.layout.regime_add_dialog, null);
         final TextInputLayout nameEditTextParent = dialogView.findViewById(R.id.addRegimeEditNameField);
         final EditText nameEditText = dialogView.findViewById(R.id.addRegimeEditName);
@@ -356,8 +356,6 @@ public class MainFragment3 extends Fragment {
             });
         }
 
-        //TODO disclaimers, suggestions when scheduleItems overlap
-
         done.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -443,6 +441,7 @@ class ScheduleAdapter extends RecyclerView.Adapter<ScheduleAdapter.ViewHolder> {
             scheduleEnd.setVisibility(View.INVISIBLE);
             view.findViewById(R.id.scheduleTextView5).setVisibility(View.INVISIBLE);
             view.findViewById(R.id.scheduleTextView4).setVisibility(View.INVISIBLE);
+            view.findViewById(R.id.scheduleTextView6).setVisibility(View.INVISIBLE);
             //scheduleEnd.setText(R.string.regime_dialog_schedule_forever);
         } else {
             scheduleStart.setText(simpleDateFormat.format(scheduleItem.start));

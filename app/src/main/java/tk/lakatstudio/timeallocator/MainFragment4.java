@@ -91,6 +91,7 @@ public class MainFragment4 extends Fragment {
                         switch (which){
                             case DialogInterface.BUTTON_POSITIVE:
                                 ActivityType.allActivityTypes.remove(activityTypes.get(i).ID);
+                                activityTypes.remove(i);
                                 pickerAdapter.notifyDataSetChanged();
                                 break;
                             case DialogInterface.BUTTON_NEGATIVE:
@@ -169,6 +170,9 @@ public class MainFragment4 extends Fragment {
             @Override
             public void onClick(View view) {
                 if(nameEditText.getText().length() > 0) {
+                    if(activityType.name == null){
+                        pickerAdapter.add(activityType);
+                    }
                     activityType.name = nameEditText.getText().toString();
                     activityType.color = selectedColor;
                     if (editTimeText.getText().length() > 0) {
